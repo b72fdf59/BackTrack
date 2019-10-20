@@ -1,0 +1,64 @@
+body{
+    font-family: 'Barlow', sans-serif;
+}
+
+.nav-sidebar{
+    margin: 70px -20px 20px 20px;
+}
+
+.nav-sidebar >li >a{
+    padding: 20px 20px;
+}
+
+.main{
+    margin-top: 50px;
+    padding: 20px;
+}
+
+.placeholders{
+    margin-top: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.placeholder{
+    margin-bottom: 20px;
+}
+
+.placeholder img{
+    display: inline;
+    border-radius: 20%;
+}
+
+.dropdown-toggle{
+    text-align: left;
+    width: 210px;
+    height: 58px;
+    padding-top: 20px;
+    padding-left: 20px;
+    position: relative;
+    right: 15.5px;
+    color: cornflowerblue;
+    display: block;
+}
+
+#A {
+    padding-top: 18px;
+}
+
+#X{
+    font-size: 100px;
+    text-align: center;
+    margin: 0 auto;
+    padding-top: 100px;
+}
+
+h2{
+    text-align: center;
+}
+
+footer > p{
+    font-size: 16px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
