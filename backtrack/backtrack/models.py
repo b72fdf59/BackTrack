@@ -8,17 +8,19 @@ class ProductBacklog(models.Model):
     project = models.ForeignKey('Project', on_delete=models.CASCADE)
 
     class Meta:
+        db_table = "Product Backlog"
         constraints = [
             models.UniqueConstraint(
-                fields=['Project', 'PBI'], name="project_PBI")
+                fields=['project', 'PBI'], name="project_PBI")
         ]
 
 
 class PBI(models.Model):
     status = models.CharField(max_length=1,
                               choices=[("N", "Not Done"), ("P", "In Progress"), ("D", "Done")], default="N")
-    story_points = models.PositiveSmallIntegerField()
-    effort_hours = models.PositiveSmallIntegerField()
+    story_points = models.FloatField()
+    effort_hours = models.FloatField()
+    summary = models.TextField(default = "None")
 
     class Meta:
         db_table = "PBI"
@@ -27,4 +29,7 @@ class PBI(models.Model):
 
 
 class Project(models.Model):
-    pass
+    name = models.CharField(max_length=256)
+
+    class Meta:
+        db_table = "Project"
