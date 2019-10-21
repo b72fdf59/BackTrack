@@ -30,6 +30,6 @@ class PBI(models.Model):
 
 class Project(models.Model):
     name = models.CharField(max_length=256)
-
+    
     class Meta:
         db_table = "Project"
