@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User, Group
+from backtrack.models import PBI
 from rest_framework import viewsets
-from .serializers import UserSerializer, GroupSerializer
+from .serializers import UserSerializer, GroupSerializer, PBISerializer
 from django.shortcuts import render
 from django.http import HttpResponse
 
@@ -11,6 +12,7 @@ def home(request):
 
 def pb(request):
     return render(request, 'backtrack/pb.html')
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -28,3 +30,9 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
+<<<<<<< HEAD
+=======
+class PBIViewSet(viewsets.ModelViewSet):
+    queryset = PBI.objects.all()
+    serializer_class = PBISerializer
+>>>>>>> poorva
