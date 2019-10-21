@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User, Group
+from backtrack.models import PBI
 from rest_framework import viewsets
-from .serializers import UserSerializer, GroupSerializer
+from .serializers import UserSerializer, GroupSerializer, PBISerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -17,3 +18,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
+class PBIViewSet(viewsets.ModelViewSet):
+    queryset = PBI.objects.all()
+    serializer_class = PBISerializer
