@@ -14,7 +14,6 @@ def pb(request):
     return render(request, 'backtrack/pb.html')
 
 
-
 class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows users to be viewed or edited.
@@ -30,9 +29,7 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
-<<<<<<< HEAD
-=======
+
 class PBIViewSet(viewsets.ModelViewSet):
     queryset = PBI.objects.all()
     serializer_class = PBISerializer
->>>>>>> poorva

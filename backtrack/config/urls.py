@@ -20,7 +20,6 @@ from rest_framework import routers
 from backtrack import views
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
-import backtrack
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
@@ -28,7 +27,7 @@ router.register(r'groups', views.GroupViewSet)
 router.register(r'product-backlog', views.PBIViewSet)
 
 urlpatterns = [
-    path('', include(backtrack.urls)),
+    path('', include('backtrack.urls')),
     path('project/', include(router.urls)),
     path('admin/', admin.site.urls, name='admin'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
