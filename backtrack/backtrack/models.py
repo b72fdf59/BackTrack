@@ -20,7 +20,8 @@ class PBI(models.Model):
                               choices=[("N", "Not Done"), ("P", "In Progress"), ("D", "Done")], default="N")
     story_points = models.FloatField()
     effort_hours = models.FloatField()
-    summary = models.TextField(default = "None")
+    summary = models.TextField(default = None)
+    priority = models.IntegerField(default=0)
 
     class Meta:
         db_table = "PBI"
