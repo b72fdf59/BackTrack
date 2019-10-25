@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.renderers import TemplateHTMLRenderer
 
-class LoginView(APIView):
+class HomeView(APIView):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'backtrack/home.html'
 
