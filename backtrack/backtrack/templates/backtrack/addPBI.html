@@ -1,13 +1,8 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
-    <h1 class="page-header"><i class="fa fa-edit" id="A"></i> Edit </h1>
+    <h1 class="page-header"><i class="fa fa-plus" id="A"></i> Add </h1>
     <div class="row placeholders"></div>
     <form>
-       <div class="form-group">
-           <label for="priority">Priority</label>
-           <input type="text" class="form-control" id="priority">
-           <small id="priority-small-text" class="form-text text-muted">This is the Product Backlog Priority for this PBI</small>
-       </div>
        <div class="form-group">
            <label for="priority">Summary</label>
            <input type="text" class="form-control" id="summary">
@@ -34,6 +29,5 @@
            <small id="priority-small-text" class="form-text text-muted">This is the Cumulative Effort hours for this PBI</small>
        </div>
        <button type="submit" class="btn btn-primary">Confirm</button>
-       <button type="submit" class="btn btn-danger">Delete</button>
     </form>
 {% endblock content %}

@@ -30,6 +30,13 @@ class PBIEditView(APIView):
     def get(self,request,pk):
         return Response({})
 
+class PBIAddView(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'backtrack/addPBI.html'
+
+    def get(self,request,pk):
+        return Response({})
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """

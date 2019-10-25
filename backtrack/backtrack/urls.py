@@ -7,6 +7,6 @@ urlpatterns = [
     path('', lambda x: redirect('1/'),name='home'),
     path('<int:pk>/', views.LoginView.as_view(),name = 'home-project'),
     path('<int:pk>/pb/', views.ProductBacklogView.as_view(),name='pb'),
-    path('<int:pk>/pb/add/', views.ProductBacklogView.as_view(),name='add'),
+    path('<int:pk>/pb/add/', views.PBIAddView.as_view(),name='add'),
     path('<int:pk>/pb/edit/', views.PBIEditView.as_view(),name='edit'),
 ]
