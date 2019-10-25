@@ -1,218 +1,117 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
-
-	<title>BackTrack - Product Backlog</title>
-    {% load staticfiles %}
-	<link rel="stylesheet" type="text/css" href="{% static 'backtrack/style.css' %}">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link href="https://fonts.googleapis.com/css?family=Barlow&display=swap" rel="stylesheet">
-
-</head>
-
-<body>
-<!--    Navbar starts here-->
-	<nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">BackTrack</a>
-        </div>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav">
-<!--            <li class="active"><a href="#"><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard <span class="sr-only">(current)</span></a></li>-->
-<!--            <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i> Settings</a></li>-->
-            <li><a href="#"><i class="fa fa-user" aria-hidden="true"></i> Profile</a></li>
-<!--            <li><a href="#"><i class="fa fa-question-circle" aria-hidden="true"></i> Help</a></li>-->
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-<!--            <li><a href="#"><i class="fa fa-user-plus" aria-hidden="true"></i> Add Users</a></li>-->
-<!--            <li><a href="#"><i class="fa fa-files-o" aria-hidden="true"></i> Add Categories</a></li>-->
-             <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i> Settings</a></li>
-          </ul>
-        </div><!-- /.navbar-collapse -->
-      </div><!-- /.container-fluid -->
-    </nav>
-<!--    Navbar ends here-->
-
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-3 col-md-2 sidebar">
-                <ul class="nav nav-sidebar">
-                    <li class="active"><a href="{% url 'home' %}">Home</a></li>
-                    <li><a href="{% url 'pb' %}">Product Backlog</a></li>
-<!--                    <li><a href="#">Sprint</a></li>-->
-                    <li>
-                        <div class="container">
-                            <div class="dropdown">
-                                <a class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" style="border:none;">Sprint
-                                    <span class="caret"></span></a>
-                                    <ul class="dropdown-menu">
-                                          <li class="dropdown-submenu">
-                                                <a class="test" tabindex="-1" href="#">Sprint 1 <span class="caret"></span></a>
-                                                    <ul class="dropdown-menu">
-                                                      <li><a tabindex="-1" href="#">Statistics</a></li>
-                                                      <li><a tabindex="-1" href="#">Information</a></li>
-                                                    </ul>
-                                          </li>
-                                    </ul>
-                            </div>
-                        </div>
-                    </li>
+{% extends "backtrack/base.html" %}
+{% block content %}
+    <h1 class="page-header"><i class="fa fa-file"></i> Product BackLog</h1>
+    <div class="row placeholders"></div>
+    <h2 class="sub-header">
+        <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle pull-left" type="button" data-toggle="dropdown">Filter By
+                <span class="caret"></span></button>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Priority</a></li>
+                    <li><a href="#">Story Points</a></li>
+                    <li><a href="#">Effort Hours</a></li>
                 </ul>
-            </div>
-            <div class="col-sm-9 col-md-10 main">
-                <h1 class="page-header"><i class="fa fa-file"></i> Product BackLog</h1>
-                <div class="row placeholders">
-                    
-                </div>
-                <h2 class="sub-header">
-                    <div class="dropdown">
-                        <button class="btn btn-light dropdown-toggle pull-left" type="button" data-toggle="dropdown">Filter By
-                            <span class="caret"></span></button>
-                            <ul class="dropdown-menu">
-                              <li><a href="#">Priority</a></li>
-                              <li><a href="#">Story Points</a></li>
-                              <li><a href="#">Effort Hours</a></li>
-                            </ul>
-                            <button type="button" class="btn btn-light"><i class="fa fa-plus" id="A"></i>ADD</button>
-                            <button type="button" class="btn btn-light"><i class="fa fa-times" id="A"></i>DELETE</button>
-                            <button type="button" class="btn btn-light"><i class="fa fa-edit" id="A"></i>EDIT</button>
-                    </div>
-                
-                
-                </h2>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th> </th>
-                                <th>Priority</th>
-                                <th>Summary</th>
-                                <th>Status</th>
-                                <th>Story Points</th>
-                                <th>Cumulative Story Points</th>
-                                <th>Effort hours</th>
-                                <th>Cumulative Effort hours</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>1</td>
-                                <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
-                                <td>In Progress</td>
-                                <td>10</td>
-                                <td>10</td>
-                                <td>5</td>
-                                <td>5</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>2</td>
-                                <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
-                                <td>In Progress</td>
-                                <td>10</td>
-                                <td>20</td>
-                                <td>5</td>
-                                <td>10</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>3</td>
-                                <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
-                                <td>Not Done</td>
-                                <td>10</td>
-                                <td>30</td>
-                                <td>5</td>
-                                <td>15</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>4</td>
-                                <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
-                                <td>Not Done</td>
-                                <td>10</td>
-                                <td>40</td>
-                                <td>5</td>
-                                <td>20</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>5</td>
-                                <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
-                                <td>Not Done</td>
-                                <td>10</td>
-                                <td>50</td>
-                                <td>5</td>
-                                <td>25</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>6</td>
-                                <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
-                                <td>Done</td>
-                                <td>10</td>
-                                <td>60</td>
-                                <td>5</td>
-                                <td>30</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>7</td>
-                                <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
-                                <td>Done</td>
-                                <td>10</td>
-                                <td>70</td>
-                                <td>5</td>
-                                <td>35</td>
-                            </tr>
-                            <tr>
-                                <td><input type="checkbox"></td>
-                                <td>8</td>
-                                <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
-                                <td>Done</td>
-                                <td>10</td>
-                                <td>80</td>
-                                <td>5</td>
-                                <td>40</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                <button type="button" class="btn btn-light"><i class="fa fa-plus" id="A"></i>ADD</button>
+                <button type="button" class="btn btn-light"><i class="fa fa-times" id="A"></i>DELETE</button>
+                <button type="button" class="btn btn-light"><i class="fa fa-edit" id="A"></i>EDIT</button>
         </div>
+    </h2>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th> </th>
+                    <th>Priority</th>
+                    <th>Summary</th>
+                    <th>Status</th>
+                    <th>Story Points</th>
+                    <th>Cumulative Story Points</th>
+                    <th>Effort hours</th>
+                    <th>Cumulative Effort hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>1</td>
+                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td>In Progress</td>
+                    <td>10</td>
+                    <td>10</td>
+                    <td>5</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>2</td>
+                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td>In Progress</td>
+                    <td>10</td>
+                    <td>20</td>
+                    <td>5</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>3</td>
+                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td>Not Done</td>
+                    <td>10</td>
+                    <td>30</td>
+                    <td>5</td>
+                    <td>15</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>4</td>
+                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td>Not Done</td>
+                    <td>10</td>
+                    <td>40</td>
+                    <td>5</td>
+                    <td>20</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>5</td>
+                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td>Not Done</td>
+                    <td>10</td>
+                    <td>50</td>
+                    <td>5</td>
+                    <td>25</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>6</td>
+                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td>Done</td>
+                    <td>10</td>
+                    <td>60</td>
+                    <td>5</td>
+                    <td>30</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>7</td>
+                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td>Done</td>
+                    <td>10</td>
+                    <td>70</td>
+                    <td>5</td>
+                    <td>35</td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>8</td>
+                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td>Done</td>
+                    <td>10</td>
+                    <td>80</td>
+                    <td>5</td>
+                    <td>40</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <footer>
-        <p class="pull-right"><i class="fa fa-arrow-circle-up" aria-hidden="true"></i> Move to Top</p>
-        <p>&copy; Pyre-m, 2019</p>
-    </footer>
-    
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
-	<script src="{% static 'backtrack/dropdown.js' %}">
-	</script>
-
-</body>
-
-</html>
+{% endblock content %}
