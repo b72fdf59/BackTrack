@@ -20,15 +20,17 @@ from rest_framework import routers
 from backtrack import views
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-router.register(r'', views.PBIViewSet)
+# router.register(r'', views.PBIViewSet)
 
 urlpatterns = [
-    path('', include('backtrack.urls')),
-    path('pb', include(router.urls)),
+    path('', lambda x: redirect('home/'), name='base'),
+    path('home/', include('backtrack.urls')),
+    path('rest/', include(router.urls)),
     path('admin/', admin.site.urls, name='admin'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
