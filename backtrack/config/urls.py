@@ -28,7 +28,7 @@ router.register(r'groups', views.GroupViewSet)
 # router.register(r'product-backlog', views.PBIViewSet)
 
 urlpatterns = [
-    path('', lambda x: redirect('home/'), name='base'),
+    path('', lambda x: redirect('accounts/login'), name='base'),
     path('home/', include('backtrack.urls')),
     path('rest/', include(router.urls)),
     path('admin/', admin.site.urls, name='admin'),
