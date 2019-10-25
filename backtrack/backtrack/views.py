@@ -12,7 +12,7 @@ class LoginView(APIView):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'backtrack/home.html'
 
-    def get(self,request):
+    def get(self,request,pk):
         return Response()
 
 
@@ -20,7 +20,7 @@ class ProductBacklogView(APIView):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'backtrack/pb.html'
 
-    def get(self,request):
+    def get(self,request,pk):
         return Response({})
 
 
@@ -40,6 +40,6 @@ class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
 
 
-class PBIViewSet(viewsets.ModelViewSet):
-    queryset = PBI.objects.all()
-    serializer_class = PBISerializer
+# class PBIViewSet(viewsets.ModelViewSet):
+#     queryset = PBI.objects.all()
+#     serializer_class = PBISerializer
