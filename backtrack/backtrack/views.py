@@ -17,6 +17,14 @@ class HomeView(APIView):
         return Response()
 
 
+class LoginView(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'backtrack/login.html'
+
+    def get(self, request, pk):
+        return Response()
+
+
 class ProductBacklogView(APIView):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'backtrack/pb.html'
@@ -24,11 +32,11 @@ class ProductBacklogView(APIView):
     def get(self, request, pk):
         data = []
         for id in ProductBacklog.objects.filter(
-            project_id=Project.objects.get(pk=pk)).values_list('PBI_id'):
+                project_id=Project.objects.get(pk=pk)).values_list('PBI_id'):
             obj = PBI.objects.get(pk=id[0])
             data.append(obj)
-        sorted(data, key = lambda x: (x.priority, x.summary))
-        sum_effort_hours , sum_story_points = 0, 0
+        sorted(data, key=lambda x: (x.priority, x.summary))
+        sum_effort_hours, sum_story_points = 0, 0
         for PBIObj in data:
             sum_effort_hours += PBIObj.effort_hours
             sum_story_points += PBIObj.story_points
@@ -37,6 +45,22 @@ class ProductBacklogView(APIView):
         context = {'data': data}
         print(data)
         return Response(context)
+
+
+class PBIEditView(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'backtrack/editPBI.html'
+
+    def get(self, request, pk):
+        return Response({})
+
+
+class PBIAddView(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'backtrack/addPBI.html'
+
+    def get(self, request, pk):
+        return Response({})
 
 
 class UserViewSet(viewsets.ModelViewSet):
