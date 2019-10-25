@@ -24,11 +24,11 @@ from django.http import HttpResponseRedirect
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
-router.register(r'product-backlog', views.PBIViewSet)
+router.register(r'', views.PBIViewSet)
 
 urlpatterns = [
     path('', include('backtrack.urls')),
-    path('project/', include(router.urls)),
+    path('pb', include(router.urls)),
     path('admin/', admin.site.urls, name='admin'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

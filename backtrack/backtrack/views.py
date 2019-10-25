@@ -1,17 +1,27 @@
 from django.contrib.auth.models import User, Group
-from backtrack.models import PBI
+from .models import PBI
 from rest_framework import viewsets
 from .serializers import UserSerializer, GroupSerializer, PBISerializer
 from django.shortcuts import render
+from rest_framework.response import Response
 from django.http import HttpResponse
+from rest_framework.views import APIView
+from rest_framework.renderers import TemplateHTMLRenderer
+
+class LoginView(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'backtrack/home.html'
+
+    def get(self,request):
+        return Response()
 
 
-def home(request):
-    return render(request, 'backtrack/home.html')
+class ProductBacklogView(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'backtrack/pb.html'
 
-
-def pb(request):
-    return render(request, 'backtrack/pb.html')
+    def get(self,request):
+        return Response({})
 
 
 class UserViewSet(viewsets.ModelViewSet):

@@ -1,11 +1,8 @@
 from django.urls import path, include
 from django.conf.urls import url
-from .views import home, pb
-
-from . import views
+from backtrack import views
 
 urlpatterns = [
-    url(r'^home/', views.home, name='home2'),
-    url(r'^pb/', views.pb, name='pb'),
-    url(r'^', views.home, name='home')
+    path('', views.LoginView.as_view(),name = 'home'),
+    path('pb/', views.ProductBacklogView.as_view(),name='pb'),
 ]
