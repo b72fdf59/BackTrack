@@ -32,9 +32,10 @@
             </thead>
             <tbody>
                 <tr>
+                    {% load staticfiles %}
                     <td><input type="checkbox"></td>
                     <td>1</td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td><a href="{% url 'edit' pk=1 %}" style="text-decoration: none; color: dimgrey">Lorem ipsum dolor sit amet, consectetur adipisicing.</a></td>
                     <td>In Progress</td>
                     <td>10</td>
                     <td>10</td>

@@ -23,6 +23,13 @@ class ProductBacklogView(APIView):
     def get(self,request,pk):
         return Response({})
 
+class PBIEditView(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'backtrack/editPBI.html'
+
+    def get(self,request,pk):
+        return Response({})
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """
