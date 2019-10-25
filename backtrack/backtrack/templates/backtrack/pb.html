@@ -11,9 +11,8 @@
                     <li><a href="#">Story Points</a></li>
                     <li><a href="#">Effort Hours</a></li>
                 </ul>
-                <button type="button" class="btn btn-light"><i class="fa fa-plus" id="A"></i>ADD</button>
+                <button type="button" class="btn btn-light" ><a href="{% url 'add' pk=1 %}" style="text-decoration: none; color: black"><i class="fa fa-plus" id="A"></i>ADD</a></button>
                 <button type="button" class="btn btn-light"><i class="fa fa-times" id="A"></i>DELETE</button>
-                <button type="button" class="btn btn-light"><i class="fa fa-edit" id="A"></i>EDIT</button>
         </div>
     </h2>
     <div class="table-responsive">
@@ -32,10 +31,9 @@
             </thead>
             <tbody>
                 <tr>
-                    {% load staticfiles %}
                     <td><input type="checkbox"></td>
                     <td>1</td>
-                    <td><a href="{% url 'edit' pk=1 %}" style="text-decoration: none; color: dimgrey">Lorem ipsum dolor sit amet, consectetur adipisicing.</a></td>
+                    <td><a href="{% url 'edit' pk=1 %}" style="text-decoration: none; color: black">Lorem ipsum dolor sit amet, consectetur adipisicing.</a></td>
                     <td>In Progress</td>
                     <td>10</td>
                     <td>10</td>
@@ -45,7 +43,7 @@
                 <tr>
                     <td><input type="checkbox"></td>
                     <td>2</td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td><a href="{% url 'edit' pk=1 %}" style="text-decoration: none; color: black">Lorem ipsum dolor sit amet, consectetur adipisicing.</a></td>
                     <td>In Progress</td>
                     <td>10</td>
                     <td>20</td>
@@ -55,7 +53,7 @@
                 <tr>
                     <td><input type="checkbox"></td>
                     <td>3</td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td><a href="{% url 'edit' pk=1 %}" style="text-decoration: none; color: black">Lorem ipsum dolor sit amet, consectetur adipisicing.</a></td>
                     <td>Not Done</td>
                     <td>10</td>
                     <td>30</td>
@@ -65,7 +63,7 @@
                 <tr>
                     <td><input type="checkbox"></td>
                     <td>4</td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td><a href="{% url 'edit' pk=1 %}" style="text-decoration: none; color: black">Lorem ipsum dolor sit amet, consectetur adipisicing.</a></td>
                     <td>Not Done</td>
                     <td>10</td>
                     <td>40</td>
@@ -75,7 +73,7 @@
                 <tr>
                     <td><input type="checkbox"></td>
                     <td>5</td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td><a href="{% url 'edit' pk=1 %}" style="text-decoration: none; color: black">Lorem ipsum dolor sit amet, consectetur adipisicing.</a></td>
                     <td>Not Done</td>
                     <td>10</td>
                     <td>50</td>
@@ -85,7 +83,7 @@
                 <tr>
                     <td><input type="checkbox"></td>
                     <td>6</td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td><a href="{% url 'edit' pk=1 %}" style="text-decoration: none; color: black">Lorem ipsum dolor sit amet, consectetur adipisicing.</a></td>
                     <td>Done</td>
                     <td>10</td>
                     <td>60</td>
@@ -95,7 +93,7 @@
                 <tr>
                     <td><input type="checkbox"></td>
                     <td>7</td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td><a href="{% url 'edit' pk=1 %}" style="text-decoration: none; color: black">Lorem ipsum dolor sit amet, consectetur adipisicing.</a></td>
                     <td>Done</td>
                     <td>10</td>
                     <td>70</td>
@@ -105,7 +103,7 @@
                 <tr>
                     <td><input type="checkbox"></td>
                     <td>8</td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+                    <td><a href="{% url 'edit' pk=1 %}" style="text-decoration: none; color: black">Lorem ipsum dolor sit amet, consectetur adipisicing.</a></td>
                     <td>Done</td>
                     <td>10</td>
                     <td>80</td>
