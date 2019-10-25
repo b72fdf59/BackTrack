@@ -15,7 +15,7 @@ class HomeView(APIView):
     def get(self,request,pk):
         return Response()
 
-class LoginnView(APIView):
+class LoginView(APIView):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'backtrack/login.html'
 

@@ -15,6 +15,7 @@
 </head>
 
 <body>
+{% if user.is_authenticated %}
 <!--    Navbar starts here-->
 	<nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
@@ -40,12 +41,14 @@
           <ul class="nav navbar-nav navbar-right">
 <!--            <li><a href="#"><i class="fa fa-user-plus" aria-hidden="true"></i> Add Users</a></li>-->
 <!--            <li><a href="#"><i class="fa fa-files-o" aria-hidden="true"></i> Add Categories</a></li>-->
-             <li><a href="#"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
+             <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
           </ul>
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
     </nav>
 <!--    Navbar ends here-->
+
+
 
     <div class="container-fluid">
         <div class="row">
@@ -97,7 +100,7 @@
         <p class="pull-right"><i class="fa fa-arrow-circle-up" aria-hidden="true"></i> Move to Top</p>
         <p>&copy; Pyre-m, 2019</p>
     </footer>
-
+    {% endif %}
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
