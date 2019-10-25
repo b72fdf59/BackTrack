@@ -7,6 +7,9 @@ class ProductBacklog(models.Model):
     PBI = models.ForeignKey('PBI', on_delete=models.CASCADE)
     project = models.ForeignKey('Project', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.project.name + " Product Backlog" 
+    
     class Meta:
         db_table = "Product Backlog"
         constraints = [
@@ -23,6 +26,9 @@ class PBI(models.Model):
     summary = models.TextField(default = None)
     priority = models.IntegerField(default=0)
 
+    def __str__(self):
+        return self.summary
+
     class Meta:
         db_table = "PBI"
         verbose_name = 'PBI'
@@ -32,5 +38,8 @@ class PBI(models.Model):
 class Project(models.Model):
     name = models.CharField(max_length=256)
     
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = "Project"

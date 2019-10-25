@@ -15,7 +15,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'name']
 
 
-class PBISerializer(serializers.HyperlinkedModelSerializer):
+class PBISerializer(serializers.ModelSerializer):
     class Meta:
         model = PBI
-        fields = ['url', 'summary', 'status', 'story_points', 'effort_hours','priority']
+        fields = [ 'summary', 'status', 'story_points', 'effort_hours','priority']
