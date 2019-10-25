@@ -1,0 +1,16 @@
+.center{
+  padding: 220px 0;
+  text-align: center;
+}
+
+.login_text{
+    font-size: 50px;
+    text-align: center;
+}
+
+#login_but{
+    margin-left: 74px;
+    width: 164px;
+}
+
+.login_ins{}

@@ -1,7 +1,26 @@
-<!-- templates/registration/login.html -->
-<h2>Login</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Login</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css">
+	<title>BackTrack - Login</title>
+    {% load staticfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'backtrack/loginstyle.css' %}">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css?family=Barlow&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="center">
+        <h2 class="login_text">Backtrack login</h2>
+        <br>
+        <div class="login_ins">
+            <form method="post" class="login_ins">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <br>
+                <button class="btn btn-success btn-lg" type="submit" id="login_but">Login</button>
+            </form>
+        </div>
+</body>
