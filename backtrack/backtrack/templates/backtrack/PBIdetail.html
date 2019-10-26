@@ -6,22 +6,22 @@
         {% csrf_token %}
         <div class="form-group">
            <label for="priority">Priority</label>
-           <input type="text" class="form-control" id="priority" name="priority" >
+           <input type="text" class="form-control" id="priority" name="priority" value={{PBI.priority}}>
            <small id="priority-small-text" class="form-text text-muted">This is the Product Backlog Priority for this PBI</small>
        </div>
        <div class="form-group">
            <label for="summary">Summary</label>
-           <input type="text" class="form-control" id="summary" name="summary">
+           <input type="text" class="form-control" id="summary" name="summary" value={{PBI.summary}}>
            <small id="priority-small-text" class="form-text text-muted">This is the summary for this PBI</small>
        </div>
        <div class="form-group">
            <label for="story-points">Story Points</label>
-           <input type="text" class="form-control" id="story-points" name="story-points">
+           <input type="text" class="form-control" id="story-points" name="story-points" value={{PBI.story_points}}>
            <small id="priority-small-text" class="form-text text-muted">This is the Story Points for this PBI</small>
        </div>
        <div class="form-group">
            <label for="effort-hours">Effort Hours</label>
-           <input type="text" class="form-control" id="effort-hours" name="effort-hours">
+           <input type="text" class="form-control" id="effort-hours" name="effort-hours" value={{PBI.effort_hours}}>
            <small id="priority-small-text" class="form-text text-muted">This is the Effort hours for this PBI</small>
        </div>
        <button type="submit" class="btn btn-primary">Confirm</button>
