@@ -9,17 +9,20 @@ from collections import OrderedDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-def getPBIfromProj(pk,all,post):
-    data =[]
+
+def getPBIfromProj(pk, all, post):
+    data = []
     for id in ProductBacklog.objects.filter(
-                project_id=get_object_or_404(Project, pk=pk)).values_list('PBI_id'):
-            obj = PBI.objects.get(pk=id[0])
-            #If post is true then do not count objects which 0 priority(which are finished), this is for when creating a new PBI
-            if post and obj.priority == 0:
-                continue
-            else:
-                data.append(obj)
+            project_id=get_object_or_404(Project, pk=pk)).values_list('PBI_id'):
+        obj = PBI.objects.get(pk=id[0])
+        # If post is true then do not count objects which 0 priority(which are finished), this is for when creating a new PBI
+        if post and obj.priority == 0:
+            continue
+        else:
+            data.append(obj)
     return data
+
+
 class HomeView(APIView):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'backtrack/home.html'
@@ -41,7 +44,7 @@ class ProductBacklogView(APIView):
     template_name = 'backtrack/pb.html'
 
     def get(self, request, pk):
-        data = getPBIfromProj(pk,True,False)
+        data = getPBIfromProj(pk, True, False)
         data = sorted(data, key=lambda x: (x.priority, x.summary))
         sum_effort_hours, sum_story_points = 0, 0
         for PBIObj in data:
@@ -50,7 +53,6 @@ class ProductBacklogView(APIView):
             PBIObj.sum_effort_hours = sum_effort_hours
             PBIObj.sum_story_points = sum_story_points
         context = {'data': data}
-        print(data)
         return Response(context)
 
 
@@ -62,12 +64,14 @@ class PBIAddEditView(APIView):
 
     def post(self, request, pk):
         data = request.data
-        PBIdata = getPBIfromProj(pk,False,True)
-        priority =  sorted(PBIdata, key=lambda x: (x.priority),reverse=True)[0].priority + 1
-        pbi = PBI(summary=data['summary'],effort_hours=data['effort-hours'],story_points=data['story-points'],priority=priority)
+        PBIdata = getPBIfromProj(pk, False, True)
+        priority = sorted(PBIdata, key=lambda x: (
+            x.priority), reverse=True)[0].priority + 1
+        pbi = PBI(summary=data['summary'], effort_hours=data['effort-hours'],
+                  story_points=data['story-points'], priority=priority)
         pbi.save()
-        ProductBacklog.objects.create(PBI_id=pbi.id,project_id=pk)
-        return redirect(reverse('pb',kwargs={'pk':pk}))
+        ProductBacklog.objects.create(PBI_id=pbi.id, project_id=pk)
+        return redirect(reverse('pb', kwargs={'pk': pk}))
 
 
 class PBIDetailView(APIView):
@@ -75,47 +79,56 @@ class PBIDetailView(APIView):
     template_name = 'backtrack/PBIdetail.html'
 
     def get(self, request, pk, pbipk):
-        pbi = get_object_or_404(PBI,pk=pbipk)
+        pbi = get_object_or_404(PBI, pk=pbipk)
         print(request.data)
-        return Response({"PBI":pbi})
-    
+        return Response({"PBI": pbi})
+
     def post(self, request, pk, pbipk):
         data = request.data
         pbi = PBI.objects.get(pk=pbipk)
 
-        #List all PBI with priority more and equal than post data priority
-        #and lesser than current PBI priority
-        PBIList = getPBIfromProj(pk,False,True)
+        # List all PBI with priority more and equal than post data priority
+        # and lesser than current PBI priority
+        PBIList = getPBIfromProj(pk, False, True)
         remove = []
-        print(int(data['priority']))
+        print(remove)
+        if int(data['priority']) < pbi.priority:
+            for PBIObj in PBIList:
+                if PBIObj.priority < int(data['priority']) or PBIObj.priority >= pbi.priority:
+                    remove.append(PBIObj.priority)
+            PBIList = [PBIObj for PBIObj in PBIList if PBIObj.priority not in remove]
+            # Increase each objects priority by one
+            for PBIObj in PBIList:
+                PBIObj.priority = PBIObj.priority + 1
+                PBIObj.save()
+        else:
+            for PBIObj in PBIList:
+                if PBIObj.priority <= pbi.priority or PBIObj.priority > int(data['priority']):
+                    remove.append(PBIObj.priority)
+            PBIList = [PBIObj for PBIObj in PBIList if PBIObj.priority not in remove]
+            for PBIObj in PBIList:
+                PBIObj.priority = PBIObj.priority - 1
+                PBIObj.save()
 
-        for PBIObj in PBIList:
-            if PBIObj.priority < int(data['priority']) or PBIObj.priority >= pbi.priority:
-                remove.append(PBIObj.priority)
-        PBIList = [PBIObj for PBIObj in PBIList if PBIObj.priority not in remove]
-
-        #Increase each objects priority by one
-        for PBIObj in PBIList:
-            PBIObj.priority = PBIObj.priority + 1
-            PBIObj.save()
-
-        #Update values and save the instance
+        # Update values and save the instance
         pbi.priority = data['priority']
         pbi.summary = data['summary']
         pbi.story_points = data['story-points']
         pbi.effort_hours = data['effort-hours']
         pbi.save()
 
-        #Redirect to product backlog
-        return redirect(reverse('pb',kwargs={'pk':pk}))
+        # Redirect to product backlog
+        return redirect(reverse('pb', kwargs={'pk': pk}))
+
 
 class PBIDeleteView(APIView):
     renderer_classes = [TemplateHTMLRenderer]
-    def get(self,request, pk, pbipk):
-        pbi = get_object_or_404(PBI,pk=pbipk)
+
+    def get(self, request, pk, pbipk):
+        pbi = get_object_or_404(PBI, pk=pbipk)
         pbi.delete()
-        return redirect(reverse('pb',kwargs={'pk':pk}))
-    
+        return redirect(reverse('pb', kwargs={'pk': pk}))
+
 
 class UserViewSet(viewsets.ModelViewSet):
     """
