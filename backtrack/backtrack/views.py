@@ -44,8 +44,9 @@ class ProductBacklogView(APIView):
     template_name = 'backtrack/pb.html'
 
     def get(self, request, pk):
+        import math
         data = getPBIfromProj(pk, True, False)
-        data = sorted(data, key=lambda x: (x.priority, x.summary))
+        data = sorted(data, key=lambda x: (x.priority if x.priority != 0 else math.inf, x.summary))
         sum_effort_hours, sum_story_points = 0, 0
         for PBIObj in data:
             sum_effort_hours += PBIObj.effort_hours
@@ -87,12 +88,11 @@ class PBIDetailView(APIView):
         data = request.data
         pbi = PBI.objects.get(pk=pbipk)
 
-        # List all PBI with priority more and equal than post data priority
-        # and lesser than current PBI priority
         PBIList = getPBIfromProj(pk, False, True)
         remove = []
-        print(remove)
         if int(data['priority']) < pbi.priority:
+            # Remove all PBI with priority higher than post data priority
+            # and lesser  or equal than current PBI priority
             for PBIObj in PBIList:
                 if PBIObj.priority < int(data['priority']) or PBIObj.priority >= pbi.priority:
                     remove.append(PBIObj.priority)
@@ -102,10 +102,13 @@ class PBIDetailView(APIView):
                 PBIObj.priority = PBIObj.priority + 1
                 PBIObj.save()
         else:
+            # Remove all PBI with priority higher than post PBI priority
+            # and lesser than and equal to Post data priority
             for PBIObj in PBIList:
                 if PBIObj.priority <= pbi.priority or PBIObj.priority > int(data['priority']):
                     remove.append(PBIObj.priority)
             PBIList = [PBIObj for PBIObj in PBIList if PBIObj.priority not in remove]
+            # Decrease each objects priority by one
             for PBIObj in PBIList:
                 PBIObj.priority = PBIObj.priority - 1
                 PBIObj.save()
