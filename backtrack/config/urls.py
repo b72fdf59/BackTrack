@@ -22,15 +22,10 @@ from django.shortcuts import redirect
 from django.http import HttpResponseRedirect, HttpRequest
 from django.urls import path, include
 
-router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
-# router.register(r'product-backlog', views.PBIViewSet)
 
 urlpatterns = [
     path('', lambda x: redirect('accounts/login') if not hasattr(HttpRequest,"user") else redirect('/home'), name='base'),
     path('home/', include('backtrack.urls')),
-    path('rest/', include(router.urls)),
     path('admin/', admin.site.urls, name='admin'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('accounts/', include('django.contrib.auth.urls')), 

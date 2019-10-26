@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User, Group
-from .models import PBI, Project, ProductBacklog
+from .models import PBI, Project
 from rest_framework import viewsets, generics
 from .serializers import UserSerializer, GroupSerializer, PBISerializer
 from rest_framework.response import Response
@@ -10,13 +10,14 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 
-def getPBIfromProj(pk, all, post):
-    data = []
-    for id in ProductBacklog.objects.filter(
-            project_id=get_object_or_404(Project, pk=pk)).values_list('PBI_id'):
-        obj = PBI.objects.get(pk=id[0])
-        # If post is true then do not count objects which 0 priority(which are finished), this is for when creating a new PBI
-        if post and obj.priority == 0 or not bool(int(all)) and obj.status == "D":
+def getPBIfromProj(pk, all):
+    from .models import PBI
+    data, pbiList = [], PBI.objects.filter(Project_id=pk)
+    print(bool(int(all)))
+    for pbi in pbiList:
+        obj = PBI.objects.get(pk=pbi.id)
+        # If all is true then do not count objects with status done(which are finished), this is for when creating a new PBI
+        if obj.status == "D" and (not bool(int(all))):
             continue
         else:
             data.append(obj)
@@ -46,9 +47,10 @@ class ProductBacklogView(APIView):
     def get(self, request, pk):
         import math
         query = request.query_params
-        print(query)
-        data = getPBIfromProj(pk, query['all'], False)
-        data = sorted(data, key=lambda x: (x.priority if x.priority != 0 else math.inf, x.summary))
+        # print(query['all'])
+        data = getPBIfromProj(pk, query['all'])
+        data = sorted(data, key=lambda x: (
+            x.priority if x.status != "D" else math.inf, x.summary))
         sum_effort_hours, sum_story_points = 0, 0
         for PBIObj in data:
             sum_effort_hours += PBIObj.effort_hours
@@ -59,7 +61,7 @@ class ProductBacklogView(APIView):
         return Response(context)
 
 
-class PBIAddEditView(APIView):
+class AddPBI(APIView):
     renderer_classes = [TemplateHTMLRenderer]
 
     def get(self, request, pk):
@@ -67,30 +69,39 @@ class PBIAddEditView(APIView):
 
     def post(self, request, pk):
         data = request.data
-        PBIdata = getPBIfromProj(pk, False, True)
-        priority = sorted(PBIdata, key=lambda x: (
-            x.priority), reverse=True)[0].priority + 1
+        PBIData = getPBIfromProj(pk, '0')
+
+        # Initialise Priority
+        priority = 0
+
+        # Sort According to Priority
+        PBIData = sorted(PBIData, key=lambda x: (
+            x.priority), reverse=True)
+
+        # If no Item in list make priority 1
+        if PBIData:
+            priority = PBIData[0].priority + 1
+        else:
+            priority = 1
         pbi = PBI(summary=data['summary'], effort_hours=data['effort-hours'],
-                  story_points=data['story-points'], priority=priority)
+                  story_points=data['story-points'], priority=priority, Project_id=pk)
         pbi.save()
-        ProductBacklog.objects.create(PBI_id=pbi.id, project_id=pk)
-        return redirect(reverse('pb', kwargs={'pk': pk}))
+        return redirect("{}?all=0".format(reverse('pb', kwargs={'pk': pk})))
 
 
-class PBIDetailView(APIView):
+class PBIDetailEdit(APIView):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'backtrack/PBIdetail.html'
 
     def get(self, request, pk, pbipk):
         pbi = get_object_or_404(PBI, pk=pbipk)
-        print(request.data)
         return Response({"PBI": pbi})
 
     def post(self, request, pk, pbipk):
         data = request.data
         pbi = PBI.objects.get(pk=pbipk)
 
-        PBIList = getPBIfromProj(pk, False, True)
+        PBIList = getPBIfromProj(pk, '0')
         remove = []
         if int(data['priority']) < pbi.priority:
             # Remove all PBI with priority higher than post data priority
@@ -98,10 +109,11 @@ class PBIDetailView(APIView):
             for PBIObj in PBIList:
                 if PBIObj.priority < int(data['priority']) or PBIObj.priority >= pbi.priority:
                     remove.append(PBIObj.priority)
-            PBIList = [PBIObj for PBIObj in PBIList if PBIObj.priority not in remove]
+            PBIList = [
+                PBIObj for PBIObj in PBIList if PBIObj.priority not in remove]
             # Increase each objects priority by one
             for PBIObj in PBIList:
-                PBIObj.priority = PBIObj.priority + 1
+                PBIObj.priority += 1
                 PBIObj.save()
         else:
             # Remove all PBI with priority higher than post PBI priority
@@ -109,10 +121,11 @@ class PBIDetailView(APIView):
             for PBIObj in PBIList:
                 if PBIObj.priority <= pbi.priority or PBIObj.priority > int(data['priority']):
                     remove.append(PBIObj.priority)
-            PBIList = [PBIObj for PBIObj in PBIList if PBIObj.priority not in remove]
+            PBIList = [
+                PBIObj for PBIObj in PBIList if PBIObj.priority not in remove]
             # Decrease each objects priority by one
             for PBIObj in PBIList:
-                PBIObj.priority = PBIObj.priority - 1
+                PBIObj.priority -= 1
                 PBIObj.save()
 
         # Update values and save the instance
@@ -123,32 +136,41 @@ class PBIDetailView(APIView):
         pbi.save()
 
         # Redirect to product backlog
-        return redirect(reverse('pb', kwargs={'pk': pk}))
+        return redirect("{}?all=0".format(reverse('pb', kwargs={'pk': pk})))
 
 
-class PBIDeleteView(APIView):
+
+class DeletePBI(APIView):
     renderer_classes = [TemplateHTMLRenderer]
 
-    def get(self, request, pk, pbipk):
-        pbi = get_object_or_404(PBI, pk=pbipk)
-        pbi.delete()
-        return redirect(reverse('pb', kwargs={'pk': pk}))
+    def post(self, request, pk, pbipk):
+        pbiList = getPBIfromProj(pk, '0')
+
+        pbiToDel = get_object_or_404(PBI, pk=pbipk)
+
+        for pbi in pbiList:
+            if pbi.priority > pbiToDel.priority:
+                pbi.priority -= 1
+                pbi.save()
+
+        pbiToDel.delete()
+        return redirect("{}?all=0".format(reverse('pb', kwargs={'pk': pk})))
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
+# class UserViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint that allows users to be viewed or edited.
+#     """
+#     queryset = User.objects.all().order_by('-date_joined')
+#     serializer_class = UserSerializer
 
 
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
+# class GroupViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint that allows groups to be viewed or edited.
+#     """
+#     queryset = Group.objects.all()
+#     serializer_class = GroupSerializer
 
 
 # class PBIViewSet(viewsets.ModelViewSet):

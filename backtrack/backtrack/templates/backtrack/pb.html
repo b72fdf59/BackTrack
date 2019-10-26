@@ -14,6 +14,10 @@
                     <li><a href="#">Story Points</a></li>
                     <li><a href="#">Effort Hours</a></li>
                 </ul>
+                <div class="btn-group btn-toggle"> 
+                    <button class="btn btn-xs btn-primary active toggle">NOT DONE</button>
+                    <button class="btn btn-xs btn-default toggle">ALL</button>
+                    </div>
                 <button type="button" class="btn btn-light" ><a href="{% url 'add' pk=1 %}" style="text-decoration: none; color: black"><i class="fa fa-plus" id="A"></i>ADD</a></button>
                 <button type="button" class="btn btn-light"><i class="fa fa-times" id="A"></i>DELETE</button>
         </div>
@@ -62,4 +66,31 @@
             </tbody>
         </table>
     </div>
+    <script>
+    $.urlParam = function (name) {
+            var results = new RegExp('[\?&]' + name + '=([^&#]*)')
+                      .exec(window.location.search);
+
+            return (results !== null) ? results[1] || 0 : false;
+        }
+    $(document).ready(function () {
+        if($.urlParam('all') == '1'){
+            $(this).find('.toggle').toggleClass('active');  
+    
+            if ($(this).find('.btn-primary').length>0) {
+    	        $(this).find('.toggle').toggleClass('btn-primary');
+            }
+        }
+        var getUrl = window.location;
+        var baseUrl = getUrl.protocol + "//" + getUrl.host + getUrl.pathname;
+        $('.btn-toggle').click(function(){
+            console.log($.urlParam('all') == '0')
+            if($.urlParam('all') == '0')
+                window.location.replace(baseUrl + "?all=1");
+            else
+                window.location.replace(baseUrl + "?all=0");
+        })
+
+    });
+    </script>
 {% endblock content %}

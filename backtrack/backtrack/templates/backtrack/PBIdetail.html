@@ -1,6 +1,6 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
-<h1 class="page-header"><i class="fa fa-plus" id="A"></i> Add </h1>
+<h1 class="page-header"><i class="fa fa-plus" id="A"></i> Edit </h1>
     <div class="row placeholders"></div>
     <form action={% url 'detail' pk=1 pbipk=PBI.id %} method="POST">
         {% csrf_token %}
@@ -11,7 +11,7 @@
        </div>
        <div class="form-group">
            <label for="summary">Summary</label>
-           <input type="text" class="form-control" id="summary" name="summary" value={{PBI.summary}}>
+           <textarea rows="5" class="form-control" id="summary" name="summary" >{{PBI.summary}}</textarea>
            <small id="priority-small-text" class="form-text text-muted">This is the summary for this PBI</small>
        </div>
        <div class="form-group">
@@ -24,7 +24,14 @@
            <input type="text" class="form-control" id="effort-hours" name="effort-hours" value={{PBI.effort_hours}}>
            <small id="priority-small-text" class="form-text text-muted">This is the Effort hours for this PBI</small>
        </div>
-       <button type="submit" class="btn btn-primary">Confirm</button>
-       <button type="submit" class="btn btn-danger"><a href="{% url 'delete' pk=1 pbipk=PBI.id %}" style="text-decoration: none; color: white">Delete</a></button>
+       {% if PBI.status != "D" %}
+            <button type="submit" class="btn btn-primary">Confirm</button>
+       {% endif %}
+    </form>
+    <form action="{% url 'delete' pk=1 pbipk=PBI.id %}" method="post">
+        {% csrf_token %}
+        {% if PBI.status != "D" %}
+            <button type="submit" class="btn btn-danger">Delete</button>
+       {% endif %}
     </form>
 {% endblock content %}
