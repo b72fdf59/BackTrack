@@ -8,6 +8,7 @@ urlpatterns = [
     path('<int:pk>/', views.HomeView.as_view(),name = 'home-project'),
     path('<int:pk>/pb/', views.ProductBacklogView.as_view(),name='pb'),
     path('<int:pk>/pb/add/', views.PBIAddEditView.as_view(),name='add'),
-    path('<int:pk>/pb/edit/', views.PBIEditView.as_view(),name='edit'),
+    path('<int:pk>/pb/<int:pbipk>/', views.PBIDetailView.as_view(),name='detail'),
+    path('<int:pk>/pb/<int:pbipk>/delete', views.PBIDeleteView.as_view(),name='delete'),
     # path('??',views.LoginView.as_view(),name='loginlanding'),
 ]

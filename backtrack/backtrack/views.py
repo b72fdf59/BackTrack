@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from .models import PBI, Project, ProductBacklog
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from .serializers import UserSerializer, GroupSerializer, PBISerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -14,7 +14,6 @@ def getPBIfromProj(pk,all,post):
     for id in ProductBacklog.objects.filter(
                 project_id=get_object_or_404(Project, pk=pk)).values_list('PBI_id'):
             obj = PBI.objects.get(pk=id[0])
-            print(obj.priority)
             if post and obj.priority == 0:
                 continue
             else:
@@ -65,16 +64,24 @@ class PBIAddEditView(APIView):
         pbi = PBI(summary=data['summary'],effort_hours=data['effort-hours'],story_points=data['story-points'],priority=len(PBIdata) + 1)
         pbi.save()
         ProductBacklog.objects.create(PBI_id=pbi.id,project_id=pk)
-        return redirect(reverse('pb',kwargs={'pk':1}))
+        return redirect(reverse('pb',kwargs={'pk':pk}))
 
 
-class PBIEditView(APIView):
+class PBIDetailView(APIView):
     renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'backtrack/editPBI.html'
+    template_name = 'backtrack/PBIdetail.html'
 
-    def get(self, request, pk):
-        return Response({})
+    def get(self, request, pk, pbipk):
+        pbi = get_object_or_404(PBI,pk=pbipk)
+        return Response({"PBI":pbi})
 
+class PBIDeleteView(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    def get(self,request, pk, pbipk):
+        pbi = get_object_or_404(PBI,pk=pbipk)
+        pbi.delete()
+        return redirect(reverse('pb',kwargs={'pk':pk}))
+    
 
 class UserViewSet(viewsets.ModelViewSet):
     """

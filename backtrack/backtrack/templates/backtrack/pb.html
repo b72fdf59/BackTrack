@@ -37,7 +37,7 @@
                     <tr>
                     <td><input type="checkbox"></td>
                     <td>{{PBI.priority}}</td>
-                    <td>{{PBI.summary}}</td>
+                    <td><a href={% url 'detail' pk=1 pbipk=PBI.id %}>{{PBI.summary}}</a></td>
                     <td>
                     {% if PBI.status == "N" %}
                         Not Done
