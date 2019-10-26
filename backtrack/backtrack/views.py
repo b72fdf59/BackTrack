@@ -16,7 +16,7 @@ def getPBIfromProj(pk, all, post):
             project_id=get_object_or_404(Project, pk=pk)).values_list('PBI_id'):
         obj = PBI.objects.get(pk=id[0])
         # If post is true then do not count objects which 0 priority(which are finished), this is for when creating a new PBI
-        if post and obj.priority == 0:
+        if post and obj.priority == 0 or not bool(int(all)) and obj.status == "D":
             continue
         else:
             data.append(obj)
@@ -45,7 +45,9 @@ class ProductBacklogView(APIView):
 
     def get(self, request, pk):
         import math
-        data = getPBIfromProj(pk, True, False)
+        query = request.query_params
+        print(query)
+        data = getPBIfromProj(pk, query['all'], False)
         data = sorted(data, key=lambda x: (x.priority if x.priority != 0 else math.inf, x.summary))
         sum_effort_hours, sum_story_points = 0, 0
         for PBIObj in data:
