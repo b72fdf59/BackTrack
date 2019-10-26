@@ -2,6 +2,9 @@
 {% block content %}
     <h1 class="page-header"><i class="fa fa-file"></i> Product BackLog</h1>
     <div class="row placeholders"></div>
+    {% if data|length == 0 %}
+        <h4>There are no PBIs</h4>
+    {% endif %}
     <h2 class="sub-header">
         <div class="dropdown">
             <button class="btn btn-light dropdown-toggle pull-left" type="button" data-toggle="dropdown">Filter By
@@ -49,9 +52,6 @@
                     <td>{{PBI.effort_hours}}</td>
                     <td>{{PBI.sum_effort_hours}}</td>
                     </tr>
-
-                {% empty %}
-                    <p>There are currently no PBIs</p>   
                 {% endfor %}
             </tbody>
         </table>

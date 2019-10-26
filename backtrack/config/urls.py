@@ -19,7 +19,7 @@ from django.conf import settings
 from rest_framework import routers
 from backtrack import views
 from django.shortcuts import redirect
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpRequest
 from django.urls import path, include
 
 router = routers.DefaultRouter()
@@ -28,7 +28,7 @@ router.register(r'groups', views.GroupViewSet)
 # router.register(r'product-backlog', views.PBIViewSet)
 
 urlpatterns = [
-    path('', lambda x: redirect('accounts/login'), name='base'),
+    path('', lambda x: redirect('accounts/login') if not hasattr(HttpRequest,"user") else redirect('/home'), name='base'),
     path('home/', include('backtrack.urls')),
     path('rest/', include(router.urls)),
     path('admin/', admin.site.urls, name='admin'),
