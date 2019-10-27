@@ -7,19 +7,19 @@
     {% endif %}
     <h2 class="sub-header">
         <div class="dropdown">
-            <button class="btn btn-light dropdown-toggle pull-left" type="button" data-toggle="dropdown">Filter By
+            <button class="btn btn-light dropdown-toggle pull-left" type="button" data-toggle="dropdown" style="margin-bottom: 10px;">Filter By
                 <span class="caret"></span></button>
                 <ul class="dropdown-menu">
                     <li><a href="#">Priority</a></li>
                     <li><a href="#">Story Points</a></li>
                     <li><a href="#">Effort Hours</a></li>
                 </ul>
-                <div class="btn-group btn-toggle"> 
+                <div class="btn-group btn-toggle">
                     <button class="btn btn-xs btn-primary active toggle">NOT DONE</button>
                     <button class="btn btn-xs btn-default toggle">ALL</button>
-                    </div>
-                <button type="button" class="btn btn-light" ><a href="{% url 'add' pk=1 %}" style="text-decoration: none; color: black"><i class="fa fa-plus" id="A"></i>ADD</a></button>
-                <button type="button" class="btn btn-light"><i class="fa fa-times" id="A"></i>DELETE</button>
+                </div>
+                <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><a href="{% url 'add' pk=1 %}" style="text-decoration: none; color: black"><i class="fa fa-plus" id="A"></i>ADD</a></button>
+                <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><i class="fa fa-times" id="A"></i>DELETE</button>
         </div>
     </h2>
     <div class="table-responsive">
@@ -47,7 +47,7 @@
                         --
                     {% endif %}
                     </td>
-                    <td><a href={% url 'detail' pk=1 pbipk=PBI.id %}>{{PBI.summary}}</a></td>
+                    <td><a style="text-decoration: none; color: cornflowerblue;" href={% url 'detail' pk=1 pbipk=PBI.id %}>{{PBI.summary}}</a></td>
                     <td>
                     {% if PBI.status == "N" %}
                         Not Done
