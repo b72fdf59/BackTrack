@@ -24,14 +24,14 @@
            <input type="text" class="form-control" id="effort-hours" name="effort-hours" value={{PBI.effort_hours}}>
            <small id="priority-small-text" class="form-text text-muted">This is the Effort hours for this PBI</small>
        </div>
-       {% if PBI.status != "D" %}
-            <button type="submit" class="btn btn-primary">Confirm</button>
+       {% if PBI.status == "N" %}
+            <button type="submit" class="btn btn-primary" style="height:2.4em;width:5em;text-align:center;">Confirm</button>
        {% endif %}
     </form>
-    <form action="{% url 'delete' pk=1 pbipk=PBI.id %}" method="post">
+    <form action="{% url 'delete' pk=1 pbipk=PBI.id %}" style="margin-top:10px;" method="post">
         {% csrf_token %}
-        {% if PBI.status != "D" %}
-            <button type="submit" class="btn btn-danger">Delete</button>
+        {% if PBI.status == "N" %}
+            <button type="submit" class="btn btn-danger" style="height:2.4em;width:5em;text-align: center;">Delete</button>
        {% endif %}
     </form>
 {% endblock content %}
