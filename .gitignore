@@ -1,3 +1,6 @@
 .vscode/settings.json
 /backtrack/db.sqlite3
 .pylintrc
+./backtrack/__pycache__/
+*.pyo
+*.pyc
