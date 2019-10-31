@@ -1,10 +1,7 @@
 from django.contrib.auth.models import User, Group
 from .models import PBI, Project
-from rest_framework import viewsets, generics
-from .serializers import UserSerializer, GroupSerializer, PBISerializer
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.renderers import TemplateHTMLRenderer, JSONRenderer
+from django.views import View
+from django.views.generic import TemplateView
 from collections import OrderedDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -13,7 +10,6 @@ from django.urls import reverse
 def getPBIfromProj(pk, all):
     from .models import PBI
     data, pbiList = [], PBI.objects.filter(Project_id=pk)
-    print(bool(int(all)))
     for pbi in pbiList:
         obj = PBI.objects.get(pk=pbi.id)
         # If all is true then do not count objects with status done(which are finished), this is for when creating a new PBI
@@ -24,31 +20,29 @@ def getPBIfromProj(pk, all):
     return data
 
 
-class HomeView(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
+class HomeView(TemplateView):
     template_name = 'backtrack/home.html'
 
-    def get(self, request, pk):
-        return Response()
+    def get_context_data(self, **kwargs):
+        context = {}
+        return context
 
 
-class LoginView(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
+class LoginView(TemplateView):
     template_name = 'backtrack/login.html'
 
-    def get(self, request, pk):
-        return Response()
+    def get_context_data(self, **kwargs):
+        context = {}
+        return context
 
 
-class ProductBacklogView(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
+class ProductBacklogView(TemplateView):
     template_name = 'backtrack/pb.html'
 
-    def get(self, request, pk):
+    def get_context_data(self, **kwargs):
         import math
-        query = request.query_params
-        # print(query['all'])
-        data = getPBIfromProj(pk, query['all'])
+        # query = request.query_params
+        data = getPBIfromProj(self.kwargs['pk'], self.request.GET['all'])
         data = sorted(data, key=lambda x: (
             x.priority if x.status != "D" else math.inf, x.summary))
         sum_effort_hours, sum_story_points = 0, 0
@@ -58,17 +52,17 @@ class ProductBacklogView(APIView):
             PBIObj.sum_effort_hours = sum_effort_hours
             PBIObj.sum_story_points = sum_story_points
         context = {'data': data}
-        return Response(context)
+        return context
 
 
-class AddPBI(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-
-    def get(self, request, pk):
-        return Response({}, template_name="backtrack/addPBI.html")
+class AddPBI(TemplateView):
+    template_name="backtrack/addPBI.html"
+    def get_context_data(self, **kwargs):
+        context = {}
+        return context
 
     def post(self, request, pk):
-        data = request.data
+        data = request.POST
         PBIData = getPBIfromProj(pk, '0')
 
         # Initialise Priority
@@ -89,16 +83,16 @@ class AddPBI(APIView):
         return redirect("{}?all=0".format(reverse('pb', kwargs={'pk': pk})))
 
 
-class PBIDetailEdit(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
+class PBIDetailEdit(TemplateView):
     template_name = 'backtrack/PBIdetail.html'
 
-    def get(self, request, pk, pbipk):
-        pbi = get_object_or_404(PBI, pk=pbipk)
-        return Response({"PBI": pbi})
+    def get_context_data(self, **kwargs):
+        pbi = get_object_or_404(PBI, pk=self.kwargs['pbipk'])
+        context = {"PBI": pbi}
+        return context
 
     def post(self, request, pk, pbipk):
-        data = request.data
+        data = request.POST
         pbi = PBI.objects.get(pk=pbipk)
 
         PBIList = getPBIfromProj(pk, '0')
@@ -140,8 +134,7 @@ class PBIDetailEdit(APIView):
 
 
 
-class DeletePBI(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
+class DeletePBI(View):
 
     def post(self, request, pk, pbipk):
         pbiList = getPBIfromProj(pk, '0')
@@ -155,24 +148,3 @@ class DeletePBI(APIView):
 
         pbiToDel.delete()
         return redirect("{}?all=0".format(reverse('pb', kwargs={'pk': pk})))
-
-
-# class UserViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows users to be viewed or edited.
-#     """
-#     queryset = User.objects.all().order_by('-date_joined')
-#     serializer_class = UserSerializer
-
-
-# class GroupViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows groups to be viewed or edited.
-#     """
-#     queryset = Group.objects.all()
-#     serializer_class = GroupSerializer
-
-
-# class PBIViewSet(viewsets.ModelViewSet):
-#     queryset = PBI.objects.all()
-#     serializer_class = PBISerializer

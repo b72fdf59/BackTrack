@@ -16,7 +16,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
-from rest_framework import routers
 from backtrack import views
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect, HttpRequest
@@ -27,7 +26,6 @@ urlpatterns = [
     path('', lambda x: redirect('accounts/login') if not hasattr(HttpRequest,"user") else redirect('/home'), name='base'),
     path('home/', include('backtrack.urls')),
     path('admin/', admin.site.urls, name='admin'),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('accounts/', include('django.contrib.auth.urls')), 
 ]
 
