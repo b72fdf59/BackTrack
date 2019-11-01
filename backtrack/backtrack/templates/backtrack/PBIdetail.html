@@ -4,24 +4,30 @@
     <div class="row placeholders"></div>
     <form action={% url 'detail' pk=1 pbipk=PBI.id %} method="POST">
         {% csrf_token %}
+       {{ form.non_field_errors }}
+        {% csrf_token %}
         <div class="form-group">
-           <label for="priority">Priority</label>
-           <input type="text" class="form-control" id="priority" name="priority" value={{PBI.priority}}>
+            {{form.priority.errors}}
+            {{form.priority.label_tag}}
+            {{form.priority}}
            <small id="priority-small-text" class="form-text text-muted">This is the Product Backlog Priority for this PBI</small>
        </div>
        <div class="form-group">
-           <label for="summary">Summary</label>
-           <textarea rows="5" class="form-control" id="summary" name="summary" >{{PBI.summary}}</textarea>
+            {{form.summary.errors}}
+            {{form.summary.label_tag}}
+            {{form.summary}}
            <small id="priority-small-text" class="form-text text-muted">This is the summary for this PBI</small>
        </div>
        <div class="form-group">
-           <label for="story-points">Story Points</label>
-           <input type="text" class="form-control" id="story-points" name="story-points" value={{PBI.story_points}}>
+            {{form.story_points.errors}}
+            {{form.story_points.label_tag}}
+            {{form.story_points}}
            <small id="priority-small-text" class="form-text text-muted">This is the Story Points for this PBI</small>
        </div>
        <div class="form-group">
-           <label for="effort-hours">Effort Hours</label>
-           <input type="text" class="form-control" id="effort-hours" name="effort-hours" value={{PBI.effort_hours}}>
+            {{form.effort_hours.errors}}
+            {{form.effort_hours.label_tag}}
+            {{form.effort_hours}}
            <small id="priority-small-text" class="form-text text-muted">This is the Effort hours for this PBI</small>
        </div>
        {% if PBI.status == "N" %}

@@ -1,10 +1,12 @@
-from django.contrib.auth.models import User, Group
 from .models import PBI, Project
+# from . import forms
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView, CreateView, UpdateView, DeleteView
 from collections import OrderedDict
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 
 def getPBIfromProj(pk, all):
@@ -20,7 +22,9 @@ def getPBIfromProj(pk, all):
     return data
 
 
-class HomeView(TemplateView):
+class HomeView(LoginRequiredMixin, TemplateView):
+    login_url = '/accounts/login'
+    redirect_field_name = '/home'
     template_name = 'backtrack/home.html'
 
     def get_context_data(self, **kwargs):
@@ -28,21 +32,15 @@ class HomeView(TemplateView):
         return context
 
 
-class LoginView(TemplateView):
-    template_name = 'backtrack/login.html'
-
-    def get_context_data(self, **kwargs):
-        context = {}
-        return context
-
-
-class ProductBacklogView(TemplateView):
+class ProductBacklogView(LoginRequiredMixin, TemplateView):
+    login_url = '/accounts/login'
+    redirect_field_name = '/home'
     template_name = 'backtrack/pb.html'
 
     def get_context_data(self, **kwargs):
         import math
         # query = request.query_params
-        data = getPBIfromProj(self.kwargs['pk'], self.request.GET['all'])
+        data = getPBIfromProj(kwargs['pk'], self.request.GET['all'] if 'all' in self.request.GET else '0')
         data = sorted(data, key=lambda x: (
             x.priority if x.status != "D" else math.inf, x.summary))
         sum_effort_hours, sum_story_points = 0, 0
@@ -55,53 +53,62 @@ class ProductBacklogView(TemplateView):
         return context
 
 
-class AddPBI(TemplateView):
-    template_name="backtrack/addPBI.html"
-    def get_context_data(self, **kwargs):
-        context = {}
-        return context
+class AddPBI(LoginRequiredMixin, CreateView):
+    model = PBI
+    fields = ['summary', 'story_points', 'effort_hours']
+    login_url = '/accounts/login'
+    redirect_field_name = '/home'
+    template_name = "backtrack/addPBI.html"
 
-    def post(self, request, pk):
-        data = request.POST
-        PBIData = getPBIfromProj(pk, '0')
+    def get_success_url(self):
+        return "{}?all=0".format(reverse('pb', kwargs={'pk': self.object.Project_id}))
 
+    def form_valid(self, form):
+        PBIData = getPBIfromProj(self.kwargs['pk'], '0')
         # Initialise Priority
         priority = 0
-
         # Sort According to Priority
         PBIData = sorted(PBIData, key=lambda x: (
             x.priority), reverse=True)
-
         # If no Item in list make priority 1
         if PBIData:
             priority = PBIData[0].priority + 1
         else:
             priority = 1
-        pbi = PBI(summary=data['summary'], effort_hours=data['effort-hours'],
-                  story_points=data['story-points'], priority=priority, Project_id=pk)
-        pbi.save()
-        return redirect("{}?all=0".format(reverse('pb', kwargs={'pk': pk})))
+        form.instance.priority = priority
+        form.instance.Project_id = self.kwargs['pk']
+        return super().form_valid(form)
 
 
-class PBIDetailEdit(TemplateView):
+class updatePBI(LoginRequiredMixin, UpdateView):
+    pk_url_kwarg = 'pbipk'
+    kwargs = {'pk_url_kwarg': 'pbipk'}
+    model = PBI
+    fields = ['priority', 'summary', 'story_points', 'effort_hours']
+    login_url = '/accounts/login'
+    redirect_field_name = '/home'
     template_name = 'backtrack/PBIdetail.html'
+    template_name_suffix = ''
 
     def get_context_data(self, **kwargs):
-        pbi = get_object_or_404(PBI, pk=self.kwargs['pbipk'])
-        context = {"PBI": pbi}
+        context = super().get_context_data(**kwargs)
+        context['PBI'] = self.object
+        print(context)
         return context
 
-    def post(self, request, pk, pbipk):
-        data = request.POST
-        pbi = PBI.objects.get(pk=pbipk)
+    def get_success_url(self):
+        return "{}?all=0".format(reverse('pb', kwargs={'pk': self.kwargs['pk']}))
 
-        PBIList = getPBIfromProj(pk, '0')
+    def form_valid(self, form):
+
+        PBIList = getPBIfromProj(self.kwargs['pk'], '0')
         remove = []
-        if int(data['priority']) < pbi.priority:
+        priorityData = form.cleaned_data['priority']
+        if int(priorityData) < self.object.priority:
             # Remove all PBI with priority higher than post data priority
             # and lesser  or equal than current PBI priority
             for PBIObj in PBIList:
-                if PBIObj.priority < int(data['priority']) or PBIObj.priority >= pbi.priority:
+                if PBIObj.priority < int(priorityData) or PBIObj.priority >= self.object.priority:
                     remove.append(PBIObj.priority)
             PBIList = [
                 PBIObj for PBIObj in PBIList if PBIObj.priority not in remove]
@@ -113,7 +120,7 @@ class PBIDetailEdit(TemplateView):
             # Remove all PBI with priority higher than post PBI priority
             # and lesser than and equal to Post data priority
             for PBIObj in PBIList:
-                if PBIObj.priority <= pbi.priority or PBIObj.priority > int(data['priority']):
+                if PBIObj.priority <= self.object.priority or PBIObj.priority > int(priorityData):
                     remove.append(PBIObj.priority)
             PBIList = [
                 PBIObj for PBIObj in PBIList if PBIObj.priority not in remove]
@@ -122,24 +129,21 @@ class PBIDetailEdit(TemplateView):
                 PBIObj.priority -= 1
                 PBIObj.save()
 
-        # Update values and save the instance
-        pbi.priority = data['priority']
-        pbi.summary = data['summary']
-        pbi.story_points = data['story-points']
-        pbi.effort_hours = data['effort-hours']
-        pbi.save()
-
-        # Redirect to product backlog
-        return redirect("{}?all=0".format(reverse('pb', kwargs={'pk': pk})))
+        return super().form_valid(form)
 
 
+class DeletePBI(LoginRequiredMixin, DeleteView):
+    model = PBI
+    login_url = '/accounts/login'
+    redirect_field_name = '/home'
 
-class DeletePBI(View):
+    def get_success_url(self):
+        return reverse_lazy('detail', kwargs={'pk': self.object.Project_id})
 
-    def post(self, request, pk, pbipk):
-        pbiList = getPBIfromProj(pk, '0')
+    def post(self, request, **kwargs):
+        pbiList = getPBIfromProj(kwargs['pk'], '0')
 
-        pbiToDel = get_object_or_404(PBI, pk=pbipk)
+        pbiToDel = get_object_or_404(PBI, pk=kwargs['pbipk'])
 
         for pbi in pbiList:
             if pbi.priority > pbiToDel.priority:
@@ -147,4 +151,4 @@ class DeletePBI(View):
                 pbi.save()
 
         pbiToDel.delete()
-        return redirect("{}?all=0".format(reverse('pb', kwargs={'pk': pk})))
+        return redirect("{}?all=0".format(reverse('pb', kwargs={'pk': kwargs['pk']})))
