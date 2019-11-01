@@ -2,7 +2,7 @@
 {% block content %}
 <h1 class="page-header"><i class="fa fa-plus" id="A"></i> Edit </h1>
     <div class="row placeholders"></div>
-    <form action={% url 'detail' pk=1 pbipk=PBI.id %} method="POST">
+    <form action={% url 'detail-pbi' pk=user.profile.project.id pbipk=PBI.id %} method="POST">
         {% csrf_token %}
        {{ form.non_field_errors }}
         {% csrf_token %}
@@ -34,7 +34,7 @@
             <button type="submit" class="btn btn-primary" style="height:2.4em;width:5em;text-align:center;">Confirm</button>
        {% endif %}
     </form>
-    <form action="{% url 'delete' pk=1 pbipk=PBI.id %}" style="margin-top:10px;" method="post">
+    <form action="{% url '-pbi' pk=user.profile.project.id pbipk=PBI.id %}" style="margin-top:10px;" method="post">
         {% csrf_token %}
         {% if PBI.status == "N" %}
             <button type="submit" class="btn btn-danger" style="height:2.4em;width:5em;text-align: center;">Delete</button>

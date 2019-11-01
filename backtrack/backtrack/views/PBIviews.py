@@ -1,4 +1,4 @@
-from .models import PBI, Project
+from ..models import PBI
 # from . import forms
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -10,8 +10,8 @@ from django.urls import reverse, reverse_lazy
 
 
 def getPBIfromProj(pk, all):
-    from .models import PBI
-    data, pbiList = [], PBI.objects.filter(Project_id=pk)
+    from ..models import PBI
+    data, pbiList = [], PBI.objects.filter(project_id=pk)
     for pbi in pbiList:
         obj = PBI.objects.get(pk=pbi.id)
         # If all is true then do not count objects with status done(which are finished), this is for when creating a new PBI
@@ -40,7 +40,8 @@ class ProductBacklogView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         import math
         # query = request.query_params
-        data = getPBIfromProj(kwargs['pk'], self.request.GET['all'] if 'all' in self.request.GET else '0')
+        data = getPBIfromProj(
+            kwargs['pk'], self.request.GET['all'] if 'all' in self.request.GET else '0')
         data = sorted(data, key=lambda x: (
             x.priority if x.status != "D" else math.inf, x.summary))
         sum_effort_hours, sum_story_points = 0, 0
@@ -61,7 +62,7 @@ class AddPBI(LoginRequiredMixin, CreateView):
     template_name = "backtrack/addPBI.html"
 
     def get_success_url(self):
-        return "{}?all=0".format(reverse('pb', kwargs={'pk': self.object.Project_id}))
+        return "{}?all=0".format(reverse('pb', kwargs={'pk': self.object.project.id}))
 
     def form_valid(self, form):
         PBIData = getPBIfromProj(self.kwargs['pk'], '0')
@@ -76,7 +77,7 @@ class AddPBI(LoginRequiredMixin, CreateView):
         else:
             priority = 1
         form.instance.priority = priority
-        form.instance.Project_id = self.kwargs['pk']
+        form.instance.project_id = self.kwargs['pk']
         return super().form_valid(form)
 
 
@@ -138,7 +139,7 @@ class DeletePBI(LoginRequiredMixin, DeleteView):
     redirect_field_name = '/home'
 
     def get_success_url(self):
-        return reverse_lazy('detail', kwargs={'pk': self.object.Project_id})
+        return reverse_lazy('pb', kwargs={'pk': self.object.project.id})
 
     def post(self, request, **kwargs):
         pbiList = getPBIfromProj(kwargs['pk'], '0')

@@ -1,0 +1,21 @@
+{% extends "backtrack/base.html" %}
+{% block content %}
+    <h1 class="page-header"><i class="fa fa-plus" id="A"></i> Add </h1>
+    <div class="row placeholders"></div>
+    <form action={% url 'create-project' %} method="POST">
+        {{ form.non_field_errors }}
+        {% csrf_token %}
+       <div class="form-group">
+            {{form.name.errors}}
+            {{form.name.label_tag}}
+            {{form.name}}
+           <small id="priority-small-text" class="form-text text-muted">This is the name for the project</small>
+       </div>
+       <button type="submit" class="btn btn-primary">Confirm</button>
+    </form>
+    <ul>
+    {% for user in users %}
+        <li>{{user}}</li>
+    {% endfor %}
+    </ul>
+{% endblock content %}

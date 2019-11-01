@@ -56,7 +56,8 @@
             <div class="col-sm-3 col-md-2 sidebar">
                 <ul class="nav nav-sidebar">
                     <li class="active"><a style="color: cornflowerblue;" href="{% url 'home' %}">Home</a></li>
-                    <li><a style="color: cornflowerblue;" href="{% url 'pb' pk=1%}?all=0">Product Backlog</a></li>
+                    {% if user.profile.project %}
+                         <li><a style="color: cornflowerblue;" href="{% url 'pb' pk=user.profile.id%}?all=0">Product Backlog</a></li>
 <!--                    <li><a href="#">Sprint</a></li>-->
                     <li>
                         <div class="container">
@@ -75,6 +76,7 @@
                             </div>
                         </div>
                     </li>
+                    {% endif %}
                 </ul>
             </div>
             <div class="col-sm-9 col-md-10 main">
@@ -82,25 +84,6 @@
             </div>
         </div>
     </div>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
 
     <footer class="pull-bottom">
         <p class="pull-right"><i class="fa fa-arrow-circle-up" aria-hidden="true"></i> Move to Top</p>

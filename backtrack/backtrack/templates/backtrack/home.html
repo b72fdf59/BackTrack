@@ -2,6 +2,12 @@
 {% block content %}
     <h1 class="page-header"><i class="fa fa-home"></i> Home </h1>
     <div class="row placeholders"></div>
-    <h1 id="X">Hello Joe !</h1>
+    <h1 id="X">Hello {{user.first_name}} !</h1>
     <h2>Welcome to your collaboration home.</h2>
+    {% if not user.profile.project %}
+    <h3 style="text-align:center;margin-top:3rem;">Start a Project Now!</h3>
+    <div style="text-align:center;margin-top:2rem;">
+        <a type="button" id="myButton" href={% url 'create-project' %} class="btn btn-primary">Start Project</a>
+    </div>
+    {% endif %}
 {% endblock content %}
