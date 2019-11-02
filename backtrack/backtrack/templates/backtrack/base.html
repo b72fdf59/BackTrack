@@ -56,8 +56,8 @@
             <div class="col-sm-3 col-md-2 sidebar">
                 <ul class="nav nav-sidebar">
                     <li class="active"><a style="color: cornflowerblue;" href="{% url 'home' %}">Home</a></li>
-                    {% if user.profile.project %}
-                         <li><a style="color: cornflowerblue;" href="{% url 'pb' pk=user.profile.id%}?all=0">Product Backlog</a></li>
+                    {% if user.projectParticipant %}
+                         <li><a style="color: cornflowerblue;" href="{% url 'pb' pk=Project.id %}?all=0">Product Backlog</a></li>
 <!--                    <li><a href="#">Sprint</a></li>-->
                     <li>
                         <div class="container">

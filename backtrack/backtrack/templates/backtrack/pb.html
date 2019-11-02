@@ -18,7 +18,7 @@
                     <button class="btn btn-xs btn-primary active toggle">NOT DONE</button>
                     <button class="btn btn-xs btn-default toggle">ALL</button>
                 </div>
-                <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><a href="{% url 'add-pbi' pk=user.profile.project.id %}" style="text-decoration: none; color: black"><i class="fa fa-plus" id="A"></i>ADD</a></button>
+                <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><a href="{% url 'add-pbi' pk=Project.id %}" style="text-decoration: none; color: black"><i class="fa fa-plus" id="A"></i>ADD</a></button>
                 <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><i class="fa fa-times" id="A"></i>DELETE</button>
         </div>
     </h2>
@@ -47,7 +47,7 @@
                         --
                     {% endif %}
                     </td>
-                    <td><a style="text-decoration: none; color: cornflowerblue;" href={% url 'detail-pbi' pk=user.profile.project.id pbipk=PBI.id %}>{{PBI.summary}}</a></td>
+                    <td><a style="text-decoration: none; color: cornflowerblue;" href={% url 'detail-pbi' pk=Project.id pbipk=PBI.id %}>{{PBI.summary}}</a></td>
                     <td>
                     {% if PBI.status == "N" %}
                         Not Done

@@ -28,7 +28,8 @@ class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'backtrack/home.html'
 
     def get_context_data(self, **kwargs):
-        context = {}
+        context = {"Project": self.request.user.projectParticipant.get(
+            project__complete=False)}
         return context
 
 
@@ -50,7 +51,8 @@ class ProductBacklogView(LoginRequiredMixin, TemplateView):
             sum_story_points += PBIObj.story_points
             PBIObj.sum_effort_hours = sum_effort_hours
             PBIObj.sum_story_points = sum_story_points
-        context = {'data': data}
+        context = {'data': data, "Project": self.request.user.projectParticipant.get(
+            project__complete=False)}
         return context
 
 
@@ -60,6 +62,12 @@ class AddPBI(LoginRequiredMixin, CreateView):
     login_url = '/accounts/login'
     redirect_field_name = '/home'
     template_name = "backtrack/addPBI.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['Project'] = self.request.user.projectParticipant.get(
+            project__complete=False)
+        return context
 
     def get_success_url(self):
         return "{}?all=0".format(reverse('pb', kwargs={'pk': self.object.project.id}))
@@ -94,7 +102,8 @@ class updatePBI(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['PBI'] = self.object
-        print(context)
+        context['Project'] = self.request.user.projectParticipant.get(
+            project__complete=False)
         return context
 
     def get_success_url(self):
@@ -102,14 +111,17 @@ class updatePBI(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
 
+        updatePBI = self.model.objects.get(pk=self.kwargs['pbipk'])
         PBIList = getPBIfromProj(self.kwargs['pk'], '0')
         remove = []
         priorityData = form.cleaned_data['priority']
-        if int(priorityData) < self.object.priority:
+        print(updatePBI.priority)
+        print(priorityData)
+        if int(priorityData) < updatePBI.priority:
             # Remove all PBI with priority higher than post data priority
             # and lesser  or equal than current PBI priority
             for PBIObj in PBIList:
-                if PBIObj.priority < int(priorityData) or PBIObj.priority >= self.object.priority:
+                if PBIObj.priority < int(priorityData) or PBIObj.priority >= updatePBI.priority:
                     remove.append(PBIObj.priority)
             PBIList = [
                 PBIObj for PBIObj in PBIList if PBIObj.priority not in remove]
@@ -121,7 +133,7 @@ class updatePBI(LoginRequiredMixin, UpdateView):
             # Remove all PBI with priority higher than post PBI priority
             # and lesser than and equal to Post data priority
             for PBIObj in PBIList:
-                if PBIObj.priority <= self.object.priority or PBIObj.priority > int(priorityData):
+                if PBIObj.priority <= updatePBI.priority or PBIObj.priority > int(priorityData):
                     remove.append(PBIObj.priority)
             PBIList = [
                 PBIObj for PBIObj in PBIList if PBIObj.priority not in remove]
