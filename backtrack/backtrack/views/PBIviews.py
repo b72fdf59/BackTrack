@@ -28,8 +28,13 @@ class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'backtrack/home.html'
 
     def get_context_data(self, **kwargs):
-        context = {"Project": self.request.user.projectParticipant.get(
-            project__complete=False)}
+        print("hello")
+
+        if self.request.user.projectParticipant.all().exists():
+            context = {"Project": self.request.user.projectParticipant.get(
+                project__complete=False)}
+        else:
+            context = {}
         return context
 
 
