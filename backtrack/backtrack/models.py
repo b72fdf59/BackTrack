@@ -73,3 +73,10 @@ class ProjectParticipant(models.Model):
         "SM", "Scrum Master"), ("PO", "Product Owner"), ("DT", "Development Team")])
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name="projectParticipant")
+    
+    # # Please add Dev Team through this method
+    # def add_dev_team(self, dev_team):
+    #     # Put logic to not allow more than 9 team members (Not sure if correct)
+    #     if self.projectParticipant.filter(role__exact="DT").user.count() >= 9:
+    #         raise Exception("Too many developers")
+    #     self.project_set.user = dev_team
