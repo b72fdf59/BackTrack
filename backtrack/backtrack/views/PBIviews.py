@@ -1,4 +1,4 @@
-from ..models import PBI
+from ..models import PBI, Project
 # from . import forms
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -28,13 +28,16 @@ class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'backtrack/home.html'
 
     def get_context_data(self, **kwargs):
-        print("hello")
 
         if self.request.user.projectParticipant.all().exists():
             context = {"Project": self.request.user.projectParticipant.get(
-                project__complete=False)}
+                project__complete=False).project,
+                "ProjectParticipant": self.request.user.projectParticipant.get(
+                project__complete=False)
+            }
         else:
             context = {}
+        print(context)
         return context
 
 
@@ -71,6 +74,8 @@ class AddPBI(LoginRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['Project'] = self.request.user.projectParticipant.get(
+            project__complete=False).project
+        context['ProjectParticipant'] = self.request.user.projectParticipant.get(
             project__complete=False)
         return context
 
@@ -78,6 +83,8 @@ class AddPBI(LoginRequiredMixin, CreateView):
         return "{}?all=0".format(reverse('pb', kwargs={'pk': self.object.project.id}))
 
     def form_valid(self, form):
+        print('permission', self.request.user._meta.permissions)
+        # print(self.request.user.projectParticipant.get(pk=kwargs['pk']))
         PBIData = getPBIfromProj(self.kwargs['pk'], '0')
         # Initialise Priority
         priority = 0
@@ -90,7 +97,9 @@ class AddPBI(LoginRequiredMixin, CreateView):
         else:
             priority = 1
         form.instance.priority = priority
-        form.instance.project_id = self.kwargs['pk']
+        # print(self.kwargs['pk'])
+        form.instance.project = get_object_or_404(
+            Project, pk=self.kwargs['pk'])
         return super().form_valid(form)
 
 
@@ -108,6 +117,8 @@ class updatePBI(LoginRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['PBI'] = self.object
         context['Project'] = self.request.user.projectParticipant.get(
+            project__complete=False).project
+        context['ProjectParticipant'] = self.request.user.projectParticipant.get(
             project__complete=False)
         return context
 
@@ -116,12 +127,11 @@ class updatePBI(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
 
+        print(self.request.user.permissions.get.all())
         updatePBI = self.model.objects.get(pk=self.kwargs['pbipk'])
         PBIList = getPBIfromProj(self.kwargs['pk'], '0')
         remove = []
         priorityData = form.cleaned_data['priority']
-        print(updatePBI.priority)
-        print(priorityData)
         if int(priorityData) < updatePBI.priority:
             # Remove all PBI with priority higher than post data priority
             # and lesser  or equal than current PBI priority

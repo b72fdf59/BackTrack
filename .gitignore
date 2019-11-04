@@ -1,4 +1,4 @@
-.vscode/settings.json
+.vscode/
 /backtrack/db.sqlite3
 .pylintrc
 ./backtrack/__pycache__/

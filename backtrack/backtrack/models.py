@@ -67,16 +67,19 @@ class Profile(models.Model):
     class Meta:
         db_table = "User Profile"
 
+
 class ProjectParticipant(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="projectParticipant")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="projectParticipant")
     role = models.CharField(max_length=2, choices=[(
         "SM", "Scrum Master"), ("PO", "Product Owner"), ("DT", "Development Team")])
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name="projectParticipant")
-    
-    # # Please add Dev Team through this method
-    # def add_dev_team(self, dev_team):
-    #     # Put logic to not allow more than 9 team members (Not sure if correct)
-    #     if self.projectParticipant.filter(role__exact="DT").user.count() >= 9:
-    #         raise Exception("Too many developers")
-    #     self.project_set.user = dev_team
+
+    class Meta:
+        unique_together = ['user', 'project']
+        # permissions=[]
+        # if role=="PO":
+        #     permissions= ['can add PBI', 'can edit PBI']
+        # else:
+        #     permissions= []

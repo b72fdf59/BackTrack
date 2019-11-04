@@ -132,3 +132,8 @@ INTERNAL_IPS = [
     '127.0.0.1'
 ]
 
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'pyrem.business@gmail.com'
+EMAIL_HOST_PASSWORD = '3Nov#12345'
+EMAIL_PORT = 587
