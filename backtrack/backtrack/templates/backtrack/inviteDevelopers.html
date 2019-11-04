@@ -1,0 +1,42 @@
+{% extends "backtrack/base.html" %}
+{% block content %}
+<div class="float-md-left" style="width: 500px;">
+    <ul class="list-group" style="margin-top: 2em;">
+        {% for user in users %}
+
+        <li class="list-group-item" style="margin-top: 2em;">
+            <div class="row">
+                <div class="col-xs-2">
+                    <h4>
+                        {{user}}
+                    </h4>
+                </div>
+                <div class="col-xs-10">
+                    <button type="button" class="btn btn-primary" id="{{user.id}}" style="float: right;">Send
+                        Invite</button>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.btn').click(function () {
+            if (this.id) {
+                const url = "{% url 'email-member' pk=projectID %}"
+                console.log(url)
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    data: {
+                        "id": this.id
+                    }
+
+                });
+            }
+        })
+    })
+</script>
+
+{% endblock content %}

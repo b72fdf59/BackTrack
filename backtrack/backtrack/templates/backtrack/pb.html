@@ -84,7 +84,6 @@
         var getUrl = window.location;
         var baseUrl = getUrl.protocol + "//" + getUrl.host + getUrl.pathname;
         $('.btn-toggle').click(function(){
-            console.log($.urlParam('all') == '0')
             if($.urlParam('all') == '0')
                 window.location.replace(baseUrl + "?all=1");
             else

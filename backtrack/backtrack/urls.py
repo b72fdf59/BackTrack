@@ -13,5 +13,11 @@ urlpatterns = [
     path('<int:pk>/pb/<int:pbipk>/delete',
          PBIviews.DeletePBI.as_view(), name='delete-pbi'),
     path('project/create', projectViews.CreateProject.as_view(),
-         name='create-project')
+         name='create-project'),
+    path('project/create/<int:pk>/inviteList', projectViews.InviteMember.as_view(),
+         name='invite-project-members'),
+         path('<int:pk>/inviteAccept', projectViews.EmailMember.as_view(),
+         name='email-member'),
+    path('project/create/<int:pk>/add/developer', projectViews.AddDeveloper.as_view(),
+         name='add-project-developer')
 ]
