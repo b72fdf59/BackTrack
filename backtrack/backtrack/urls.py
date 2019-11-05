@@ -1,6 +1,6 @@
 from django.urls import path
 from django.conf.urls import url
-from .views import PBIviews, projectViews
+from .views import PBIviews, projectViews, sprintViews
 from django.shortcuts import redirect
 
 urlpatterns = [
@@ -16,8 +16,12 @@ urlpatterns = [
          name='create-project'),
     path('project/create/<int:pk>/inviteList', projectViews.InviteMember.as_view(),
          name='invite-project-members'),
-         path('<int:pk>/inviteAccept', projectViews.EmailMember.as_view(),
+    path('<int:pk>/inviteAccept', projectViews.EmailMember.as_view(),
          name='email-member'),
     path('project/create/<int:pk>/add/developer', projectViews.AddDeveloper.as_view(),
-         name='add-project-developer')
+         name='add-project-developer'),
+    path('<int:pk>/create/sprint',
+         sprintViews.CreateSprint.as_view(), name='create-sprint'),
+    path('<int:pk>/<int:spk>/',
+         sprintViews.SprintDetail.as_view(), name='detail-sprint')
 ]

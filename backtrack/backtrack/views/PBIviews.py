@@ -19,7 +19,6 @@ def getPBIfromProj(pk, all):
             continue
         else:
             data.append(obj)
-    print(data)
     return data
 
 
@@ -35,7 +34,10 @@ class HomeView(LoginRequiredMixin, TemplateView):
                 project__complete=False).project,
                 "ProjectParticipant": self.request.user.projectParticipant.get(
                 project__complete=False)
+
             }
+            context['Sprints'] = self.request.user.projectParticipant.get(
+                project__complete=False).project.sprint.all()
         else:
             context = {}
         return context
@@ -62,6 +64,8 @@ class ProductBacklogView(LoginRequiredMixin, TemplateView):
         context = {'data': data, "Project": self.request.user.projectParticipant.get(
             project__complete=False), "ProjectParticipant": self.request.user.projectParticipant.get(
                 project__complete=False)}
+        context['Sprints'] = self.request.user.projectParticipant.get(
+            project__complete=False).project.sprint.all()
         return context
 
 
@@ -78,6 +82,8 @@ class AddPBI(LoginRequiredMixin, CreateView):
             project__complete=False).project
         context['ProjectParticipant'] = self.request.user.projectParticipant.get(
             project__complete=False)
+        context['Sprints'] = self.request.user.projectParticipant.get(
+            project__complete=False).project.sprint.all()
         return context
 
     def get_success_url(self):
@@ -96,7 +102,6 @@ class AddPBI(LoginRequiredMixin, CreateView):
         else:
             priority = 1
         form.instance.priority = priority
-        # print(self.kwargs['pk'])
         form.instance.project = get_object_or_404(
             Project, pk=self.kwargs['pk'])
         return super().form_valid(form)
@@ -119,6 +124,8 @@ class updatePBI(LoginRequiredMixin, UpdateView):
             project__complete=False).project
         context['ProjectParticipant'] = self.request.user.projectParticipant.get(
             project__complete=False)
+        context['Sprints'] = self.request.user.projectParticipant.get(
+            project__complete=False).project.sprint.all()
         return context
 
     def get_success_url(self):
@@ -174,4 +181,6 @@ class DeletePBI(LoginRequiredMixin, DeleteView):
             project__complete=False).project
         context['ProjectParticipant'] = self.request.user.projectParticipant.get(
             project__complete=False)
+        context['Sprints'] = self.request.user.projectParticipant.get(
+            project__complete=False).project.sprint.all()
         return context

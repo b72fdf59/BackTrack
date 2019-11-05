@@ -1,0 +1,28 @@
+{% extends "backtrack/base.html" %}
+{% block content %}
+<h1 class="page-header"><i class="fa fa-plus" id="A"></i> Add </h1>
+<div class="row placeholders"></div>
+<form action={% url 'create-sprint' pk=Project.id %} method="POST">
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    <div class="form-group">
+        {{form.capacity.errors}}
+        {{form.capacity.label_tag}}
+        {{form.capacity}}
+        <small id="priority-small-text" class="form-text text-muted">This is the name for the project</small>
+    </div>
+    <div class="form-group">
+        {{form.start.errors}}
+        {{form.start.label_tag}}
+        {{form.start}}
+        <small id="priority-small-text" class="form-text text-muted">This is the name for the project</small>
+    </div>
+    <div class="form-group">
+        {{form.end.errors}}
+        {{form.end.label_tag}}
+        {{form.end}}
+        <small id="priority-small-text" class="form-text text-muted">This is the name for the project</small>
+    </div>
+    <button type="submit" class="btn btn-primary">Confirm</button>
+</form>
+{% endblock content %}

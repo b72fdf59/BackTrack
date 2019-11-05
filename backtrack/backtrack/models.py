@@ -19,13 +19,13 @@ class PBI(models.Model):
     sprint = models.ForeignKey(
         'Sprint', on_delete=models.CASCADE, related_name='sprint', null=True, blank=True)
 
-    def delete(self,*args,**kwargs):
-        pbiList = self.project.pbi.all().exclude(status = "D")
+    def delete(self, *args, **kwargs):
+        pbiList = self.project.pbi.all().exclude(status="D")
         for pbi in pbiList:
             if pbi.priority > self.priority:
                 pbi.priority -= 1
                 pbi.save()
-        super().delete(*args,**kwargs)
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return self.summary
@@ -99,11 +99,16 @@ class Sprint(models.Model):
     capacity = models.FloatField()
     project = models.ForeignKey(
         'Project', on_delete=models.CASCADE, related_name='sprint')
-    start = models.DateTimeField(
+    start = models.DateField(
         auto_now=False, auto_now_add=False, blank=False)
-    end = models.DateTimeField(auto_now=False, auto_now_add=False, blank=False)
+    end = models.DateField(auto_now=False, auto_now_add=False, blank=False)
 
     @property
     def available(self):
-        now = datetime.now()
-        return now > start and now <= end 
+        from datetime import date
+        now = date.today()
+        return now > self.start and now <= self.end
+
+    def get_absolute_url(self):
+        return reverse("detail-sprint", kwargs={"pk": self.project_id, "spk": self.id})
+    

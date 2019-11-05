@@ -58,8 +58,11 @@
                     <li class="active"><a style="color: cornflowerblue;" href="{% url 'home' %}">Home</a></li>
                     {% if Project %}
                          <li><a style="color: cornflowerblue;" href="{% url 'pb' pk=Project.id %}?all=0">Product Backlog</a></li>
+                         {% for sprint in Sprints %}
+                            <li><a style="color: cornflowerblue;" href="{% url 'detail-sprint' pk=Project.id spk=sprint.id %}?all=0">Sprint {{forloop.counter}}</a></li>
+                         {% endfor %}
                          {% if ProjectParticipant.role == "DT"%}
-                            <li><a style="color: cornflowerblue;" href="#">Create Sprint</a></li>
+                            <li><a style="color: cornflowerblue;" href="{% url 'create-sprint' pk=Project.id %}">Create Sprint</a></li>
                         {% endif %}
                         {% if ProjectParticipant.role == "PO"%}
                             <li><a style="color: cornflowerblue;" href="{% url 'invite-project-members' pk=Project.id %}">Invite Members</a></li>
