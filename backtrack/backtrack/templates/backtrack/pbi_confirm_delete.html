@@ -1,0 +1,9 @@
+{% extends "backtrack/base.html" %}
+{% block content %}
+<span style="text-align: center; margin: auto;">
+    <form method="post">{% csrf_token %}
+        <h4>Are you sure you want to delete "{{ object }}"?</h4>
+        <input type="submit" value="Confirm" class="btn btn-danger">
+    </form>
+</span>
+{% endblock content %}

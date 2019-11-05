@@ -19,6 +19,7 @@ def getPBIfromProj(pk, all):
             continue
         else:
             data.append(obj)
+    print(data)
     return data
 
 
@@ -37,7 +38,6 @@ class HomeView(LoginRequiredMixin, TemplateView):
             }
         else:
             context = {}
-        print(context)
         return context
 
 
@@ -60,7 +60,8 @@ class ProductBacklogView(LoginRequiredMixin, TemplateView):
             PBIObj.sum_effort_hours = sum_effort_hours
             PBIObj.sum_story_points = sum_story_points
         context = {'data': data, "Project": self.request.user.projectParticipant.get(
-            project__complete=False)}
+            project__complete=False), "ProjectParticipant": self.request.user.projectParticipant.get(
+                project__complete=False)}
         return context
 
 
@@ -83,8 +84,6 @@ class AddPBI(LoginRequiredMixin, CreateView):
         return "{}?all=0".format(reverse('pb', kwargs={'pk': self.object.project.id}))
 
     def form_valid(self, form):
-        print('permission', self.request.user._meta.permissions)
-        # print(self.request.user.projectParticipant.get(pk=kwargs['pk']))
         PBIData = getPBIfromProj(self.kwargs['pk'], '0')
         # Initialise Priority
         priority = 0
@@ -126,8 +125,6 @@ class updatePBI(LoginRequiredMixin, UpdateView):
         return "{}?all=0".format(reverse('pb', kwargs={'pk': self.kwargs['pk']}))
 
     def form_valid(self, form):
-
-        print(self.request.user.permissions.get.all())
         updatePBI = self.model.objects.get(pk=self.kwargs['pbipk'])
         PBIList = getPBIfromProj(self.kwargs['pk'], '0')
         remove = []
@@ -161,22 +158,20 @@ class updatePBI(LoginRequiredMixin, UpdateView):
 
 
 class DeletePBI(LoginRequiredMixin, DeleteView):
+    template_name = 'backtrack/pbi_confirm_delete.html'
     model = PBI
     login_url = '/accounts/login'
     redirect_field_name = '/home'
+    pk_url_kwarg = 'pbipk'
 
     def get_success_url(self):
-        return reverse_lazy('pb', kwargs={'pk': self.object.project.id})
+        return "{}?all=0".format(reverse('pb', kwargs={'pk': self.object.project.id}))
 
-    def post(self, request, **kwargs):
-        pbiList = getPBIfromProj(kwargs['pk'], '0')
-
-        pbiToDel = get_object_or_404(PBI, pk=kwargs['pbipk'])
-
-        for pbi in pbiList:
-            if pbi.priority > pbiToDel.priority:
-                pbi.priority -= 1
-                pbi.save()
-
-        pbiToDel.delete()
-        return redirect("{}?all=0".format(reverse('pb', kwargs={'pk': kwargs['pk']})))
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['PBI'] = self.object
+        context['Project'] = self.request.user.projectParticipant.get(
+            project__complete=False).project
+        context['ProjectParticipant'] = self.request.user.projectParticipant.get(
+            project__complete=False)
+        return context

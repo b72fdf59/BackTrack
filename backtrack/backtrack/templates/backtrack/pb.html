@@ -18,53 +18,65 @@
                     <button class="btn btn-xs btn-primary active toggle">NOT DONE</button>
                     <button class="btn btn-xs btn-default toggle">ALL</button>
                 </div>
-                <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><a href="{% url 'add-pbi' pk=Project.id %}" style="text-decoration: none; color: black"><i class="fa fa-plus" id="A"></i>ADD</a></button>
-                <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><i class="fa fa-times" id="A"></i>DELETE</button>
+                {% if ProjectParticipant.role == "PO" %}
+                    <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><a href="{% url 'add-pbi' pk=Project.id %}" style="text-decoration: none; color: black"><i class="fa fa-plus" id="A"></i>ADD</a></button>
+                    <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><i class="fa fa-times" id="A"></i>DELETE</button>
+                {% endif %}
         </div>
     </h2>
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th> </th>
-                    <th>Priority</th>
-                    <th>Summary</th>
-                    <th>Status</th>
-                    <th>Story Points</th>
-                    <th>Cumulative Story Points</th>
-                    <th>Effort hours</th>
-                    <th>Cumulative Effort hours</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for PBI in data %}
-                    <tr>
-                    <td><input type="checkbox"></td>
-                    <td>
-                    {% if PBI.status == "N" %}
-                        {{PBI.priority}}
-                    {% else %}
-                        --
-                    {% endif %}
-                    </td>
-                    <td><a style="text-decoration: none; color: cornflowerblue;" href={% url 'detail-pbi' pk=Project.id pbipk=PBI.id %}>{{PBI.summary}}</a></td>
-                    <td>
-                    {% if PBI.status == "N" %}
-                        Not Done
-                    {% elif PBI.status == "P" %}
-                        In Progress
-                    {% else %}    
-                        Done
-                    {% endif %}
-                    </td>
-                    <td>{{PBI.story_points}}</td>
-                    <td>{{PBI.sum_story_points}}</td>
-                    <td>{{PBI.effort_hours}}</td>
-                    <td>{{PBI.sum_effort_hours}}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="row">
+            <div class="">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th> </th>
+                                <th>Priority</th>
+                                <th>Sprint</th>
+                                <th>Summary</th>
+                                <th>Status</th>
+                                <th>Story Points</th>
+                                <th>Cumulative Story Points</th>
+                                <th>Effort hours</th>
+                                <th>Cumulative Effort hours</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for PBI in data %}
+                                <tr>
+                                <td><input type="checkbox"></td>
+                                <td>
+                                {% if PBI.status == "N" %}
+                                    {{PBI.priority}}
+                                {% else %}
+                                    --
+                                {% endif %}
+                                </td>
+                                <td>
+                                    {% if PBI.sprint %}
+                                        {{PBI.sprint.count}}
+                                    {% else %}
+                                        --
+                                    {% endif %}
+                                </td>
+                                <td><a style="text-decoration: none; color: cornflowerblue;" href={% url 'detail-pbi' pk=Project.id pbipk=PBI.id %}>{{PBI.summary}}</a></td>
+                                <td>
+                                {% if PBI.status == "N" %}
+                                    Not Done
+                                {% elif PBI.status == "P" %}
+                                    In Progress
+                                {% else %}    
+                                    Done
+                                {% endif %}
+                                </td>
+                                <td>{{PBI.story_points}}</td>
+                                <td>{{PBI.sum_story_points}}</td>
+                                <td>{{PBI.effort_hours}}</td>
+                                <td>{{PBI.sum_effort_hours}}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
     </div>
     <script>
     $.urlParam = function (name) {

@@ -1,43 +1,44 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
 <h1 class="page-header"><i class="fa fa-plus" id="A"></i> Edit </h1>
-    <div class="row placeholders"></div>
-    <form action={% url 'detail-pbi' pk=Project.id pbipk=PBI.id %} method="POST">
-        {% csrf_token %}
-       {{ form.non_field_errors }}
-        {% csrf_token %}
-        <div class="form-group">
-            {{form.priority.errors}}
-            {{form.priority.label_tag}}
-            {{form.priority}}
-           <small id="priority-small-text" class="form-text text-muted">This is the Product Backlog Priority for this PBI</small>
-       </div>
-       <div class="form-group">
-            {{form.summary.errors}}
-            {{form.summary.label_tag}}
-            {{form.summary}}
-           <small id="priority-small-text" class="form-text text-muted">This is the summary for this PBI</small>
-       </div>
-       <div class="form-group">
-            {{form.story_points.errors}}
-            {{form.story_points.label_tag}}
-            {{form.story_points}}
-           <small id="priority-small-text" class="form-text text-muted">This is the Story Points for this PBI</small>
-       </div>
-       <div class="form-group">
-            {{form.effort_hours.errors}}
-            {{form.effort_hours.label_tag}}
-            {{form.effort_hours}}
-           <small id="priority-small-text" class="form-text text-muted">This is the Effort hours for this PBI</small>
-       </div>
-       {% if PBI.status == "N" %}
-            <button type="submit" class="btn btn-primary" style="height:2.4em;width:5em;text-align:center;">Confirm</button>
-       {% endif %}
-    </form>
-    <form action="{% url 'delete-pbi' pk=Project.id pbipk=PBI.id %}" style="margin-top:10px;" method="post">
-        {% csrf_token %}
-        {% if PBI.status == "N" %}
-            <button type="submit" class="btn btn-danger" style="height:2.4em;width:5em;text-align: center;">Delete</button>
-       {% endif %}
-    </form>
+<div class="row placeholders"></div>
+<form action={% url 'detail-pbi' pk=Project.id pbipk=PBI.id %} method="POST">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    <div class="form-group">
+        {{form.priority.errors}}
+        {{form.priority.label_tag}}
+        {{form.priority}}
+        <small id="priority-small-text" class="form-text text-muted">This is the Product Backlog Priority for this
+            PBI</small>
+    </div>
+    <div class="form-group">
+        {{form.summary.errors}}
+        {{form.summary.label_tag}}
+        {{form.summary}}
+        <small id="priority-small-text" class="form-text text-muted">This is the summary for this PBI</small>
+    </div>
+    <div class="form-group">
+        {{form.story_points.errors}}
+        {{form.story_points.label_tag}}
+        {{form.story_points}}
+        <small id="priority-small-text" class="form-text text-muted">This is the Story Points for this PBI</small>
+    </div>
+    <div class="form-group">
+        {{form.effort_hours.errors}}
+        {{form.effort_hours.label_tag}}
+        {{form.effort_hours}}
+        <small id="priority-small-text" class="form-text text-muted">This is the Effort hours for this PBI</small>
+    </div>
+    {% if PBI.status == "N" %}
+    <button type="submit" class="btn btn-primary" style="height:2.4em;width:5em;text-align:center;">Confirm</button>
+    {% endif %}
+</form>
+{% csrf_token %}
+{% if PBI.status == "N" %}
+<a id="Delete" href="{% url 'delete-pbi' pk=Project.id pbipk=PBI.id %}" type="submit" class="btn btn-danger"
+    style="height:2.4em;width:5em;text-align: center;">Delete</a>
+{% endif %}
+
 {% endblock content %}
