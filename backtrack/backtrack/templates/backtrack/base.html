@@ -59,7 +59,7 @@
                     {% if Project %}
                          <li><a style="color: cornflowerblue;" href="{% url 'pb' pk=Project.id %}?all=0">Product Backlog</a></li>
                          {% for sprint in Sprints %}
-                            <li><a style="color: cornflowerblue;" href="{% url 'detail-sprint' pk=Project.id spk=sprint.id %}?all=0">Sprint {{forloop.counter}}</a></li>
+                            <li><a style="color: cornflowerblue;" href="{% url 'detail-sprint' pk=Project.id spk=sprint.id %}">Sprint {{forloop.counter}}</a></li>
                          {% endfor %}
                          {% if ProjectParticipant.role == "DT"%}
                             <li><a style="color: cornflowerblue;" href="{% url 'create-sprint' pk=Project.id %}">Create Sprint</a></li>

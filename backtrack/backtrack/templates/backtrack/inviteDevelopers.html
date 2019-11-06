@@ -25,7 +25,7 @@
     $(document).ready(function () {
         $('.btn').click(function () {
             if (this.id) {
-                const url = "{% url 'email-member' pk=projectID %}"
+                const url = "{% url 'email-member' pk=Project.id %}"
                 console.log(url)
                 $.ajax({
                     type: "GET",

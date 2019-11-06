@@ -8,7 +8,7 @@ from ..models import Project, ProjectParticipant
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView, DeleteView, View, TemplateView
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from ..helpers import addContext
 
 class CreateProject(LoginRequiredMixin, CreateView):
     model = Project
@@ -35,14 +35,9 @@ class InviteMember(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = {}
         context['users'] = User.objects.filter(
-            projectParticipant__isnull=True).exclude(username=self.request.user.username)
-        context['projectID'] = kwargs['pk']
-        context['Project'] = self.request.user.projectParticipant.get(
-            project__complete=False).project
-        context['ProjectParticipant'] = self.request.user.projectParticipant.get(
-            project__complete=False)
-        context['Sprints'] = self.request.user.projectParticipant.get(
-            project__complete=False).project.sprint.all()
+        projectParticipant__isnull=True).exclude(username=self.request.user.username)
+        context = addContext(self,context)
+        print(context)
         return context
 
 

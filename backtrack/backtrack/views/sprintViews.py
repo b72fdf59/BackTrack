@@ -5,7 +5,7 @@ from ..forms import CreateSprintForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.contrib.auth.models import User
-
+from ..helpers import addContext
 
 class CreateSprint(LoginRequiredMixin, CreateView):
     model = Sprint
@@ -18,15 +18,7 @@ class CreateSprint(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['users'] = User.objects.filter(
-            projectParticipant__isnull=True).exclude(username=self.request.user.username)
-        context['projectID'] = self.kwargs['pk']
-        context['Project'] = self.request.user.projectParticipant.get(
-            project__complete=False).project
-        context['ProjectParticipant'] = self.request.user.projectParticipant.get(
-            project__complete=False)
-        context['Sprints'] = self.request.user.projectParticipant.get(
-            project__complete=False).project.sprint.all()
+        context = addContext(self,context)
         return context
 
     def form_valid(self, form):
@@ -47,13 +39,5 @@ class SprintDetail(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['users'] = User.objects.filter(
-            projectParticipant__isnull=True).exclude(username=self.request.user.username)
-        context['projectID'] = self.kwargs['pk']
-        context['Project'] = self.request.user.projectParticipant.get(
-            project__complete=False).project
-        context['ProjectParticipant'] = self.request.user.projectParticipant.get(
-            project__complete=False)
-        context['Sprints'] = self.request.user.projectParticipant.get(
-            project__complete=False).project.sprint.all()
+        context = addContext(self,context)
         return context

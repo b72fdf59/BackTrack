@@ -7,6 +7,7 @@ from django.views.generic import TemplateView, FormView, CreateView, UpdateView,
 from collections import OrderedDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from ..helpers import addContext
 
 
 def getPBIfromProj(pk, all):
@@ -27,17 +28,14 @@ class HomeView(LoginRequiredMixin, TemplateView):
     redirect_field_name = '/home'
     template_name = 'backtrack/home.html'
 
+    def get_redirect_field_name(self):
+        return reverse('home')
+
     def get_context_data(self, **kwargs):
 
         if self.request.user.projectParticipant.all().exists():
-            context = {"Project": self.request.user.projectParticipant.get(
-                project__complete=False).project,
-                "ProjectParticipant": self.request.user.projectParticipant.get(
-                project__complete=False)
-
-            }
-            context['Sprints'] = self.request.user.projectParticipant.get(
-                project__complete=False).project.sprint.all()
+            context = {}
+            context = addContext(self, context)
         else:
             context = {}
         return context
@@ -61,11 +59,8 @@ class ProductBacklogView(LoginRequiredMixin, TemplateView):
             sum_story_points += PBIObj.story_points
             PBIObj.sum_effort_hours = sum_effort_hours
             PBIObj.sum_story_points = sum_story_points
-        context = {'data': data, "Project": self.request.user.projectParticipant.get(
-            project__complete=False), "ProjectParticipant": self.request.user.projectParticipant.get(
-                project__complete=False)}
-        context['Sprints'] = self.request.user.projectParticipant.get(
-            project__complete=False).project.sprint.all()
+        context = {'data': data}
+        context = addContext(self, context)
         return context
 
 
@@ -78,12 +73,7 @@ class AddPBI(LoginRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['Project'] = self.request.user.projectParticipant.get(
-            project__complete=False).project
-        context['ProjectParticipant'] = self.request.user.projectParticipant.get(
-            project__complete=False)
-        context['Sprints'] = self.request.user.projectParticipant.get(
-            project__complete=False).project.sprint.all()
+        context = addContext(self, context)
         return context
 
     def get_success_url(self):
@@ -120,12 +110,7 @@ class updatePBI(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['PBI'] = self.object
-        context['Project'] = self.request.user.projectParticipant.get(
-            project__complete=False).project
-        context['ProjectParticipant'] = self.request.user.projectParticipant.get(
-            project__complete=False)
-        context['Sprints'] = self.request.user.projectParticipant.get(
-            project__complete=False).project.sprint.all()
+        context = addContext(self, context)
         return context
 
     def get_success_url(self):
@@ -177,10 +162,5 @@ class DeletePBI(LoginRequiredMixin, DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['PBI'] = self.object
-        context['Project'] = self.request.user.projectParticipant.get(
-            project__complete=False).project
-        context['ProjectParticipant'] = self.request.user.projectParticipant.get(
-            project__complete=False)
-        context['Sprints'] = self.request.user.projectParticipant.get(
-            project__complete=False).project.sprint.all()
+        context = addContext(self, context)
         return context
