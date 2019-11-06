@@ -1,6 +1,17 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
 <h1 class="page-header"><i class="fa fa-plus" id="A"></i> Add </h1>
+{% if messages %}
+<ul class="messages" style="padding:0;">
+    {% for message in messages %}
+    <div class="alert alert-danger alert-dismissible">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <li{% if message.tags %} class="{{ message.tags }}" {% endif %} style="list-style:none">{{ message }}</li>
+            {% endfor %}
+    </div>
+
+</ul>
+{% endif %}
 <div class="row placeholders"></div>
 <form action={% url 'create-sprint' pk=Project.id %} method="POST">
     {{ form.non_field_errors }}
@@ -9,19 +20,19 @@
         {{form.capacity.errors}}
         {{form.capacity.label_tag}}
         {{form.capacity}}
-        <small id="priority-small-text" class="form-text text-muted">This is the name for the project</small>
+        <small id="priority-small-text" class="form-text text-muted">This is the capactiy for the sprint</small>
     </div>
     <div class="form-group">
         {{form.start.errors}}
         {{form.start.label_tag}}
         {{form.start}}
-        <small id="priority-small-text" class="form-text text-muted">This is the name for the project</small>
+        <small id="priority-small-text" class="form-text text-muted">This is the start date for the sprint</small>
     </div>
     <div class="form-group">
         {{form.end.errors}}
         {{form.end.label_tag}}
         {{form.end}}
-        <small id="priority-small-text" class="form-text text-muted">This is the name for the project</small>
+        <small id="priority-small-text" class="form-text text-muted">This is the end date for the sprint</small>
     </div>
     <button type="submit" class="btn btn-primary">Confirm</button>
 </form>

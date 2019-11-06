@@ -1,5 +1,5 @@
 from ..models import PBI, Project
-# from . import forms
+from django.contrib import messages
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
@@ -8,6 +8,7 @@ from collections import OrderedDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from ..helpers import addContext
+from django.contrib.messages.views import SuccessMessageMixin
 
 
 def getPBIfromProj(pk, all):
@@ -25,11 +26,7 @@ def getPBIfromProj(pk, all):
 
 class HomeView(LoginRequiredMixin, TemplateView):
     login_url = '/accounts/login'
-    redirect_field_name = '/home'
     template_name = 'backtrack/home.html'
-
-    def get_redirect_field_name(self):
-        return reverse('home')
 
     def get_context_data(self, **kwargs):
 
@@ -43,7 +40,6 @@ class HomeView(LoginRequiredMixin, TemplateView):
 
 class ProductBacklogView(LoginRequiredMixin, TemplateView):
     login_url = '/accounts/login'
-    redirect_field_name = '/home'
     template_name = 'backtrack/pb.html'
 
     def get_context_data(self, **kwargs):
@@ -64,12 +60,12 @@ class ProductBacklogView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class AddPBI(LoginRequiredMixin, CreateView):
+class AddPBI(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = PBI
     fields = ['summary', 'story_points', 'effort_hours']
     login_url = '/accounts/login'
-    redirect_field_name = '/home'
     template_name = "backtrack/addPBI.html"
+    success_message = "PBI was created"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -97,15 +93,13 @@ class AddPBI(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class updatePBI(LoginRequiredMixin, UpdateView):
+class updatePBI(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     pk_url_kwarg = 'pbipk'
-    kwargs = {'pk_url_kwarg': 'pbipk'}
     model = PBI
     fields = ['priority', 'summary', 'story_points', 'effort_hours']
     login_url = '/accounts/login'
-    redirect_field_name = '/home'
     template_name = 'backtrack/PBIdetail.html'
-    template_name_suffix = ''
+    success_message = "PBI was updated"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -149,12 +143,12 @@ class updatePBI(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class DeletePBI(LoginRequiredMixin, DeleteView):
+class DeletePBI(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     template_name = 'backtrack/pbi_confirm_delete.html'
     model = PBI
     login_url = '/accounts/login'
-    redirect_field_name = '/home'
     pk_url_kwarg = 'pbipk'
+    success_message = "PBI was deteled"
 
     def get_success_url(self):
         return "{}?all=0".format(reverse('pb', kwargs={'pk': self.object.project.id}))
@@ -164,3 +158,7 @@ class DeletePBI(LoginRequiredMixin, DeleteView):
         context['PBI'] = self.object
         context = addContext(self, context)
         return context
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)

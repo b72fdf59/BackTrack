@@ -9,13 +9,16 @@ from django.views.generic import TemplateView, FormView, CreateView, UpdateView,
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.mixins import LoginRequiredMixin
 from ..helpers import addContext
+from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
 
-class CreateProject(LoginRequiredMixin, CreateView):
+
+class CreateProject(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Project
     fields = ['name']
     login_url = '/accounts/login'
     template_name = "backtrack/createProject.html"
-    # success_url=reverse('create-project-developer',kwargs={'pk':self.object.id})
+    success_message = "Project was created"
 
     def get_success_url(self):
         return reverse('invite-project-members', kwargs={'pk': self.object.id})
@@ -29,15 +32,14 @@ class CreateProject(LoginRequiredMixin, CreateView):
 
 
 class InviteMember(LoginRequiredMixin, TemplateView):
-    template_name = "backtrack/inviteDevelopers.html"
+    template_name = "backtrack/inviteMembers.html"
     login_url = '/accounts/login'
 
     def get_context_data(self, **kwargs):
         context = {}
         context['users'] = User.objects.filter(
-        projectParticipant__isnull=True).exclude(username=self.request.user.username)
-        context = addContext(self,context)
-        print(context)
+            projectParticipant__isnull=True).exclude(username=self.request.user.username)
+        context = addContext(self, context)
         return context
 
 
@@ -65,7 +67,6 @@ class EmailMember(LoginRequiredMixin, View):
 class AddDeveloper(LoginRequiredMixin, View):
     model = ProjectParticipant
     login_url = '/accounts/login'
-    redirect_field_name = '/home/'
 
     def get(self, request, *args, **kwargs):
         project = get_object_or_404(Project, pk=kwargs['pk'])
@@ -79,4 +80,5 @@ class AddDeveloper(LoginRequiredMixin, View):
                 raise Exception("You are already a part of a projects")
         else:
             raise Exception("This Project already has 9 developers")
+        messages.success(request, 'Successfully joined project')
         return redirect(reverse('home'))

@@ -1,5 +1,16 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
 <h4>Sprint Detail</h4>
+{% if messages %}
+<ul class="messages" style="padding:0;">
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <li{% if message.tags %} class="{{ message.tags }}" {% endif %} style="list-style:none">{{ message }}</li>
+            {% endfor %}
+    </div>
+
+</ul>
+{% endif %}
 
 {% endblock content %}

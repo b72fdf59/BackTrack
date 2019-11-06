@@ -6,29 +6,30 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.contrib.auth.models import User
 from ..helpers import addContext
+from django.contrib.messages.views import SuccessMessageMixin
+from django.http import HttpResponseRedirect
+from django.contrib import messages
 
-class CreateSprint(LoginRequiredMixin, CreateView):
+
+class CreateSprint(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Sprint
     form_class = CreateSprintForm
     template_name = "backtrack/createSprint.html"
     login_url = '/accounts/login'
-
-    # def get_success_url(self):
-    #     return reverse("detail-sprint", kwargs={"pk": self.instance.project.id, "spk": self.instance.id})
+    success_message = "Sprint was created"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = addContext(self,context)
+        context = addContext(self, context)
         return context
 
     def form_valid(self, form):
         project = get_object_or_404(Project, pk=self.kwargs['pk'])
         sprintList = project.sprint.all()
-        print(sprintList)
         for sprint in sprintList:
-            print(sprint.available)
             if sprint.available:
-                raise Exception("Sprint is already in Progress")
+                messages.error(self.request,'Sprint is in Progress')
+                return redirect(self.request.path_info)
         form.instance.project = project
         return super().form_valid(form)
 
@@ -39,5 +40,5 @@ class SprintDetail(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context = addContext(self,context)
+        context = addContext(self, context)
         return context

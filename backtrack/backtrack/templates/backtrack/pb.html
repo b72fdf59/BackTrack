@@ -1,117 +1,128 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
 <h1 class="page-header"><i class="fa fa-file"></i> Product BackLog</h1>
-<div class="row placeholders"></div>
-    {% if data|length == 0 %}
-    <h3>There are no PBIs</h3>
-    {% endif %}
-    <h2 class="sub-header">
-        <div class="dropdown">
-            <button class="btn btn-light dropdown-toggle pull-left" type="button" data-toggle="dropdown"
-                style="margin-bottom: 10px;">Filter By
-                <span class="caret"></span></button>
-            <ul class="dropdown-menu">
-                <li><a href="#">Priority</a></li>
-                <li><a href="#">Story Points</a></li>
-                <li><a href="#">Effort Hours</a></li>
-            </ul>
-            <div class="btn-group btn-toggle">
-                <button class="btn btn-xs btn-primary active toggle">NOT DONE</button>
-                <button class="btn btn-xs btn-default toggle">ALL</button>
-            </div>
-            {% if ProjectParticipant.role == "DT" %}
-                <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><a
-                    href="{% url 'add-pbi' pk=Project.id %}" style="text-decoration: none; color: black"><i
-                        class="fa fa-plus" id="A"></i>Add to Sprint</a></button>
-            {% endif %}
-            {% if ProjectParticipant.role == "PO" %}
-            <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><a
-                    href="{% url 'add-pbi' pk=Project.id %}" style="text-decoration: none; color: black"><i
-                        class="fa fa-plus" id="A"></i>ADD</a></button>
-            <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><i class="fa fa-times"
-                    id="A"></i>DELETE</button>
-            {% endif %}
-        </div>
-    </h2>
-    <div class="row">
-        <div class="">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th> </th>
-                        <th>Priority</th>
-                        <th>Sprint</th>
-                        <th>Summary</th>
-                        <th>Status</th>
-                        <th>Story Points</th>
-                        <th>Cumulative Story Points</th>
-                        <th>Effort hours</th>
-                        <th>Cumulative Effort hours</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for PBI in data %}
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td>
-                            {% if PBI.status == "N" %}
-                            {{PBI.priority}}
-                            {% else %}
-                            --
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if PBI.sprint %}
-                            {{PBI.sprint.count}}
-                            {% else %}
-                            --
-                            {% endif %}
-                        </td>
-                        <td><a style="text-decoration: none; color: cornflowerblue;"
-                                href={% url 'detail-pbi' pk=Project.id pbipk=PBI.id %}>{{PBI.summary}}</a></td>
-                        <td>
-                            {% if PBI.status == "N" %}
-                            Not Done
-                            {% elif PBI.status == "P" %}
-                            In Progress
-                            {% else %}
-                            Done
-                            {% endif %}
-                        </td>
-                        <td>{{PBI.story_points}}</td>
-                        <td>{{PBI.sum_story_points}}</td>
-                        <td>{{PBI.effort_hours}}</td>
-                        <td>{{PBI.sum_effort_hours}}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+{% if messages %}
+<ul class="messages" style="padding:0;">
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <li{% if message.tags %} class="{{ message.tags }}" {% endif %} style="list-style:none">{{ message }}</li>
+        {% endfor %}
     </div>
-    <script>
-        $.urlParam = function (name) {
-            var results = new RegExp('[\?&]' + name + '=([^&#]*)')
-                .exec(window.location.search);
 
-            return (results !== null) ? results[1] || 0 : false;
-        }
-        $(document).ready(function () {
-            if ($.urlParam('all') == '1') {
-                $(this).find('.toggle').toggleClass('active');
+</ul>
+{% endif %}
+<div class="row placeholders"></div>
+{% if data|length == 0 %}
+<h3>There are no PBIs</h3>
+{% endif %}
+<h2 class="sub-header">
+    <div class="dropdown">
+        <button class="btn btn-light dropdown-toggle pull-left" type="button" data-toggle="dropdown"
+            style="margin-bottom: 10px;">Filter By
+            <span class="caret"></span></button>
+        <ul class="dropdown-menu">
+            <li><a href="#">Priority</a></li>
+            <li><a href="#">Story Points</a></li>
+            <li><a href="#">Effort Hours</a></li>
+        </ul>
+        <div class="btn-group btn-toggle">
+            <button class="btn btn-xs btn-primary active toggle">NOT DONE</button>
+            <button class="btn btn-xs btn-default toggle">ALL</button>
+        </div>
+        {% if ProjectParticipant.role == "DT" %}
+        <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><a
+                href="{% url 'add-pbi' pk=Project.id %}" style="text-decoration: none; color: black"><i
+                    class="fa fa-plus" id="A"></i>Add to Sprint</a></button>
+        {% endif %}
+        {% if ProjectParticipant.role == "PO" %}
+        <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><a
+                href="{% url 'add-pbi' pk=Project.id %}" style="text-decoration: none; color: black"><i
+                    class="fa fa-plus" id="A"></i>ADD</a></button>
+        <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><i class="fa fa-times"
+                id="A"></i>DELETE</button>
+        {% endif %}
+    </div>
+</h2>
+<div class="row">
+    <div class="">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th> </th>
+                    <th>Priority</th>
+                    <th>Sprint</th>
+                    <th>Summary</th>
+                    <th>Status</th>
+                    <th>Story Points</th>
+                    <th>Cumulative Story Points</th>
+                    <th>Effort hours</th>
+                    <th>Cumulative Effort hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for PBI in data %}
+                <tr>
+                    <td><input type="checkbox"></td>
+                    <td>
+                        {% if PBI.status == "N" %}
+                        {{PBI.priority}}
+                        {% else %}
+                        --
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if PBI.sprint %}
+                        {{PBI.sprint.count}}
+                        {% else %}
+                        --
+                        {% endif %}
+                    </td>
+                    <td><a style="text-decoration: none; color: cornflowerblue;"
+                            href={% url 'detail-pbi' pk=Project.id pbipk=PBI.id %}>{{PBI.summary}}</a></td>
+                    <td>
+                        {% if PBI.status == "N" %}
+                        Not Done
+                        {% elif PBI.status == "P" %}
+                        In Progress
+                        {% else %}
+                        Done
+                        {% endif %}
+                    </td>
+                    <td>{{PBI.story_points}}</td>
+                    <td>{{PBI.sum_story_points}}</td>
+                    <td>{{PBI.effort_hours}}</td>
+                    <td>{{PBI.sum_effort_hours}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    $.urlParam = function (name) {
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)')
+            .exec(window.location.search);
 
-                if ($(this).find('.btn-primary').length > 0) {
-                    $(this).find('.toggle').toggleClass('btn-primary');
-                }
+        return (results !== null) ? results[1] || 0 : false;
+    }
+    $(document).ready(function () {
+        if ($.urlParam('all') == '1') {
+            $(this).find('.toggle').toggleClass('active');
+
+            if ($(this).find('.btn-primary').length > 0) {
+                $(this).find('.toggle').toggleClass('btn-primary');
             }
-            var getUrl = window.location;
-            var baseUrl = getUrl.protocol + "//" + getUrl.host + getUrl.pathname;
-            $('.btn-toggle').click(function () {
-                if ($.urlParam('all') == '0')
-                    window.location.replace(baseUrl + "?all=1");
-                else
-                    window.location.replace(baseUrl + "?all=0");
-            })
+        }
+        var getUrl = window.location;
+        var baseUrl = getUrl.protocol + "//" + getUrl.host + getUrl.pathname;
+        $('.btn-toggle').click(function () {
+            if ($.urlParam('all') == '0')
+                window.location.replace(baseUrl + "?all=1");
+            else
+                window.location.replace(baseUrl + "?all=0");
+        })
 
-        });
-    </script>
-    {% endblock content %}
+    });
+</script>
+{% endblock content %}

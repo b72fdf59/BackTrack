@@ -107,8 +107,9 @@ class Sprint(models.Model):
     def available(self):
         from datetime import date
         now = date.today()
-        return now > self.start and now <= self.end
+        print(self.end)
+        print(now <= self.end)
+        return now <= self.end
 
     def get_absolute_url(self):
         return reverse("detail-sprint", kwargs={"pk": self.project_id, "spk": self.id})
-    

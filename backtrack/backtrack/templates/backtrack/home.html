@@ -1,13 +1,24 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
-    <h1 class="page-header"><i class="fa fa-home"></i> Home </h1>
-    <div class="row placeholders"></div>
-    <h1 id="X">Hello {{user.first_name}} !</h1>
-    <h2>Welcome to your collaboration home.</h2>
-    {% if not Project %}
-    <h3 style="text-align:center;margin-top:3rem;">Start a Project Now!</h3>
-    <div style="text-align:center;margin-top:2rem;">
-        <a type="button" id="myButton" href={% url 'create-project' %} class="btn btn-primary">Start Project</a>
+<h1 class="page-header"><i class="fa fa-home"></i> Home </h1>
+{% if messages %}
+<ul class="messages" style="padding:0;">
+    {% for message in messages %}
+    <div class="alert alert-success alert-dismissible">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <li{% if message.tags %} class="{{ message.tags }}" {% endif %} style="list-style:none">{{ message }}</li>
+            {% endfor %}
     </div>
-    {% endif %}
+
+</ul>
+{% endif %}
+<div class="row placeholders"></div>
+<h1 id="X">Hello {{user.first_name}} !</h1>
+<h2>Welcome to your collaboration home.</h2>
+{% if not Project %}
+<h3 style="text-align:center;margin-top:3rem;">Start a Project Now!</h3>
+<div style="text-align:center;margin-top:2rem;">
+    <a type="button" id="myButton" href={% url 'create-project' %} class="btn btn-primary">Start Project</a>
+</div>
+{% endif %}
 {% endblock content %}
