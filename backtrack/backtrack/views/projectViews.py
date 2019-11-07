@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
@@ -49,19 +49,22 @@ class EmailMember(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         userID = self.request.GET['id']
         recipient_email = get_object_or_404(User, id=userID).email
-        username = self.request.user.username
-        name = User.objects.get(id=userID).username
-        fullPath = self.request.build_absolute_uri(
-            reverse('add-project-developer', kwargs={'pk': kwargs['pk']}))
-        link = "{}?id={}".format(
-            fullPath, userID)
-        subject = "Invitation to join new project"
-        message = "Dear {}, {} invites you to join a new project as a developer.\nClick on the link below to join the team.\n {}".format(
-            name, username, link)
-        from_email = settings.EMAIL_HOST_USER
-        send_mail(subject, message, from_email, [
-                  recipient_email], fail_silently=False)
-        return HttpResponse()
+        if recipient_email:
+            username = self.request.user.username
+            name = User.objects.get(id=userID).username
+            fullPath = self.request.build_absolute_uri(
+                reverse('add-project-developer', kwargs={'pk': kwargs['pk']}))
+            link = "{}?id={}".format(
+                fullPath, userID)
+            subject = "Invitation to join new project"
+            message = "Dear {}, {} invites you to join a new project as a developer.\nClick on the link below to join the team.\n {}".format(
+                name, username, link)
+            from_email = settings.EMAIL_HOST_USER
+            send_mail(subject, message, from_email, [
+                    recipient_email], fail_silently=False)
+            return HttpResponse()
+        else:
+            return HttpResponseForbidden("User does not have an email")
 
 
 class AddDeveloper(LoginRequiredMixin, View):

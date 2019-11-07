@@ -107,9 +107,25 @@ class Sprint(models.Model):
     def available(self):
         from datetime import date
         now = date.today()
-        print(self.end)
-        print(now <= self.end)
         return now <= self.end
 
     def get_absolute_url(self):
         return reverse("detail-sprint", kwargs={"pk": self.project_id, "spk": self.id})
+
+
+class Task(models.Model):
+    status = models.CharField(max_length=1,
+                              choices=[("N", "Not Done"), ("P", "In Progress"), ("D", "Done")], default="N")
+    story_points = models.FloatField()
+    effort_hours = models.FloatField()
+    summary = models.TextField(default=None)
+    pbi = models.ForeignKey(
+        'PBI', on_delete=models.CASCADE, related_name='task')
+    sprint = models.ForeignKey(
+        'Sprint', on_delete=models.CASCADE, related_name='task_sprint', null=True, blank=True)
+
+    def __str__(self):
+        return self.summary
+
+    class Meta:
+        db_table = "Task"
