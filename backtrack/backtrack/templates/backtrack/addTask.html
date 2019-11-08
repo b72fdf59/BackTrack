@@ -1,0 +1,22 @@
+{% extends "backtrack/base.html" %}
+{% block content %}
+    <h1 class="page-header"><i class="fa fa-plus" id="A"></i> Add Task</h1>
+    <div class="row placeholders"></div>
+    <form action={% url 'add-task' pk=Project.id spk=sprint.id%} method="POST">
+        {{ form.non_field_errors }}
+        {% csrf_token %}
+       <div class="form-group">
+            {{form.summary.errors}}
+            {{form.summary.label_tag}}
+            {{form.summary}}
+           <small id="priority-small-text" class="form-text text-muted">This is the summary for this Task</small>
+       </div>
+       <div class="form-group">
+            {{form.effort_hours.errors}}
+            {{form.effort_hours.label_tag}}
+            {{form.effort_hours}}
+           <small id="priority-small-text" class="form-text text-muted">This is the Effort hours for this Task</small>
+       </div>
+       <button type="submit" class="btn btn-primary">Confirm</button>
+    </form>
+{% endblock content %}
