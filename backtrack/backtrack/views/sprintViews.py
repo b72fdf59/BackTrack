@@ -55,28 +55,25 @@ class CreateSprint(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
 
 class SprintDetail(LoginRequiredMixin, TemplateView):
+    pk_url_kwarg = 'pbipk'
     login_url = '/accounts/login'
     template_name = 'backtrack/sprintDetail.html'
 
     def get_context_data(self, **kwargs):
         sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
         pbi = get_object_or_404(PBI, pk=self.kwargs['spk'])
-        data = getPBIfromProj(
-            kwargs['pk'], self.request.GET['all'] if 'all' in self.request.GET else '0')
+        data = getPBIfromProj(self.kwargs['pk'], '0')
         task = Task.objects.all()
-        taskList = []
-        for tk in task:
-            if tk.pbi.id == pbi.id:
-                taskList.append(tk)
         PBIList = []
         for pbi in data:
             if pbi.sprint == sprint:
                 PBIList.append(pbi)
-        context = {'data': PBIList, 'sprint': sprint, 'task': taskList}
+        context = {'data': PBIList, 'sprint': sprint, 'task': task}
         context = addContext(self, context)
         return context
 
 class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    pk_url_kwarg = 'pbipk'
     model = Task
     fields = ['summary', 'effort_hours']
     login_url = '/accounts/login'
@@ -85,9 +82,11 @@ class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
+        pbi = get_object_or_404(PBI, pk=self.kwargs['pbipk'])
         context = super().get_context_data(**kwargs)
         context = addContext(self, context)
         context['sprint'] = sprint
+        context['pbi'] = pbi
         return context
 
     def get_success_url(self):
@@ -95,7 +94,7 @@ class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.pbi = get_object_or_404(
-            PBI, pk=self.kwargs['pk'])
+            PBI, pk=self.kwargs['pbipk'])
         form.instance.project = get_object_or_404(
             Project, pk=self.kwargs['pk'])
         form.instance.sprint = get_object_or_404(

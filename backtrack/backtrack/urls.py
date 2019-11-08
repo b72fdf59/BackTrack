@@ -22,7 +22,7 @@ urlpatterns = [
          name='add-project-developer'),
     path('<int:pk>/create/sprint',
          sprintViews.CreateSprint.as_view(), name='create-sprint'),
-    path('<int:pk>/<int:spk>/add-task/',
+    path('<int:pk>/<int:spk>/<int:pbipk>/add-task/',
          sprintViews.AddTask.as_view(), name='add-task'),
     path('<int:pk>/<int:spk>/',
          sprintViews.SprintDetail.as_view(), name='detail-sprint'),
