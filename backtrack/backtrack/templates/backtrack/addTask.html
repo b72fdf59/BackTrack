@@ -2,7 +2,7 @@
 {% block content %}
     <h1 class="page-header"><i class="fa fa-plus" id="A"></i> Add Task</h1>
     <div class="row placeholders"></div>
-    <form action={% url 'add-task' pk=Project.id spk=sprint.id%} method="POST">
+    <form action={% url 'add-task' pk=Project.id spk=sprint.id pbipk=pbi.id %} method="POST">
         {{ form.non_field_errors }}
         {% csrf_token %}
        <div class="form-group">
