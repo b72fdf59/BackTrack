@@ -23,5 +23,7 @@ urlpatterns = [
     path('<int:pk>/create/sprint',
          sprintViews.CreateSprint.as_view(), name='create-sprint'),
     path('<int:pk>/<int:spk>/',
-         sprintViews.SprintDetail.as_view(), name='detail-sprint')
+         sprintViews.SprintDetail.as_view(), name='detail-sprint'),
+         path('<int:pk>/pb/add-pbi-to-sprint',
+         sprintViews.AddPBIToSprint.as_view(), name='add-pbi-to-sprint'),
 ]

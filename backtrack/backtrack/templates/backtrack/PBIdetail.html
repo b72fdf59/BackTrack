@@ -3,9 +3,9 @@
 <h1 class="page-header"><i class="fa fa-plus" id="A"></i> Edit </h1>
 <div class="row placeholders"></div>
 <form action={% url 'detail-pbi' pk=Project.id pbipk=PBI.id %} method="POST">
-    {% csrf_token %}
     {{ form.non_field_errors }}
     {% csrf_token %}
+    {% if ProjectParticipant.role == "PO" %}
     <div class="form-group">
         {{form.priority.errors}}
         {{form.priority.label_tag}}
@@ -13,6 +13,7 @@
         <small id="priority-small-text" class="form-text text-muted">This is the Product Backlog Priority for this
             PBI</small>
     </div>
+    {% endif %}
     <div class="form-group">
         {{form.summary.errors}}
         {{form.summary.label_tag}}
@@ -31,14 +32,24 @@
         {{form.effort_hours}}
         <small id="priority-small-text" class="form-text text-muted">This is the Effort hours for this PBI</small>
     </div>
-    {% if PBI.status == "N" %}
+    {% if PBI.status == "D" or ProjectParticipant.role == "PO" %}
     <button type="submit" class="btn btn-primary" style="height:2.4em;width:5em;text-align:center;">Confirm</button>
     {% endif %}
 </form>
 {% csrf_token %}
-{% if PBI.status == "N" %}
+{% if PBI.status == "D" or ProjectParticipant.role == "PO" %}
 <a id="Delete" href="{% url 'delete-pbi' pk=Project.id pbipk=PBI.id %}" type="submit" class="btn btn-danger"
-    style="height:2.4em;width:5em;text-align: center;">Delete</a>
+    style="height:2.4em;width:5em;text-align: center; margin-top: 0.5em;">Delete</a>
+{% endif %}
+
+
+{% if PBI.status == "N" and ProjectParticipant.role == "DT"%}
+<form action="{% url 'add-pbi-to-sprint' pk=Project.id %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" value="{{PBI.id}}" name="PBIs" />
+    <button id="AddToSprint" type="submit" class="btn btn-primary"
+        style="height:2.4em;width:10em;text-align: center; margin-top: 0.5em;">Add to Sprint</button>
+</form>
 {% endif %}
 
 {% endblock content %}

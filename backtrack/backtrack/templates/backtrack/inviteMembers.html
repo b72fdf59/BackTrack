@@ -1,16 +1,15 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
-{% if messages %}
 <ul class="messages" style="padding:0;">
+    {% if messages %}
     {% for message in messages %}
     <div class="alert alert-success alert-dismissible">
         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
         <li{% if message.tags %} class="{{ message.tags }}" {% endif %} style="list-style:none">{{ message }}</li>
             {% endfor %}
     </div>
-
+    {% endif %}
 </ul>
-{% endif %}
 <div class="float-md-center" style="width: 500px;margin: auto">
     <h3>Developers:</h3>
     <ul class="list-group" style="margin-top: 2em;">
@@ -37,12 +36,24 @@
         $('.btn').click(function () {
             if (this.id) {
                 const url = "{% url 'email-member' pk=Project.id %}"
-                console.log(url)
+                var $button = $(this)
                 $.ajax({
                     type: "GET",
                     url: url,
                     data: {
                         "id": this.id
+                    },
+                    success: function (data) {
+                        $button.toggleClass("btn-primary btn-default").text('Sent');
+                        $button.delay(10000).queue(function (next) {
+                            $button.toggleClass("btn-default btn-primary").text(
+                                'Send Invite')
+                            next();
+                        })
+                    },
+                    error: function (data) {
+                        $("ul.messages").append(
+                            '<div class="alert alert-danger alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" > User does not have an email </li> </div>')
                     }
 
                 });

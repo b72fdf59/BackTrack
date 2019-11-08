@@ -3,13 +3,15 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.urls import reverse
+from django_fsm import FSMField, transition
 
 # Create your models here.
 
 
 class PBI(models.Model):
-    status = models.CharField(max_length=1,
-                              choices=[("N", "Not Done"), ("P", "In Progress"), ("D", "Done")], default="N")
+    # status = models.CharField(max_length=1,
+    #                           choices=[("N", "Not Done"), ("P", "In Progress"), ("D", "Done")], default="N")
+    status = FSMField(default='N')
     story_points = models.FloatField()
     effort_hours = models.FloatField()
     summary = models.TextField(default=None)
@@ -17,7 +19,21 @@ class PBI(models.Model):
     project = models.ForeignKey(
         'Project', on_delete=models.CASCADE, related_name='pbi')
     sprint = models.ForeignKey(
-        'Sprint', on_delete=models.CASCADE, related_name='sprint', null=True, blank=True)
+        'Sprint', on_delete=models.CASCADE, related_name='pbi', null=True, blank=True)
+
+    @transition(field=status, source='N', target='P')
+    def addToSprint(self, sprint):
+        self.sprint = sprint
+
+    @transition(field=status, source='P', target='N')
+    def removeToSprint(self, sprint):
+        self.sprint = None
+
+    @transition(field=status, source='P', target='D')
+    def markDone(self):
+        pass
+
+    #can implement transition unfinished if need be
 
     def delete(self, *args, **kwargs):
         pbiList = self.project.pbi.all().exclude(status="D")
@@ -107,9 +123,38 @@ class Sprint(models.Model):
     def available(self):
         from datetime import date
         now = date.today()
-        print(self.end)
-        print(now <= self.end)
         return now <= self.end
+
+    @property
+    def remainingCapacity(self):
+        from django.db.models import Sum
+        myDict = self.pbi.all().aggregate(Sum('story_points'))
+        usedCapacity = myDict['story_points__sum']
+        if not usedCapacity:
+            usedCapacity = 0
+        return self.capacity - usedCapacity
+    @property
+    def count(self):
+        return self.project.sprint.filter(start__lte=self.start).count()
 
     def get_absolute_url(self):
         return reverse("detail-sprint", kwargs={"pk": self.project_id, "spk": self.id})
+
+
+class Task(models.Model):
+    # status = models.CharField(max_length=1,
+    #                           choices=[("N", "Not Done"), ("P", "In Progress"), ("D", "Done")], default="N")
+    status = FSMField(default='N')
+    # story_points = models.FloatField()
+    effort_hours = models.FloatField()
+    summary = models.TextField(default=None)
+    pbi = models.ForeignKey(
+        'PBI', on_delete=models.CASCADE, related_name='task')
+    sprint = models.ForeignKey(
+        'Sprint', on_delete=models.CASCADE, related_name='task_sprint', null=True, blank=True)
+
+    def __str__(self):
+        return self.summary
+
+    class Meta:
+        db_table = "Task"
