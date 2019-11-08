@@ -6,9 +6,9 @@
             <thead>
                 <tr>
                     <th>PBI</th>
-                    <th>Not Done</th>
-                    <th>In Progress</th>
-                    <th>Done</th>
+                    <th style="padding-left: 105px">Not Done</th>
+                    <th style="padding-left: 85px">In Progress</th>
+                    <th style="padding-left: 105px">Done</th>
                 </tr>
             </thead>
             <tbody>
@@ -23,6 +23,7 @@
                         {% endif %}
                     </td>
                     <td>
+                      <div style="height: 110px; overflow: scroll">
                         <table class="table table-borderless" style="width: 80%;">
                             <thead class="thead-dark">
                                 <tr>
@@ -47,8 +48,10 @@
                             {% endif %}
                             {% endfor %}
                         </table>
+                      </div>
                     </td>
                     <td>
+                      <div style="height: 110px; overflow: scroll">
                         <table class="table table-borderless" style="width: 80%;">
                             <thead class="thead-dark">
                                 <tr>
@@ -73,8 +76,10 @@
                             {% endif %}
                             {% endfor %}
                         </table>
+                      </div>
                     </td>
                     <td>
+                      <div style="height: 110px; overflow: scroll">
                         <table class="table table-borderless" style="width: 80%;">
                             <thead class="thead-dark">
                                 <tr>
@@ -99,6 +104,7 @@
                             {% endif %}
                             {% endfor %}
                         </table>
+                      </div>
                     </td>
                 </tr>
                 {% endfor %}
