@@ -1,20 +1,106 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
 <h1 class="page-header"><i class="fa fa-print"></i> Sprint Details </h1>
-{% if messages %}
-<ul class="messages" style="padding:0;">
-    {% for message in messages %}
-    <div class="alert alert-success alert-dismissible">
-        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-        <li{% if message.tags %} class="{{ message.tags }}" {% endif %} style="list-style:none">{{ message }}</li>
-            {% endfor %}
-    </div>
-
-</ul>
-{% endif %}
 <div class="row placeholders"></div>
-{% for task in data %}
-{{ task.summary }}
-{{ task.story_points }}
-{% endfor %}
+    <table>
+        <tr>
+            <th>
+                    <div style="height: 200px; overflow: auto; display: block; width: 350px; ">
+
+                            <table class="table table-bordered table-striped mb-0">
+                              <thead>
+                                <tr>
+                                  <th scope="col" style="text-align: center">Not Done</th>
+                                  </tr>
+                              </thead>
+                              <tbody style="color: cornflowerblue; text-align: center">
+                                {% for PBI in data %}
+                                    <tr>
+                                        <td>
+                                            {% if PBI.status == "N" %}
+                                                {{ PBI.summary }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                    </div>
+            </th>
+            <th>
+                    <div style="height: 200px; overflow: auto; display: block;  width: 350px;">
+
+                            <table class="table table-bordered table-striped mb-0">
+                              <thead>
+                                <tr>
+                                  <th scope="col" style="text-align: center">In Progress</th>
+                                  </tr>
+                              </thead>
+                              <tbody style="color: cornflowerblue; text-align: center">
+                                {% for PBI in data %}
+                                    <tr>
+                                        <td>
+                                            {% if PBI.status == "P" %}
+                                                {{ PBI.summary }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                    </div>
+            </th>
+            <th>
+                    <div style="height: 200px; overflow: auto; display: block;  width: 350px;">
+
+                            <table class="table table-bordered table-striped mb-0">
+                              <thead>
+                                <tr>
+                                  <th scope="col" style="text-align: center">In Progress</th>
+                                  </tr>
+                              </thead>
+                              <tbody style="color: cornflowerblue; text-align: center">
+                                {% for PBI in data %}
+                                    <tr>
+                                        <td>
+                                            {% if PBI.status == "D" %}
+                                                {{ PBI.summary }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                    </div>
+            </th>
+        </tr>
+    </table>
+</div>
+
+<script>
+    $.urlParam = function (name) {
+        var results = new RegExp('[\?&]' + name + '=([^&#]*)')
+            .exec(window.location.search);
+
+        return (results !== null) ? results[1] || 0 : false;
+    }
+    $(document).ready(function () {
+        if ($.urlParam('all') == '1') {
+            $(this).find('.toggle').toggleClass('active');
+
+            if ($(this).find('.btn-primary').length > 0) {
+                $(this).find('.toggle').toggleClass('btn-primary');
+            }
+        }
+        var getUrl = window.location;
+        var baseUrl = getUrl.protocol + "//" + getUrl.host + getUrl.pathname;
+        $('.btn-toggle').click(function () {
+            if ($.urlParam('all') == '0')
+                window.location.replace(baseUrl + "?all=1");
+            else
+                window.location.replace(baseUrl + "?all=0");
+        })
+
+    });
+</script>
 {% endblock content %}
