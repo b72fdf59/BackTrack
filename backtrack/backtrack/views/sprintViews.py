@@ -11,6 +11,18 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.contrib import messages
 
 
+def getPBIfromProj(pk, all):
+    from ..models import PBI
+    data, pbiList = [], PBI.objects.filter(project_id=pk)
+    for pbi in pbiList:
+        obj = PBI.objects.get(pk=pbi.id)
+        # If all is true then do not count objects with status done(which are finished), this is for when creating a new PBI
+        if obj.status == 'D' and (not bool(int(all))):
+            continue
+        else:
+            data.append(obj)
+    return data
+
 class CreateSprint(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Sprint
     form_class = CreateSprintForm
@@ -39,7 +51,17 @@ class SprintDetail(LoginRequiredMixin, TemplateView):
     template_name = 'backtrack/sprintDetail.html'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        sprint = self.request.user.projectParticipant.get(
+            project__complete=False).project.sprint.all().order_by('-start')[0]
+        data = getPBIfromProj(
+            kwargs['pk'], self.request.GET['all'] if 'all' in self.request.GET else '0')
+        for pbi in data:
+            obj = PBI.objects.get(pk=pbi.id)
+            if obj.sprint == sprint:
+                continue
+            else:
+                data.remove(obj)
+        context = {'data': data}
         context = addContext(self, context)
         return context
 
