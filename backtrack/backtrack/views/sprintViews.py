@@ -58,7 +58,10 @@ class AddPBIToSprint(LoginRequiredMixin, SuccessMessageMixin, View):
         PBIid = request.POST.get('PBIs')
         if PBIid:
             addPBI = get_object_or_404(PBI, pk=PBIid)
-            if sprint.remainingCapacity < addPBI.story_points:
+            if not sprint:
+                messages.error(
+                    self.request, "No such sprint")
+            elif sprint.remainingCapacity < addPBI.story_points:
                 messages.error(
                     self.request, "Sprint remaining capacity is lesser than PBI capactiy")
             else:
@@ -68,6 +71,10 @@ class AddPBIToSprint(LoginRequiredMixin, SuccessMessageMixin, View):
                 addPBI.save()
             return redirect(reverse('pb', kwargs={'pk': self.kwargs['pk']}))
         else:
+            if not sprint:
+                response = JsonResponse({"error": "No current Sprint"})
+                response.status_code = 400
+                return response
             data = json.loads(request.body)
             PBIidList = data['PBIs']
             if len(PBIidList) == 0:
@@ -75,6 +82,10 @@ class AddPBIToSprint(LoginRequiredMixin, SuccessMessageMixin, View):
                 response.status_code = 400
                 return response
             else:
+                if not sprint:
+                    response = JsonResponse({"error": "No current Sprint"})
+                    response.status_code = 400
+                    return response
                 PBIList = []
                 totCap = 0
                 for PBIid in PBIidList:
