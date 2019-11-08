@@ -51,8 +51,7 @@ class SprintDetail(LoginRequiredMixin, TemplateView):
     template_name = 'backtrack/sprintDetail.html'
 
     def get_context_data(self, **kwargs):
-        sprint = self.request.user.projectParticipant.get(
-            project__complete=False).project.sprint.all().order_by('-start')[0]
+        sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
         data = getPBIfromProj(
             kwargs['pk'], self.request.GET['all'] if 'all' in self.request.GET else '0')
         for pbi in data:
