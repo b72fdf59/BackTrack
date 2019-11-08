@@ -54,12 +54,11 @@ class SprintDetail(LoginRequiredMixin, TemplateView):
         sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
         data = getPBIfromProj(
             kwargs['pk'], self.request.GET['all'] if 'all' in self.request.GET else '0')
+        PBIList = []
         for pbi in data:
             if pbi.sprint == sprint:
-                continue
-            else:
-                data.remove(pbi)
-        context = {'data': data}
+                PBIList.append(pbi)
+        context = {'data': PBIList}
         context = addContext(self, context)
         return context
 
