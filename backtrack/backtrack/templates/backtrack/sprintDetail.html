@@ -1,6 +1,6 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
-<h4>Sprint Detail</h4>
+<h1 class="page-header"><i class="fa fa-print"></i> Sprint Details </h1>
 {% if messages %}
 <ul class="messages" style="padding:0;">
     {% for message in messages %}
@@ -12,5 +12,9 @@
 
 </ul>
 {% endif %}
-
+<div class="row placeholders"></div>
+{% for task in data %}
+{{ task.summary }}
+{{ task.story_points }}
+{% endfor %}
 {% endblock content %}

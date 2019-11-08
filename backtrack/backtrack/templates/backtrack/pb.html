@@ -1,21 +1,23 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
 <h1 class="page-header"><i class="fa fa-file"></i> Product BackLog</h1>
-{% if messages %}
+
 <ul class="messages" style="padding:0;">
+    {% if messages %}
     {% for message in messages %}
-    <div class="alert alert-success alert-dismissible">
+    <div class="alert 
+        {% if message.tags == "success" %} alert-success {% endif %}
+         {% if message.tags == "error" %} alert-danger {% endif %} 
+         alert-dismissible">
         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
         <li{% if message.tags %} class="{{ message.tags }}" {% endif %} style="list-style:none">{{ message }}</li>
-        {% endfor %}
+            {% endfor %}
     </div>
-
+    {% endif %}
 </ul>
-{% endif %}
+
+
 <div class="row placeholders"></div>
-{% if data|length == 0 %}
-<h3>There are no PBIs</h3>
-{% endif %}
 <h2 class="sub-header">
     <div class="dropdown">
         <button class="btn btn-light dropdown-toggle pull-left" type="button" data-toggle="dropdown"
@@ -26,30 +28,32 @@
             <li><a href="#">Story Points</a></li>
             <li><a href="#">Effort Hours</a></li>
         </ul>
-        <div class="btn-group btn-toggle">
-            <button class="btn btn-xs btn-primary active toggle">NOT DONE</button>
-            <button class="btn btn-xs btn-default toggle">ALL</button>
+        <div style="float: right;">
+            <div class="btn-group btn-toggle" id="filter-done">
+                <button class="btn btn-xs btn-primary active toggle">NOT DONE</button>
+                <button class="btn btn-xs btn-default toggle">ALL</button>
+            </div>
+            {% if ProjectParticipant.role == "DT" %}
+            <button type="button" class="btn btn-light" style="margin-bottom: 10px;" id="put-in-sprint"><a href="#"
+                    style="text-decoration: none; color: black"><i class="fa fa-plus"></i>Put in
+                    Sprint</a></button>
+            {% endif %}
+            {% if ProjectParticipant.role == "PO" %}
+            <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><a
+                    href="{% url 'add-pbi' pk=Project.id %}" style="text-decoration: none; color: black"><i
+                        class="fa fa-plus" id="add"></i>ADD</a></button>
+            <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><i class="fa fa-times"
+                    id="delete"></i>DELETE</button>
+            {% endif %}
         </div>
-        {% if ProjectParticipant.role == "DT" %}
-        <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><a
-                href="{% url 'add-pbi' pk=Project.id %}" style="text-decoration: none; color: black"><i
-                    class="fa fa-plus" id="A"></i>Add to Sprint</a></button>
-        {% endif %}
-        {% if ProjectParticipant.role == "PO" %}
-        <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><a
-                href="{% url 'add-pbi' pk=Project.id %}" style="text-decoration: none; color: black"><i
-                    class="fa fa-plus" id="A"></i>ADD</a></button>
-        <button type="button" class="btn btn-light" style="margin-bottom: 10px;"><i class="fa fa-times"
-                id="A"></i>DELETE</button>
-        {% endif %}
     </div>
 </h2>
 <div class="row">
     <div class="">
-        <table class="table table-striped">
+        <table class="table table-striped" id="product-backlog">
             <thead>
                 <tr>
-                    <th> </th>
+                    <th></th>
                     <th>Priority</th>
                     <th>Sprint</th>
                     <th>Summary</th>
@@ -63,9 +67,13 @@
             <tbody>
                 {% for PBI in data %}
                 <tr>
+                    {% if PBI.status != "N" %}
+                    <td><input type="checkbox" disabled checked></td>
+                    {% else %}
                     <td><input type="checkbox"></td>
+                    {% endif %}
                     <td>
-                        {% if PBI.status == "N" %}
+                        {% if PBI.status != "D" %}
                         {{PBI.priority}}
                         {% else %}
                         --
@@ -93,12 +101,47 @@
                     <td>{{PBI.sum_story_points}}</td>
                     <td>{{PBI.effort_hours}}</td>
                     <td>{{PBI.sum_effort_hours}}</td>
+                    <td style="visibility:hidden">{{PBI.id}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        {% if data|length == 0 %}
+        <h3>There are no PBIs</h3>
+        {% endif %}
     </div>
 </div>
+
+
+
+{% if ProjectParticipant.role == "DT" %}
+<h1 class="page-header">Add to Current Sprint:</h1>
+<h2 class="sub-header" style="float: right;">
+    <button type="button" class="btn btn-light" style="margin-bottom: 10px;" id="add-sprint"><a href="#"
+            style="text-decoration: none; color: black"><i class="fa fa-plus"></i>Add to
+            Sprint</a></button>
+</h2>
+<table class="table table-striped" id="sprint-table">
+    <thead>
+        <tr>
+            <th>Priority</th>
+            <th>Sprint</th>
+            <th>Summary</th>
+            <th>Status</th>
+            <th>Story Points</th>
+            <th>Cumulative Story Points</th>
+            <th>Effort hours</th>
+            <th>Cumulative Effort hours</th>
+        </tr>
+    </thead>
+    <tbody>
+
+
+    </tbody>
+</table>
+{% endif %}
+
+
 <script>
     $.urlParam = function (name) {
         var results = new RegExp('[\?&]' + name + '=([^&#]*)')
@@ -107,6 +150,16 @@
         return (results !== null) ? results[1] || 0 : false;
     }
     $(document).ready(function () {
+
+        if (localStorage.getItem("Message")) {
+            var msg = localStorage.getItem("Message")
+            $("ul.messages").append(
+                '<div class="alert alert-success alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" > ' +
+                msg + '</li> </div>')
+            localStorage.clear();
+        }
+
+        var token = '{{csrf_token}}';
         if ($.urlParam('all') == '1') {
             $(this).find('.toggle').toggleClass('active');
 
@@ -121,6 +174,47 @@
                 window.location.replace(baseUrl + "?all=1");
             else
                 window.location.replace(baseUrl + "?all=0");
+        })
+
+        $("#put-in-sprint").click(function () {
+            $("#sprint-table").find("tr:gt(0)").remove();
+            $('input:checkbox:checked', "#product-backlog").each(function () {
+                if ($.trim($(this).closest('tr').children('td').eq(2).text()) == "--") {
+                    row = $(this).closest('tr').clone().find('td:first').remove().end().prop(
+                        'outerHTML');
+                    $("#sprint-table tbody").append(row);
+                }
+            });
+        })
+
+        $("#add-sprint").click(function () {
+            PBIid = []
+            $('tbody tr', "#sprint-table").each(function () {
+                PBIid.push($(this).closest("tr").find('td:last').text())
+            })
+            const url = "{% url 'add-pbi-to-sprint' pk=Project.id %}"
+            $.ajax({
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": token
+                },
+                url: url,
+                data: JSON.stringify({
+                    "PBIs": PBIid
+                }),
+                success: function (data) {
+                    var msg = data.success
+                    localStorage.setItem("Message", msg)
+                    window.location.reload();
+                },
+                error: function (data) {
+                    var err = data.responseJSON.error
+                    $("ul.messages").append(
+                        '<div class="alert alert-danger alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" >' +
+                        err + '</li> </div>')
+                }
+
+            });
         })
 
     });

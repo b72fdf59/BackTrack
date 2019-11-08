@@ -36,10 +36,7 @@
         $('.btn').click(function () {
             if (this.id) {
                 const url = "{% url 'email-member' pk=Project.id %}"
-                var message = $("#403")
                 var $button = $(this)
-                console.log(message)
-                message.css("display", "block")
                 $.ajax({
                     type: "GET",
                     url: url,
