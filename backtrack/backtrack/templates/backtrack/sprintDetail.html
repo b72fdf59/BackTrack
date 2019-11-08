@@ -2,78 +2,107 @@
 {% block content %}
 <h1 class="page-header"><i class="fa fa-print"></i> Sprint Details </h1>
 <div class="row placeholders"></div>
-    <table>
-        <tr>
-            <th>
-                    <div style="height: 200px; overflow: auto; display: block; width: 350px; ">
-
-                            <table class="table table-bordered table-striped mb-0">
-                              <thead>
+    <table class="table table-striped" id="product-backlog">
+            <thead>
+                <tr>
+                    <th>PBI</th>
+                    <th>Not Done</th>
+                    <th>In Progress</th>
+                    <th>Done</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for PBI in data %}
+                <tr>
+                    <td style="color: cornflowerblue">
+                        {{ PBI.summary }}
+                        <br>
+                        {% if ProjectParticipant.role == "DT" %}
+                            <a href="{% url 'add-task' pk=Project.id spk=sprint.id%}" style="text-decoration: none; color: black"><i
+                            class="fa fa-plus" id="add"></i>ADD</a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <table class="table table-borderless" style="width: 80%;">
+                            <thead class="thead-dark">
                                 <tr>
-                                  <th scope="col" style="text-align: center">Not Done</th>
-                                  </tr>
-                              </thead>
-                              <tbody style="color: cornflowerblue; text-align: center">
-                                {% for PBI in data %}
-                                    {% if PBI.status == "N" %}
-                                    <tr>
-                                        <td>
-                                                {{ PBI.summary }}
-                                        </td>
-                                    </tr>
-                                    {% endif %}
-                                {% endfor %}
-                              </tbody>
-                            </table>
-                    </div>
-            </th>
-            <th>
-                    <div style="height: 200px; overflow: auto; display: block;  width: 350px;">
-
-                            <table class="table table-bordered table-striped mb-0">
-                              <thead>
+                                    <th>
+                                        Summary
+                                    </th>
+                                    <th>
+                                        Effort hours
+                                    </th>
+                                </tr>
+                            </thead>
+                            {% for tk in task %}
+                            {% if tk.status == 'N' %}
+                            <tr>
+                                <td>
+                                    {{ tk.summary }}
+                                </td>
+                                <td>
+                                    {{ tk.effort_hours }}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </table>
+                    </td>
+                    <td>
+                        <table class="table table-borderless" style="width: 80%;">
+                            <thead class="thead-dark">
                                 <tr>
-                                  <th scope="col" style="text-align: center">In Progress</th>
-                                  </tr>
-                              </thead>
-                              <tbody style="color: cornflowerblue; text-align: center">
-                                {% for PBI in data %}
-                                    {% if PBI.status == "P" %}
-                                    <tr>
-                                        <td>
-                                                {{ PBI.summary }}
-                                        </td>
-                                    </tr>
-                                    {% endif %}
-                                {% endfor %}
-                              </tbody>
-                            </table>
-                    </div>
-            </th>
-            <th>
-                    <div style="height: 200px; overflow: auto; display: block;  width: 350px;">
-
-                            <table class="table table-bordered table-striped mb-0">
-                              <thead>
+                                    <th>
+                                        Summary
+                                    </th>
+                                    <th>
+                                        Effort hours
+                                    </th>
+                                </tr>
+                            </thead>
+                            {% for tk in task %}
+                            {% if tk.status == 'P' %}
+                            <tr>
+                                <td>
+                                    {{ tk.summary }}
+                                </td>
+                                <td>
+                                    {{ tk.effort_hours }}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </table>
+                    </td>
+                    <td>
+                        <table class="table table-borderless" style="width: 80%;">
+                            <thead class="thead-dark">
                                 <tr>
-                                  <th scope="col" style="text-align: center">Done</th>
-                                  </tr>
-                              </thead>
-                              <tbody style="color: cornflowerblue; text-align: center">
-                                {% for PBI in data %}
-                                    {% if PBI.status == "D" %}
-                                    <tr>
-                                        <td>
-                                                {{ PBI.summary }}
-                                        </td>
-                                    </tr>
-                                    {% endif %}
-                                {% endfor %}
-                              </tbody>
-                            </table>
-                    </div>
-            </th>
-        </tr>
+                                    <th>
+                                        Summary
+                                    </th>
+                                    <th>
+                                        Effort hours
+                                    </th>
+                                </tr>
+                            </thead>
+                            {% for tk in task %}
+                            {% if tk.status == 'D' %}
+                            <tr>
+                                <td>
+                                    {{ tk.summary }}
+                                </td>
+                                <td>
+                                    {{ tk.effort_hours }}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </table>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
     </table>
 </div>
 

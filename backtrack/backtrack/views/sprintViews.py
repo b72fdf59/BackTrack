@@ -1,6 +1,6 @@
 from django.views.generic import CreateView, View, TemplateView
 from django.shortcuts import get_object_or_404, redirect, render
-from ..models import Sprint, Project, PBI
+from ..models import Sprint, Project, PBI, Task
 from ..forms import CreateSprintForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
@@ -21,6 +21,14 @@ def getPBIfromProj(pk, all):
             continue
         else:
             data.append(obj)
+    return data
+
+def getTaskfromProj(pk, all):
+    from ..models import Task
+    data, TaskList = [], Task.objects.all()
+    for task in TaskList:
+        obj = Task.objects.get(pk=task.id)
+        data.append(obj)
     return data
 
 class CreateSprint(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -52,15 +60,47 @@ class SprintDetail(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
+        pbi = get_object_or_404(PBI, pk=self.kwargs['spk'])
         data = getPBIfromProj(
             kwargs['pk'], self.request.GET['all'] if 'all' in self.request.GET else '0')
+        task = Task.objects.all()
+        taskList = []
+        for tk in task:
+            if tk.pbi.id == pbi.id:
+                taskList.append(tk)
         PBIList = []
         for pbi in data:
             if pbi.sprint == sprint:
                 PBIList.append(pbi)
-        context = {'data': PBIList}
+        context = {'data': PBIList, 'sprint': sprint, 'task': taskList}
         context = addContext(self, context)
         return context
+
+class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    model = Task
+    fields = ['summary', 'effort_hours']
+    login_url = '/accounts/login'
+    template_name = "backtrack/addTask.html"
+    success_message = "Task was created"
+
+    def get_context_data(self, **kwargs):
+        sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
+        context = super().get_context_data(**kwargs)
+        context = addContext(self, context)
+        context['sprint'] = sprint
+        return context
+
+    def get_success_url(self):
+        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.object.project.id, 'spk': self.object.sprint.id}))
+
+    def form_valid(self, form):
+        form.instance.pbi = get_object_or_404(
+            PBI, pk=self.kwargs['pk'])
+        form.instance.project = get_object_or_404(
+            Project, pk=self.kwargs['pk'])
+        form.instance.sprint = get_object_or_404(
+            Sprint, pk=self.kwargs['pk'])
+        return super().form_valid(form)
 
 
 class AddPBIToSprint(LoginRequiredMixin, SuccessMessageMixin, View):
