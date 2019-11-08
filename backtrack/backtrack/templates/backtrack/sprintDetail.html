@@ -15,13 +15,13 @@
                               </thead>
                               <tbody style="color: cornflowerblue; text-align: center">
                                 {% for PBI in data %}
+                                    {% if PBI.status == "N" %}
                                     <tr>
                                         <td>
-                                            {% if PBI.status == "N" %}
                                                 {{ PBI.summary }}
-                                            {% endif %}
                                         </td>
                                     </tr>
+                                    {% endif %}
                                 {% endfor %}
                               </tbody>
                             </table>
@@ -38,13 +38,13 @@
                               </thead>
                               <tbody style="color: cornflowerblue; text-align: center">
                                 {% for PBI in data %}
+                                    {% if PBI.status == "P" %}
                                     <tr>
                                         <td>
-                                            {% if PBI.status == "P" %}
                                                 {{ PBI.summary }}
-                                            {% endif %}
                                         </td>
                                     </tr>
+                                    {% endif %}
                                 {% endfor %}
                               </tbody>
                             </table>
@@ -56,18 +56,18 @@
                             <table class="table table-bordered table-striped mb-0">
                               <thead>
                                 <tr>
-                                  <th scope="col" style="text-align: center">In Progress</th>
+                                  <th scope="col" style="text-align: center">Done</th>
                                   </tr>
                               </thead>
                               <tbody style="color: cornflowerblue; text-align: center">
                                 {% for PBI in data %}
+                                    {% if PBI.status == "D" %}
                                     <tr>
                                         <td>
-                                            {% if PBI.status == "D" %}
                                                 {{ PBI.summary }}
-                                            {% endif %}
                                         </td>
                                     </tr>
+                                    {% endif %}
                                 {% endfor %}
                               </tbody>
                             </table>
