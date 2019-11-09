@@ -160,8 +160,19 @@ class Task(models.Model):
     summary = models.TextField(default=None)
     pbi = models.ForeignKey(
         'PBI', on_delete=models.CASCADE, related_name='task')
-    sprint = models.ForeignKey(
-        'Sprint', on_delete=models.CASCADE, related_name='task_sprint', null=True, blank=True)
+    # sprint = models.ForeignKey(
+    #     'Sprint', on_delete=models.CASCADE, related_name='task_sprint', null=True, blank=True)
+    projectParticipant = models.ForeignKey(
+        'ProjectParticipant', on_delete=models.CASCADE, related_name='task', null=True, blank=True)
+
+    @transition(field=status, source='N', target='P')
+    def putInProgress(self, pp):
+        print(pp)
+        self.projectParticipant = pp
+
+    @transition(field=status, source='N', target='P')
+    def putInDone(self, pp):
+        pass
 
     def __str__(self):
         return self.summary

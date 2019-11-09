@@ -28,4 +28,5 @@ urlpatterns = [
          sprintViews.SprintDetail.as_view(), name='detail-sprint'),
     path('<int:pk>/pb/add-pbi-to-sprint',
          sprintViews.AddPBIToSprint.as_view(), name='add-pbi-to-sprint'),
+     path('task/in-progress',taskViews.AddTaskToInProgress.as_view(), name='task-in-progress')
 ]
