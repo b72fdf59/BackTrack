@@ -1,6 +1,6 @@
 from django.urls import path
 from django.conf.urls import url
-from .views import PBIviews, projectViews, sprintViews
+from .views import PBIviews, projectViews, sprintViews, taskViews
 from django.shortcuts import redirect
 
 urlpatterns = [
@@ -23,7 +23,7 @@ urlpatterns = [
     path('<int:pk>/create/sprint',
          sprintViews.CreateSprint.as_view(), name='create-sprint'),
     path('<int:pk>/<int:spk>/<int:pbipk>/add-task/',
-         sprintViews.AddTask.as_view(), name='add-task'),
+         taskViews.AddTask.as_view(), name='add-task'),
     path('<int:pk>/<int:spk>/',
          sprintViews.SprintDetail.as_view(), name='detail-sprint'),
     path('<int:pk>/pb/add-pbi-to-sprint',

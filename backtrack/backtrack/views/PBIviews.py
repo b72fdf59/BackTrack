@@ -7,21 +7,8 @@ from django.views.generic import TemplateView, FormView, CreateView, UpdateView,
 from collections import OrderedDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from ..helpers import addContext
+from ..helpers import addContext, getPBIfromProj
 from django.contrib.messages.views import SuccessMessageMixin
-
-
-def getPBIfromProj(pk, all):
-    from ..models import PBI
-    data, pbiList = [], PBI.objects.filter(project_id=pk)
-    for pbi in pbiList:
-        obj = PBI.objects.get(pk=pbi.id)
-        # If all is true then do not count objects with status done(which are finished), this is for when creating a new PBI
-        if obj.status == "D" and (not bool(int(all))):
-            continue
-        else:
-            data.append(obj)
-    return data
 
 
 class HomeView(LoginRequiredMixin, TemplateView):
