@@ -20,15 +20,18 @@ from backtrack import views
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect, HttpRequest
 from django.urls import path, include
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 
 urlpatterns = [
-    path('', lambda x: redirect('accounts/login') if not hasattr(HttpRequest,"user") else redirect('/home'), name='base'),
+    path('', lambda x: redirect('accounts/login')
+         if not hasattr(HttpRequest, "user") else redirect('/home'), name='base'),
     path('home/', include('backtrack.urls')),
     path('admin/', admin.site.urls, name='admin'),
-    path('accounts/', include('django.contrib.auth.urls')), 
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
 
+urlpatterns += staticfiles_urlpatterns()
 
 if settings.DEBUG:
     import debug_toolbar

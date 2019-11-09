@@ -33,7 +33,7 @@ class PBI(models.Model):
     def markDone(self):
         pass
 
-    #can implement transition unfinished if need be
+    # can implement transition unfinished if need be
 
     def delete(self, *args, **kwargs):
         pbiList = self.project.pbi.all().exclude(status="D")
@@ -133,6 +133,16 @@ class Sprint(models.Model):
         if not usedCapacity:
             usedCapacity = 0
         return self.capacity - usedCapacity
+
+    # @property
+    # def remainingCapacity(self):
+    #     from django.db.models import Sum
+    #     myDict = self.pbi.all().aggregate(Sum('effort_hours'))
+    #     hoursCompleted = myDict['effort_hours__sum']
+    #     if not hoursCompleted:
+    #         hoursCompleted = 0
+    #     return self.capacity - hoursCompleted
+
     @property
     def count(self):
         return self.project.sprint.filter(start__lte=self.start).count()

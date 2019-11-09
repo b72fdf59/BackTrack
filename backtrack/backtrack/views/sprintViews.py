@@ -5,23 +5,11 @@ from ..forms import CreateSprintForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.contrib.auth.models import User
-from ..helpers import addContext
+from ..helpers import addContext, getPBIfromProj
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.contrib import messages
 
-
-def getPBIfromProj(pk, all):
-    from ..models import PBI
-    data, pbiList = [], PBI.objects.filter(project_id=pk)
-    for pbi in pbiList:
-        obj = PBI.objects.get(pk=pbi.id)
-        # If all is true then do not count objects with status done(which are finished), this is for when creating a new PBI
-        if obj.status == 'D' and (not bool(int(all))):
-            continue
-        else:
-            data.append(obj)
-    return data
 
 def getTaskfromProj(pk, all):
     from ..models import Task
@@ -30,6 +18,7 @@ def getTaskfromProj(pk, all):
         obj = Task.objects.get(pk=task.id)
         data.append(obj)
     return data
+
 
 class CreateSprint(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Sprint
@@ -61,45 +50,15 @@ class SprintDetail(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
-        pbi = get_object_or_404(PBI, pk=self.kwargs['spk'])
-        data = getPBIfromProj(self.kwargs['pk'], '0')
-        task = Task.objects.all()
-        PBIList = []
-        for pbi in data:
-            if pbi.sprint == sprint:
-                PBIList.append(pbi)
+        # pbi = get_object_or_404(PBI, pk=self.kwargs['spk'])
+        data = getPBIfromProj(self.kwargs['pk'], '1')
+        PBIList = data.filter(sprint_id = sprint.id)
+        task = []
+        for pbi in PBIList:
+            task.append(pbi.task.all())
         context = {'data': PBIList, 'sprint': sprint, 'task': task}
         context = addContext(self, context)
         return context
-
-class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
-    pk_url_kwarg = 'pbipk'
-    model = Task
-    fields = ['summary', 'effort_hours']
-    login_url = '/accounts/login'
-    template_name = "backtrack/addTask.html"
-    success_message = "Task was created"
-
-    def get_context_data(self, **kwargs):
-        sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
-        pbi = get_object_or_404(PBI, pk=self.kwargs['pbipk'])
-        context = super().get_context_data(**kwargs)
-        context = addContext(self, context)
-        context['sprint'] = sprint
-        context['pbi'] = pbi
-        return context
-
-    def get_success_url(self):
-        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.object.project.id, 'spk': self.object.sprint.id}))
-
-    def form_valid(self, form):
-        form.instance.pbi = get_object_or_404(
-            PBI, pk=self.kwargs['pbipk'])
-        form.instance.project = get_object_or_404(
-            Project, pk=self.kwargs['pk'])
-        form.instance.sprint = get_object_or_404(
-            Sprint, pk=self.kwargs['pk'])
-        return super().form_valid(form)
 
 
 class AddPBIToSprint(LoginRequiredMixin, SuccessMessageMixin, View):

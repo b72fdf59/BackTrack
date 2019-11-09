@@ -1,115 +1,181 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
+
+<ul class="messages" style="padding:0;">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert 
+        {% if message.tags == "success" %} alert-success {% endif %}
+         {% if message.tags == "error" %} alert-danger {% endif %} 
+         alert-dismissible">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <li{% if message.tags %} class="{{ message.tags }}" {% endif %} style="list-style:none">{{ message }}</li>
+            {% endfor %}
+    </div>
+    {% endif %}
+</ul>
+
 <h1 class="page-header"><i class="fa fa-print"></i> Sprint Details </h1>
-<div class="row placeholders"></div>
-    <table class="table table-striped" id="product-backlog">
-            <thead>
-                <tr>
-                    <th>PBI</th>
-                    <th style="padding-left: 105px">Not Done</th>
-                    <th style="padding-left: 85px">In Progress</th>
-                    <th style="padding-left: 105px">Done</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for PBI in data %}
-                <tr>
-                    <td style="color: cornflowerblue">
-                        {{ PBI.summary }}
-                        <br>
-                        {% if ProjectParticipant.role == "DT" %}
-                            <a href="{% url 'add-task' pk=Project.id spk=sprint.id pbipk=PBI.id%}" style="text-decoration: none; color: black"><i
-                            class="fa fa-plus" id="add"></i>ADD</a>
+
+
+<div class="sub-header">
+    <div class="col-md-4">
+        <div class="card card-default">
+            <div class="card-body box-shadow">
+                <p class="lead medium-text bold-text card-body-margin-fix">Total capacity</p>
+                <p class="lead bold-text">{{sprint.capacity}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-default box-shadow">
+            <div class="card-body">
+                <p class="lead medium-text bold-text card-body-margin-fix">Remaining capacity</p>
+                <p class="lead bold-text">{{sprint.remainingCapacity}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-default box-shadow">
+            <div class="card-body">
+                <p class="lead medium-text bold-text card-body-margin-fix">Remaining Hours</p>
+                <p class="lead bold-text">--</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<table class="table table-striped" id="product-backlog">
+    <col width=10%>
+    <col width=26%>
+    <col width=26%>
+    <col width=26%>
+    <col width=5%>
+    <col width=5%>
+    <thead>
+        <tr>
+            <th style="text-align: center;">
+                <h3>PBI</h3>
+            </th>
+            <th style="text-align: center;">
+                <h3>Not Done</h3>
+            </th>
+            <th style="text-align: center;">
+                <h3>In Progress</h3>
+            </th>
+            <th style="text-align: center;">
+                <h3>Done</h3>
+            </th>
+            <th style="text-align: center;">
+                <h3>Burndown</h3>
+            </th>
+            <th style="text-align: center;">
+                <h3>Remaining Effort Hours</h3>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for PBI in data %}
+        <tr>
+            <td>
+                <a href="{% url 'detail-pbi' pk=Project.id pbipk=PBI.id  %}">
+                    <h4 style="color: black;text-align: center;margin: 2rem 0;" class="bold-text">{{ PBI.summary }}</h4>
+                </a>
+                <div style="text-align: center;">
+                    {% if ProjectParticipant.role == "DT" and PBI.status != "D" %}
+                    <a href="{% url 'add-task' pk=Project.id spk=sprint.id pbipk=PBI.id%}"
+                        style="text-decoration: none; color: black"><i class="fa fa-plus" id="add"></i> ADD TASK</a>
+                    {% endif %}
+                </div>
+            </td>
+            <td height="100">
+                <div style="height: 110px; overflow: scroll">
+                    {% for pbiTaskList in task %}
+                    {% if forloop.counter == forloop.parentloop.counter %}
+                    <div class="row">
+                        {% for tk in pbiTaskList %}
+                        {% if tk.status == 'N' and tk.pbi.id == PBI.id %}
+                        <div class="col-lg-6">
+                            <div class="card card-default align-items-center">
+                                <div class="card-body text-center">
+                                    <p class="card-body-margin-fix"> {{ tk.summary }}</p>
+                                    <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
+                                    <p class="hidden-display"> {{ tk.id }}</p>
+                                    <div class="card-footer text-center">
+                                        <button type="button" class="btn btn-primary btn-sm not-done">Start
+                                            Task</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         {% endif %}
-                    </td>
-                    <td>
-                      <div style="height: 110px; overflow: scroll">
-                        <table class="table table-borderless" style="width: 80%;">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th style="text-align: center">
-                                        Summary
-                                    </th>
-                                    <th style="text-align: center">
-                                        Effort hours
-                                    </th>
-                                </tr>
-                            </thead>
-                            {% for tk in task %}
-                            {% if tk.status == 'N' and tk.pbi.id == PBI.id %}
-                            <tr>
-                                <td style="text-align: center">
-                                    {{ tk.summary }}
-                                </td>
-                                <td style="text-align: center">
-                                    {{ tk.effort_hours }}
-                                </td>
-                            </tr>
-                            {% endif %}
-                            {% endfor %}
-                        </table>
-                      </div>
-                    </td>
-                    <td>
-                      <div style="height: 110px; overflow: scroll">
-                        <table class="table table-borderless" style="width: 80%;">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th style="text-align: center">
-                                        Summary
-                                    </th>
-                                    <th style="text-align: center">
-                                        Effort hours
-                                    </th>
-                                </tr>
-                            </thead>
-                            {% for tk in task %}
-                            {% if tk.status == 'P' and tk.pbi.id == PBI.id%}
-                            <tr>
-                                <td style="text-align: center">
-                                    {{ tk.summary }}
-                                </td>
-                                <td style="text-align: center">
-                                    {{ tk.effort_hours }}
-                                </td>
-                            </tr>
-                            {% endif %}
-                            {% endfor %}
-                        </table>
-                      </div>
-                    </td>
-                    <td>
-                      <div style="height: 110px; overflow: scroll">
-                        <table class="table table-borderless" style="width: 80%;">
-                            <thead class="thead-dark">
-                                <tr>
-                                    <th style="text-align: center">
-                                        Summary
-                                    </th>
-                                    <th style="text-align: center">
-                                        Effort hours
-                                    </th>
-                                </tr>
-                            </thead>
-                            {% for tk in task %}
-                            {% if tk.status == 'D' and tk.pbi.id == PBI.id%}
-                            <tr>
-                                <td style="text-align: center">
-                                    {{ tk.summary }}
-                                </td>
-                                <td style="text-align: center">
-                                    {{ tk.effort_hours }}
-                                </td>
-                            </tr>
-                            {% endif %}
-                            {% endfor %}
-                        </table>
-                      </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-    </table>
+                        {% endfor %}
+
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+            </td>
+            <td height="100">
+                <div style="height: 110px; overflow: scroll">
+                    {% for pbiTaskList in task %}
+                    {% if forloop.counter == forloop.parentloop.counter %}
+                    <div class="row">
+                        {% for tk in pbiTaskList %}
+                        {% if tk.status == 'P' and tk.pbi.id == PBI.id %}
+                        <div class="col-lg-6">
+                            <div class="card card-default align-items-center">
+                                <div class="card-body text-center">
+                                    <p class="card-body-margin-fix"> {{ tk.summary }}</p>
+                                    <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
+                                    <p class="hidden-display"> {{ tk.id }}</p>
+                                    <div class="card-footer text-center">
+                                        <button type="button" class="btn btn-primary btn-sm in-progress">Push To
+                                            Done</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td height="100">
+                <div style="height: 110px; overflow: scroll">
+                    {% for pbiTaskList in task %}
+                    {% if forloop.counter == forloop.parentloop.counter %}
+                    <div class="row">
+                        {% for tk in pbiTaskList %}
+                        {% if tk.status == 'D' and tk.pbi.id == PBI.id %}
+                        <div class="col-lg-6">
+                            <div class="card card-default align-items-center">
+                                <div class="card-body text-center">
+                                    <p class="card-body-margin-fix"> {{ tk.summary }}</p>
+                                    <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
+
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </td>
+            <td height="100" style="text-align: right;">
+                4
+            </td>
+            <td height="100" style="text-align: right;">
+                5
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 </div>
 
 <script>
@@ -120,20 +186,39 @@
         return (results !== null) ? results[1] || 0 : false;
     }
     $(document).ready(function () {
-        if ($.urlParam('all') == '1') {
-            $(this).find('.toggle').toggleClass('active');
-
-            if ($(this).find('.btn-primary').length > 0) {
-                $(this).find('.toggle').toggleClass('btn-primary');
+        $(".not-done").click(function () {
+            var taskid = $(this).closest(".card-body").find('p.hidden-display').text()
+            console.log(taskid)
+            // const url = "{% url 'add-pbi-to-sprint' pk=Project.id %}"
+            {
+                %
+                comment %
             }
-        }
-        var getUrl = window.location;
-        var baseUrl = getUrl.protocol + "//" + getUrl.host + getUrl.pathname;
-        $('.btn-toggle').click(function () {
-            if ($.urlParam('all') == '0')
-                window.location.replace(baseUrl + "?all=1");
-            else
-                window.location.replace(baseUrl + "?all=0");
+            $.ajax({
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": token
+                },
+                url: url,
+                data: JSON.stringify({
+                    "PBIs": PBIid
+                }),
+                success: function (data) {
+                    var msg = data.success
+                    localStorage.setItem("Message", msg)
+                    window.location.reload();
+                },
+                error: function (data) {
+                    var err = data.responseJSON.error
+                    $("ul.messages").append(
+                        '<div class="alert alert-danger alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" >' +
+                        err + '</li> </div>')
+                }
+
+            }); {
+                %
+                endcomment %
+            }
         })
 
     });
