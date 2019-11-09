@@ -5,10 +5,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from ..helpers import addContext
 from django.views.generic import CreateView, View, TemplateView
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+import json
 
 
 class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
-    pk_url_kwarg = 'pbipk'
+    # pk_url_kwarg = 'pbipk'
     model = Task
     fields = ['summary', 'effort_hours']
     login_url = '/accounts/login'
@@ -25,15 +27,15 @@ class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return context
 
     def get_success_url(self):
-        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.object.project.id, 'spk': self.object.sprint.id}))
+        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.object.project.id, 'spk': self.kwargs['spk']}))
 
     def form_valid(self, form):
         form.instance.pbi = get_object_or_404(
             PBI, pk=self.kwargs['pbipk'])
         form.instance.project = get_object_or_404(
             Project, pk=self.kwargs['pk'])
-        form.instance.sprint = get_object_or_404(
-            Sprint, pk=self.kwargs['pk'])
+        # form.instance.sprint = get_object_or_404(
+        #     Sprint, pk=self.kwargs['pk'])
         return super().form_valid(form)
 
 
@@ -42,36 +44,14 @@ class AddTaskToInProgress(LoginRequiredMixin, SuccessMessageMixin, View):
     success_message = "PBI was added"
 
     def post(self, request, *args, **kwargs):
-        if not sprint:
-            response = JsonResponse({"error": "No current Sprint"})
-            response.status_code = 400
-            return response
         data = json.loads(request.body)
-        PBIidList = data['PBIs']
-        if len(PBIidList) == 0:
-            response = JsonResponse({"error": "Please select PBIs"})
-            response.status_code = 400
-            return response
-        else:
-            if not sprint:
-                response = JsonResponse({"error": "No current Sprint"})
-                response.status_code = 400
-                return response
-            PBIList = []
-            totCap = 0
-            for PBIid in PBIidList:
-                myPBI = get_object_or_404(PBI, pk=PBIid)
-                totCap += myPBI.story_points
-                PBIList.append(myPBI)
-            if sprint.remainingCapacity < totCap:
-                response = JsonResponse(
-                    {"error": "Sprint remaining capacity is lesser than all PBI capactiy"})
-                response.status_code = 400
-                return response
-            else:
-                for PBI in PBIList:
-                    PBI.addToSprint(sprint)
-                    PBI.save()
-                    response = JsonResponse(
-                        {"success": "Successfully added PBIs to sprint"})
-                return response
+        taskid = data['Task']
+        projectid = data['ProjectID']
+        # print(data)
+        task = get_object_or_404(Task, pk=taskid)
+        task.putInProgress(
+            self.request.user.projectParticipant.get(project_id=projectid))
+        task.save()
+        response = JsonResponse(
+            {"success": "Successfully added PBIs to sprint"})
+        return response

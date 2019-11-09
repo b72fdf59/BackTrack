@@ -90,6 +90,11 @@ footer {
   display: none;
 }
 
+.small-button{
+  width: 2rem !important;
+}
+
+
 /* CSS for bootstrap 3 card */
 /* === card component ====== 
  * Variation of the panel component

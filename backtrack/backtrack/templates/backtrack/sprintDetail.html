@@ -103,8 +103,7 @@
                                     <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
                                     <p class="hidden-display"> {{ tk.id }}</p>
                                     <div class="card-footer text-center">
-                                        <button type="button" class="btn btn-primary btn-sm not-done">Start
-                                            Task</button>
+                                        <button type="button" class="btn btn-primary btn-sm not-done">--&gt</button>
                                     </div>
                                 </div>
                             </div>
@@ -128,10 +127,17 @@
                                 <div class="card-body text-center">
                                     <p class="card-body-margin-fix"> {{ tk.summary }}</p>
                                     <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
+                                    <p class="card-body-margin-fix">{{tk.projectParticipant.user.username}}</p>
                                     <p class="hidden-display"> {{ tk.id }}</p>
                                     <div class="card-footer text-center">
-                                        <button type="button" class="btn btn-primary btn-sm in-progress">Push To
-                                            Done</button>
+                                        <div class="row">
+                                            <div class="col-lg-6"><button type="button"
+                                                    class="btn btn-primary btn-sm in-progress" style="padding: 4px;"> &lt--
+                                                </button></div>
+                                            <div class="col-lg-6"><button type="button"
+                                                    class="btn btn-primary btn-sm in-progress" style="padding: 4px;">
+                                                    --&gt</button></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -179,21 +185,22 @@
 </div>
 
 <script>
-    $.urlParam = function (name) {
-        var results = new RegExp('[\?&]' + name + '=([^&#]*)')
-            .exec(window.location.search);
-
-        return (results !== null) ? results[1] || 0 : false;
-    }
     $(document).ready(function () {
+
+        if (localStorage.getItem("Message")) {
+            var msg = localStorage.getItem("Message")
+            $("ul.messages").append(
+                '<div class="alert alert-success alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" > ' +
+                msg + '</li> </div>')
+            localStorage.clear();
+        }
+
+        var token = '{{csrf_token}}';
         $(".not-done").click(function () {
-            var taskid = $(this).closest(".card-body").find('p.hidden-display').text()
-            console.log(taskid)
-            // const url = "{% url 'add-pbi-to-sprint' pk=Project.id %}"
-            {
-                %
-                comment %
-            }
+            const taskid = $(this).closest(".card-body").find('p.hidden-display').text()
+            const url = "{% url 'task-in-progress' %}"
+            const projectID = "{{Project.id}}"
+
             $.ajax({
                 type: "POST",
                 headers: {
@@ -201,7 +208,8 @@
                 },
                 url: url,
                 data: JSON.stringify({
-                    "PBIs": PBIid
+                    "Task": taskid,
+                    "ProjectID": projectID
                 }),
                 success: function (data) {
                     var msg = data.success
@@ -215,10 +223,7 @@
                         err + '</li> </div>')
                 }
 
-            }); {
-                %
-                endcomment %
-            }
+            });
         })
 
     });
