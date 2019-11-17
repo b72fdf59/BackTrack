@@ -50,7 +50,6 @@ class SprintDetail(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
-        # pbi = get_object_or_404(PBI, pk=self.kwargs['spk'])
         data = getPBIfromProj(self.kwargs['pk'], '1')
         PBIList = data.filter(sprint_id = sprint.id)
         task = []
