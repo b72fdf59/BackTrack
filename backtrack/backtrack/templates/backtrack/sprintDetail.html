@@ -103,7 +103,9 @@
                                     <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
                                     <p class="hidden-display"> {{ tk.id }}</p>
                                     <div class="card-footer text-center">
-                                        <button type="button" class="btn btn-primary btn-sm not-done">--&gt</button>
+                                        {% if ProjectParticipant.role == "DT" %}
+                                            <button type="button" class="btn btn-primary btn-sm not-done">--&gt</button>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -131,12 +133,14 @@
                                     <p class="hidden-display"> {{ tk.id }}</p>
                                     <div class="card-footer text-center">
                                         <div class="row">
+                                            {% if ProjectParticipant.role == "DT" %}
                                             <div class="col-lg-6"><button type="button"
                                                     class="btn btn-primary btn-sm in-progress" style="padding: 4px;"> &lt--
                                                 </button></div>
                                             <div class="col-lg-6"><button type="button"
                                                     class="btn btn-primary btn-sm in-progress" style="padding: 4px;">
                                                     --&gt</button></div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -161,7 +165,6 @@
                                 <div class="card-body text-center">
                                     <p class="card-body-margin-fix"> {{ tk.summary }}</p>
                                     <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
-
                                 </div>
                             </div>
                         </div>
