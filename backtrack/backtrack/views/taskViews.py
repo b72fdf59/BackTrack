@@ -4,7 +4,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from ..helpers import addContext
-from django.views.generic import CreateView, View, TemplateView
+from django.views.generic import CreateView, View, TemplateView, UpdateView
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 import json
 
@@ -36,6 +36,30 @@ class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
             Project, pk=self.kwargs['pk'])
         # form.instance.sprint = get_object_or_404(
         #     Sprint, pk=self.kwargs['pk'])
+        return super().form_valid(form)
+
+
+class UpdateTask(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    pk_url_kwarg = 'taskpk'
+    model = Task
+    fields = ['summary', 'effort_hours']
+    login_url = '/accounts/login'
+    template_name = 'backtrack/Taskdetail.html'
+    success_message = "PBI was updated"
+
+    def get_context_data(self, **kwargs):
+        sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
+        context = super().get_context_data(**kwargs)
+        context['Task'] = self.object
+        context['sprint'] = sprint
+        context = addContext(self, context)
+        return context
+
+    def get_success_url(self):
+        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
+
+    def form_valid(self, form):
+        UpdateTask = self.model.objects.get(pk=self.kwargs['taskpk'])
         return super().form_valid(form)
 
 
