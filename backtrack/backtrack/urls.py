@@ -24,6 +24,8 @@ urlpatterns = [
          sprintViews.CreateSprint.as_view(), name='create-sprint'),
     path('<int:pk>/<int:spk>/<int:pbipk>/add-task/',
          taskViews.AddTask.as_view(), name='add-task'),
+    path('<int:pk>/<int:spk>/<int:taskpk>/detail-task/',
+         taskViews.UpdateTask.as_view(), name='detail-task'),
     path('<int:pk>/<int:spk>/',
          sprintViews.SprintDetail.as_view(), name='detail-sprint'),
     path('<int:pk>/pb/add-pbi-to-sprint',
