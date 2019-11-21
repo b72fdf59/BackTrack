@@ -135,7 +135,7 @@ class DeletePBI(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = PBI
     login_url = '/accounts/login'
     pk_url_kwarg = 'pbipk'
-    success_message = "PBI was deteled"
+    success_message = "PBI was deleted"
 
     def get_success_url(self):
         return "{}?all=0".format(reverse('pb', kwargs={'pk': self.object.project.id}))

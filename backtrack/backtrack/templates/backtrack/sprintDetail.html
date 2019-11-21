@@ -101,16 +101,21 @@
                                 <div class="card-body text-center">
                                     {% if ProjectParticipant.role == "DT" %}
                                     <p class="card-body-margin-fix"><a style="text-decoration: none; color: cornflowerblue;"
-                                        href={% url 'detail-task' pk=Project.id spk=sprint.id taskpk=tk.id %}> {{ tk.summary }} </a></p>
+                                        href={% url 'detail-task-notDone' pk=Project.id spk=sprint.id taskpk=tk.id %}> {{ tk.summary }} </a></p>
                                     {% else %}
                                     <p class="card-body-margin-fix"><a style="text-decoration: none; color: cornflowerblue;"
                                         href="#"> {{ tk.summary }} </a></p>
                                     {% endif %}
                                     <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
+                                    {% if tk.projectParticipant.user.username %}
+                                    <p class="card-body-margin-fix">{{tk.projectParticipant.user.username}}</p>
+                                    {% else %}
+                                    <p class="card-body-margin-fix"> Not assigned </p>
+                                    {% endif %}
                                     <p class="hidden-display"> {{ tk.id }}</p>
                                     <div class="card-footer text-center">
                                         {% if ProjectParticipant.role == "DT" %}
-                                            <button type="button" class="btn btn-primary btn-sm not-done">--&gt</button>
+                                            <button type="button" class="btn btn-primary btn-sm not-done">-&gt</button>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -133,8 +138,13 @@
                         <div class="col-lg-6">
                             <div class="card card-default align-items-center">
                                 <div class="card-body text-center">
+                                    {% if ProjectParticipant.role == "DT" %}
+                                    <p class="card-body-margin-fix"><a style="text-decoration: none; color: cornflowerblue;"
+                                        href={% url 'detail-task-inProgress' pk=Project.id spk=sprint.id taskpk=tk.id %}> {{ tk.summary }} </a></p>
+                                    {% else %}
                                     <p class="card-body-margin-fix"><a style="text-decoration: none; color: cornflowerblue;"
                                         href="#"> {{ tk.summary }} </a></p>
+                                    {% endif %}
                                     <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
                                     <p class="card-body-margin-fix">{{tk.projectParticipant.user.username}}</p>
                                     <p class="hidden-display"> {{ tk.id }}</p>
@@ -142,11 +152,11 @@
                                         <div class="row">
                                             {% if ProjectParticipant.role == "DT" %}
                                             <div class="col-lg-6"><button type="button"
-                                                    class="btn btn-primary btn-sm in-progress" style="padding: 4px;"> &lt--
+                                                    class="btn btn-primary btn-sm in-progress-first" style="padding: 4px;"> &lt-
                                                 </button></div>
                                             <div class="col-lg-6"><button type="button"
-                                                    class="btn btn-primary btn-sm in-progress" style="padding: 4px;">
-                                                    --&gt</button></div>
+                                                    class="btn btn-primary btn-sm in-progress-second" style="padding: 4px;">
+                                                    -&gt</button></div>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -170,7 +180,13 @@
                         <div class="col-lg-6">
                             <div class="card card-default align-items-center">
                                 <div class="card-body text-center">
-                                    <p class="card-body-margin-fix"> {{ tk.summary }}</p>
+                                    {% if ProjectParticipant.role == "DT" %}
+                                    <p class="card-body-margin-fix"><a style="text-decoration: none; color: cornflowerblue;"
+                                        href={% url 'detail-task-notDone' pk=Project.id spk=sprint.id taskpk=tk.id %}> {{ tk.summary }} </a></p>
+                                    {% else %}
+                                    <p class="card-body-margin-fix"><a style="text-decoration: none; color: cornflowerblue;"
+                                        href="#"> {{ tk.summary }} </a></p>
+                                    {% endif %}
                                     <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
                                 </div>
                             </div>
@@ -209,6 +225,92 @@
         $(".not-done").click(function () {
             const taskid = $(this).closest(".card-body").find('p.hidden-display').text()
             const url = "{% url 'task-in-progress' %}"
+            const projectID = "{{Project.id}}"
+
+            $.ajax({
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": token
+                },
+                url: url,
+                data: JSON.stringify({
+                    "Task": taskid,
+                    "ProjectID": projectID
+                }),
+                success: function (data) {
+                    var msg = data.success
+                    localStorage.setItem("Message", msg)
+                    window.location.reload();
+                },
+                error: function (data) {
+                    var err = data.responseJSON.error
+                    $("ul.messages").append(
+                        '<div class="alert alert-danger alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" >' +
+                        err + '</li> </div>')
+                }
+
+            });
+        })
+
+    });
+
+    $(document).ready(function () {
+
+        if (localStorage.getItem("Message")) {
+            var msg = localStorage.getItem("Message")
+            $("ul.messages").append(
+                '<div class="alert alert-success alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" > ' +
+                msg + '</li> </div>')
+            localStorage.clear();
+        }
+
+        var token = '{{csrf_token}}';
+        $(".in-progress-first").click(function () {
+            const taskid = $(this).closest(".card-body").find('p.hidden-display').text()
+            const url = "{% url 'task-not-done' %}"
+            const projectID = "{{Project.id}}"
+
+            $.ajax({
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": token
+                },
+                url: url,
+                data: JSON.stringify({
+                    "Task": taskid,
+                    "ProjectID": projectID
+                }),
+                success: function (data) {
+                    var msg = data.success
+                    localStorage.setItem("Message", msg)
+                    window.location.reload();
+                },
+                error: function (data) {
+                    var err = data.responseJSON.error
+                    $("ul.messages").append(
+                        '<div class="alert alert-danger alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" >' +
+                        err + '</li> </div>')
+                }
+
+            });
+        })
+
+    });
+
+    $(document).ready(function () {
+
+        if (localStorage.getItem("Message")) {
+            var msg = localStorage.getItem("Message")
+            $("ul.messages").append(
+                '<div class="alert alert-success alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" > ' +
+                msg + '</li> </div>')
+            localStorage.clear();
+        }
+
+        var token = '{{csrf_token}}';
+        $(".in-progress-second").click(function () {
+            const taskid = $(this).closest(".card-body").find('p.hidden-display').text()
+            const url = "{% url 'task-done' %}"
             const projectID = "{{Project.id}}"
 
             $.ajax({
