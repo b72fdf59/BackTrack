@@ -4,6 +4,7 @@ from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.urls import reverse
 from django_fsm import FSMField, transition
+from django.http import JsonResponse
 
 # Create your models here.
 
@@ -174,8 +175,7 @@ class Task(models.Model):
         if self.projectParticipant:
             pass
         else:
-            self.projectParticipant = pp
-            pass
+            return 1
 
     @transition(field=status, source='P', target='D')
     def putInDone(self, pp):
@@ -187,10 +187,7 @@ class Task(models.Model):
     def putInNotDone(self, pp):
         print(pp)
         if self.projectParticipant:
-            pass
-        else:
-            self.projectParticipant = pp
-            pass
+            self.projectParticipant = None
 
     def __str__(self):
         return self.summary

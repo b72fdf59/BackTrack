@@ -6,7 +6,7 @@
         {{ form.non_field_errors }}
         {% csrf_token %}
        <div class="form-group">
-            {{form.summary.errors}}
+            {{form.status.errors}}
             {{form.status.label_tag}}
             {{form.status}}
            <small id="priority-small-text" class="form-text text-muted">This is the status for this Task</small>
