@@ -46,7 +46,7 @@ class UpdateTaskNotDone(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     fields = ['status', 'summary', 'effort_hours', 'projectParticipant']
     login_url = '/accounts/login'
     template_name = 'backtrack/Taskdetail.html'
-    success_message = "PBI was updated"
+    success_message = "Task was updated"
 
     def get_context_data(self, **kwargs):
         sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
@@ -97,12 +97,18 @@ class AddTaskToInProgress(LoginRequiredMixin, SuccessMessageMixin, View):
         projectid = data['ProjectID']
         # print(data)
         task = get_object_or_404(Task, pk=taskid)
-        task.putInProgress(
+        x = task.putInProgress(
             self.request.user.projectParticipant.get(project_id=projectid))
-        task.save()
-        response = JsonResponse(
-            {"success": "Successfully changed Task status to In Progress"})
-        return response
+        if not x:
+            task.save()
+            response = JsonResponse(
+                {"success": "Successfully changed Task status to In Progress"})
+            return response
+        else:
+            response = JsonResponse(
+                {"error": "No ProjectParticipant is in-charge of the Task"})
+            response.status_code = 400
+            return response
 
 
 class AddTaskToDone(LoginRequiredMixin, SuccessMessageMixin, View):
