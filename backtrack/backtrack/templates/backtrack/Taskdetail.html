@@ -33,4 +33,9 @@
        <button type="submit" class="btn btn-primary">Confirm</button>
        {% endif %}
     </form>
+    {% csrf_token %}
+    {% if Task.status == "N" %}
+    <a id="Delete" href="{% url 'delete-task' pk=Project.id spk=sprint.id taskpk=Task.id %}" type="submit" class="btn btn-danger"
+        style="height:2.4em;width:5em;text-align: center; margin-top: 0.5em;">Delete</a>
+    {% endif %}
 {% endblock content %}

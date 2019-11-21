@@ -28,11 +28,13 @@ urlpatterns = [
          taskViews.UpdateTaskNotDone.as_view(), name='detail-task-notDone'),
     path('<int:pk>/<int:spk>/<int:taskpk>/detail-task-inProgress/',
          taskViews.UpdateTaskinProgress.as_view(), name='detail-task-inProgress'),
+    path('<int:pk>/<int:spk>/<int:taskpk>/detail-task/delete-task/',
+         taskViews.DeleteTask.as_view(), name='delete-task'),
     path('<int:pk>/<int:spk>/',
          sprintViews.SprintDetail.as_view(), name='detail-sprint'),
     path('<int:pk>/pb/add-pbi-to-sprint',
          sprintViews.AddPBIToSprint.as_view(), name='add-pbi-to-sprint'),
     path('task/in-progress',taskViews.AddTaskToInProgress.as_view(), name='task-in-progress'),
     path('task/done',taskViews.AddTaskToDone.as_view(), name='task-done'),
-    path('task/not-done',taskViews.AddTaskToNotDone.as_view(), name='task-not-done')
+    path('task/not-done',taskViews.AddTaskToNotDone.as_view(), name='task-not-done'),
 ]
