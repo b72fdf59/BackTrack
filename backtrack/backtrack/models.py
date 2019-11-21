@@ -102,6 +102,9 @@ class ProjectParticipant(models.Model):
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name="projectParticipant")
 
+    def __str__(self):
+        return self.user.username
+
     class Meta:
         unique_together = ['user', 'project']
         # permissions=[]

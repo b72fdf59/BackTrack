@@ -1,10 +1,11 @@
 from ..models import Sprint, Project, PBI, Task
+from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from ..helpers import addContext
-from django.views.generic import CreateView, View, TemplateView, UpdateView
+from django.views.generic import CreateView, View, TemplateView, UpdateView, DeleteView
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 import json
 
@@ -138,3 +139,24 @@ class AddTaskToNotDone(LoginRequiredMixin, SuccessMessageMixin, View):
         response = JsonResponse(
             {"success": "Successfully changed Task status to Not Done"})
         return response
+
+
+class DeleteTask(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+    template_name = 'backtrack/task_confirm_delete.html'
+    model = Task
+    login_url = '/accounts/login'
+    pk_url_kwarg = 'taskpk'
+    success_message = "Task was deleted"
+
+    def get_success_url(self):
+        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['Task'] = self.object
+        context = addContext(self, context)
+        return context
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super().delete(request, *args, **kwargs)
