@@ -39,10 +39,10 @@ class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return super().form_valid(form)
 
 
-class UpdateTask(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class UpdateTaskNotDone(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     pk_url_kwarg = 'taskpk'
     model = Task
-    fields = ['summary', 'effort_hours']
+    fields = ['status', 'summary', 'effort_hours', 'projectParticipant']
     login_url = '/accounts/login'
     template_name = 'backtrack/Taskdetail.html'
     success_message = "PBI was updated"
@@ -62,10 +62,33 @@ class UpdateTask(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         UpdateTask = self.model.objects.get(pk=self.kwargs['taskpk'])
         return super().form_valid(form)
 
+class UpdateTaskinProgress(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    pk_url_kwarg = 'taskpk'
+    model = Task
+    fields = ['status']
+    login_url = '/accounts/login'
+    template_name = 'backtrack/Taskdetail_inProgress.html'
+    success_message = "Task was updated"
+
+    def get_context_data(self, **kwargs):
+        sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
+        context = super().get_context_data(**kwargs)
+        context['Task'] = self.object
+        context['sprint'] = sprint
+        context = addContext(self, context)
+        return context
+
+    def get_success_url(self):
+        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
+
+    def form_valid(self, form):
+        UpdateTask = self.model.objects.get(pk=self.kwargs['taskpk'])
+        return super().form_valid(form)
+
 
 class AddTaskToInProgress(LoginRequiredMixin, SuccessMessageMixin, View):
     login_url = '/accounts/login'
-    success_message = "PBI was added"
+    success_message = "Successfully changed Task status to In Progress"
 
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
@@ -77,5 +100,41 @@ class AddTaskToInProgress(LoginRequiredMixin, SuccessMessageMixin, View):
             self.request.user.projectParticipant.get(project_id=projectid))
         task.save()
         response = JsonResponse(
-            {"success": "Successfully added PBIs to sprint"})
+            {"success": "Successfully changed Task status to In Progress"})
+        return response
+
+
+class AddTaskToDone(LoginRequiredMixin, SuccessMessageMixin, View):
+    login_url = '/accounts/login'
+    success_message = "Successfully changed Task status to Done"
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        taskid = data['Task']
+        projectid = data['ProjectID']
+        # print(data)
+        task = get_object_or_404(Task, pk=taskid)
+        task.putInDone(
+            self.request.user.projectParticipant.get(project_id=projectid))
+        task.save()
+        response = JsonResponse(
+            {"success": "Successfully changed Task status to Done"})
+        return response
+
+
+class AddTaskToNotDone(LoginRequiredMixin, SuccessMessageMixin, View):
+    login_url = '/accounts/login'
+    success_message = "Successfully changed Task status to Not Done"
+
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        taskid = data['Task']
+        projectid = data['ProjectID']
+        # print(data)
+        task = get_object_or_404(Task, pk=taskid)
+        task.putInNotDone(
+            self.request.user.projectParticipant.get(project_id=projectid))
+        task.save()
+        response = JsonResponse(
+            {"success": "Successfully changed Task status to Not Done"})
         return response

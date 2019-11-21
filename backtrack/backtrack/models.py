@@ -168,11 +168,26 @@ class Task(models.Model):
     @transition(field=status, source='N', target='P')
     def putInProgress(self, pp):
         print(pp)
-        self.projectParticipant = pp
+        if self.projectParticipant:
+            pass
+        else:
+            self.projectParticipant = pp
+            pass
 
-    @transition(field=status, source='N', target='P')
+    @transition(field=status, source='P', target='D')
     def putInDone(self, pp):
+        # print(pp)
+        # self.projectParticipant = pp
         pass
+
+    @transition(field=status, source='P', target='N')
+    def putInNotDone(self, pp):
+        print(pp)
+        if self.projectParticipant:
+            pass
+        else:
+            self.projectParticipant = pp
+            pass
 
     def __str__(self):
         return self.summary
