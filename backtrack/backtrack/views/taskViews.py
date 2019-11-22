@@ -31,7 +31,7 @@ class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
     def get_success_url(self):
         # Redirect to Sprint Detail
-        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
+        return reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']})
 
     def form_valid(self, form):
         # Add PBI and Project to task before saving
@@ -59,7 +59,7 @@ class DetailTask(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
 
     def get_success_url(self):
         # Redirect to Sprint Backlog
-        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
+        return reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']})
 
 
 class AddTaskToInProgress(LoginRequiredMixin, SuccessMessageMixin, View):
@@ -71,26 +71,40 @@ class AddTaskToInProgress(LoginRequiredMixin, SuccessMessageMixin, View):
             # If post request is sent from Detail Page
             taskid = request.POST.get('Task')
             projectid = request.POST.get('ProjectID')
-            print(taskid)
+            sprintid = request.POST.get('SprintID')
+            task = get_object_or_404(Task, pk=taskid)
+            confirmed = task.putInProgress(
+                self.request.user.projectParticipant.get(project_id=projectid))
+
+            if confirmed:
+                task.save()
+                messages.success(
+                    self.request, "Successfully changed Task status to In Progress")
+                return redirect(reverse('detail-sprint', kwargs={'pk': projectid, 'spk': sprintid}))
+            else:
+                messages.error(
+                    self.request, "No ProjectParticipant is in charge of the Task")
+                return redirect(reverse('detail-sprint', kwargs={'pk': projectid, 'spk': sprintid}))
+
         else:
             # json sent
             data = json.loads(request.body)
             taskid = data['Task']
             projectid = data['ProjectID']
-        task = get_object_or_404(Task, pk=taskid)
-        confirmed = task.putInProgress(
-            self.request.user.projectParticipant.get(project_id=projectid))
+            task = get_object_or_404(Task, pk=taskid)
+            confirmed = task.putInProgress(
+                self.request.user.projectParticipant.get(project_id=projectid))
 
-        if confirmed:
-            task.save()
-            response = JsonResponse(
-                {"success": "Successfully changed Task status to In Progress"})
-            return response
-        else:
-            response = JsonResponse(
-                {"error": "No ProjectParticipant is in-charge of the Task"})
-            response.status_code = 400
-            return response
+            if confirmed:
+                task.save()
+                response = JsonResponse(
+                    {"success": "Successfully changed Task status to In Progress"})
+                return response
+            else:
+                response = JsonResponse(
+                    {"error": "No ProjectParticipant is in charge of the Task"})
+                response.status_code = 400
+                return response
 
 
 class AddTaskToDone(LoginRequiredMixin, SuccessMessageMixin, View):
@@ -98,16 +112,42 @@ class AddTaskToDone(LoginRequiredMixin, SuccessMessageMixin, View):
     success_message = "Successfully changed Task status to Done"
 
     def post(self, request, *args, **kwargs):
-        data = json.loads(request.body)
-        taskid = data['Task']
-        projectid = data['ProjectID']
-        # print(data)
-        task = get_object_or_404(Task, pk=taskid)
-        task.putInDone()
-        task.save()
-        response = JsonResponse(
-            {"success": "Successfully changed Task status to Done"})
-        return response
+        if request.POST.get('Task') and request.POST.get('ProjectID'):
+            # If post request is sent from Detail Page
+            taskid = request.POST.get('Task')
+            projectid = request.POST.get('ProjectID')
+            sprintid = request.POST.get('SprintID')
+            task = get_object_or_404(Task, pk=taskid)
+            confirmed = task.putInDone()
+
+            if confirmed:
+                task.save()
+                messages.success(
+                    self.request, "Successfully changed Task status to In Progress")
+                return redirect(reverse('detail-sprint', kwargs={'pk': projectid, 'spk': sprintid}))
+            else:
+                messages.error(
+                    self.request, "No ProjectParticipant is in charge of the Task")
+                return redirect(reverse('detail-sprint', kwargs={'pk': projectid, 'spk': sprintid}))
+
+        else:
+            # json sent
+            data = json.loads(request.body)
+            taskid = data['Task']
+            projectid = data['ProjectID']
+            task = get_object_or_404(Task, pk=taskid)
+            confirmed = task.putInDone()
+
+            if confirmed:
+                task.save()
+                response = JsonResponse(
+                    {"success": "Successfully changed Task status to In Progress"})
+                return response
+            else:
+                response = JsonResponse(
+                    {"error": "No ProjectParticipant is in charge of the Task"})
+                response.status_code = 400
+                return response
 
 
 class AddTaskToNotDone(LoginRequiredMixin, SuccessMessageMixin, View):
@@ -115,16 +155,42 @@ class AddTaskToNotDone(LoginRequiredMixin, SuccessMessageMixin, View):
     success_message = "Successfully changed Task status to Not Done"
 
     def post(self, request, *args, **kwargs):
-        data = json.loads(request.body)
-        taskid = data['Task']
-        projectid = data['ProjectID']
-        # print(data)
-        task = get_object_or_404(Task, pk=taskid)
-        task.putInNotDone()
-        task.save()
-        response = JsonResponse(
-            {"success": "Successfully changed Task status to Not Done"})
-        return response
+        if request.POST.get('Task') and request.POST.get('ProjectID'):
+            # If post request is sent from Detail Page
+            taskid = request.POST.get('Task')
+            projectid = request.POST.get('ProjectID')
+            sprintid = request.POST.get('SprintID')
+            task = get_object_or_404(Task, pk=taskid)
+            confirmed = task.putInNotDone()
+
+            if confirmed:
+                task.save()
+                messages.success(
+                    self.request, "Successfully changed Task status to In Progress")
+                return redirect(reverse('detail-sprint', kwargs={'pk': projectid, 'spk': sprintid}))
+            else:
+                messages.error(
+                    self.request, "No ProjectParticipant is in charge of the Task")
+                return redirect(reverse('detail-sprint', kwargs={'pk': projectid, 'spk': sprintid}))
+
+        else:
+            # json sent
+            data = json.loads(request.body)
+            taskid = data['Task']
+            projectid = data['ProjectID']
+            task = get_object_or_404(Task, pk=taskid)
+            confirmed = task.putInNotDone()
+
+            if confirmed:
+                task.save()
+                response = JsonResponse(
+                    {"success": "Successfully changed Task status to In Progress"})
+                return response
+            else:
+                response = JsonResponse(
+                    {"error": "No ProjectParticipant is in charge of the Task"})
+                response.status_code = 400
+                return response
 
 
 class DeleteTask(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
@@ -135,7 +201,7 @@ class DeleteTask(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     success_message = "Task was deleted"
 
     def get_success_url(self):
-        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
+        return reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

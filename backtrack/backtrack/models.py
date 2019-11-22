@@ -205,12 +205,13 @@ class Task(models.Model):
 
     @transition(field=status, source='P', target='D')
     def putInDone(self):
-        pass
+        return True
 
     @transition(field=status, source='P', target='N')
     def putInNotDone(self):
         if self.projectParticipant:
             self.projectParticipant = None
+        return True
 
     def __str__(self):
         return self.summary
