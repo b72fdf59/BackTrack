@@ -24,6 +24,8 @@ class PBI(models.Model):
         from django.db.models import Sum
         myDict = self.task.filter(status__exact = "D").aggregate(Sum('effort_hours'))
         remainingHours = myDict['effort_hours__sum']
+        if not remainingHours:
+            remainingHours = 0
         return remainingHours
 
     @property
@@ -138,7 +140,8 @@ class Sprint(models.Model):
     start = models.DateField(
         auto_now=False, auto_now_add=False, blank=False)
     end = models.DateField(auto_now=False, auto_now_add=False, blank=False)
-
+    # complete = models.BooleanField(default=False)
+    
     @property
     def available(self):
         from datetime import date
@@ -154,15 +157,6 @@ class Sprint(models.Model):
             usedCapacity = 0
         return self.capacity - usedCapacity
 
-    # @property
-    # def remainingCapacity(self):
-    #     from django.db.models import Sum
-    #     myDict = self.pbi.all().aggregate(Sum('effort_hours'))
-    #     hoursCompleted = myDict['effort_hours__sum']
-    #     if not hoursCompleted:
-    #         hoursCompleted = 0
-    #     return self.capacity - hoursCompleted
-
     @property
     def count(self):
         return self.project.sprint.filter(start__lte=self.start).count()
@@ -176,6 +170,10 @@ class Sprint(models.Model):
         for PBI in PBIList:
             remainingHours += PBI.remainingEffortHours
         return remainingHours
+
+    @property
+    def remainingDays(self):
+        return 0
 
     def get_absolute_url(self):
         return reverse("detail-sprint", kwargs={"pk": self.project_id, "spk": self.id})

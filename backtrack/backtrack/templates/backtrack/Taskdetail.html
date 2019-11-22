@@ -23,34 +23,34 @@
             {{ form.projectParticipant }}
            <small id="priority-small-text" class="form-text text-muted">This is the Project participant responsible for this Task</small>
        </div>
-       {% if Task.status == 'N' %}
+       {% if Task.status == 'N' and sprint.available %}
        <button type="submit" class="btn btn-primary">Confirm</button>
        {% endif %}
     </form>
     {% csrf_token %}
-    {% if Task.status == "N" %}
+    {% if Task.status == "N" and sprint.available %}
     <a id="Delete" href="{% url 'delete-task' pk=Project.id spk=sprint.id taskpk=Task.id %}" type="submit" class="btn btn-danger"
         style="height:2.4em;width:5em;text-align: center; margin-top: 0.5em;">Delete</a>
     {% endif %}
     
     <form action={% url 'task-in-progress' %} method="POST">
     {% csrf_token %}
-    {% if Task.status == 'N' %}
+    {% if Task.status == 'N' and sprint.available %}
         <input type="hidden" value={{Task.id}} name='Task' />
         <input type="hidden" value={{Project.id}} name="ProjectID" />
         <input type="hidden" value={{sprint.id}} name="SprintID" />
-       <button type="submit" class="btn btn-primary">Start</button>
+       <button type="submit" class="btn btn-primary" style="margin-top: 0.5em;">Start Task</button>
     {% endif %}
     </form>
 
-    {% if Task.status == 'P' %}
+    {% if Task.status == 'P' and sprint.available %}
     <form action={% url 'task-done' %} method="POST">
         {% csrf_token %}
         
             <input type="hidden" value={{Task.id}} name='Task' />
             <input type="hidden" value={{Project.id}} name="ProjectID" />
             <input type="hidden" value={{sprint.id}} name="SprintID" />
-           <button type="submit" class="btn btn-primary">Finish</button>
+           <button type="submit" class="btn btn-primary" style="margin-top: 0.5em;">Finish Task</button>
     </form>
     <form action={% url 'task-not-done' %} method="POST">
         {% csrf_token %}
@@ -58,7 +58,7 @@
             <input type="hidden" value={{Task.id}} name='Task' />
             <input type="hidden" value={{Project.id}} name="ProjectID" />
             <input type="hidden" value={{sprint.id}} name="SprintID" />
-           <button type="submit" class="btn btn-primary">Not Done</button>
+           <button type="submit" class="btn btn-primary" style="margin-top: 0.5em;">Task Not Done</button>
         
     </form>
     {% endif %}

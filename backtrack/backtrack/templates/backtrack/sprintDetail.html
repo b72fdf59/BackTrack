@@ -2,6 +2,12 @@
 {% block content %}
 
 <ul class="messages" style="padding:0;">
+    {% if sprint.available is False %}
+    <div class="alert alert-danger alert-dismissible">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <li style="list-style:none"> The Sprint is complete</li>
+    </div>
+    {% endif %}
     {% if messages %}
     {% for message in messages %}
     <div class="alert 
@@ -15,11 +21,11 @@
     {% endif %}
 </ul>
 
-<h1 class="page-header"><i class="fa fa-print"></i> Sprint Details </h1>
+<h1 class="page-header"><i class="fa fa-print"></i> Sprint Backlog </h1>
 
 
 <div class="sub-header">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card card-default">
             <div class="card-body box-shadow">
                 <p class="lead medium-text bold-text card-body-margin-fix">Total capacity</p>
@@ -27,7 +33,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card card-default box-shadow">
             <div class="card-body">
                 <p class="lead medium-text bold-text card-body-margin-fix">Remaining capacity</p>
@@ -35,11 +41,19 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card card-default box-shadow">
             <div class="card-body">
                 <p class="lead medium-text bold-text card-body-margin-fix">Remaining Hours</p>
                 <p class="lead bold-text">{{sprint.remainingHours}}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card card-default box-shadow">
+            <div class="card-body">
+                <p class="lead medium-text bold-text card-body-margin-fix">Remaining Days</p>
+                <p class="lead bold-text">{{sprint.remainingDays}}</p>
             </div>
         </div>
     </div>
@@ -83,9 +97,11 @@
                     <h4 style="color: black;text-align: center;margin: 2rem 0;" class="bold-text">{{ PBI.summary }}</h4>
                 </a>
                 <div style="text-align: center;">
-                    {% if ProjectParticipant.role == "DT" and PBI.status != "D" %}
+                    {% if ProjectParticipant.role == "DT" and PBI.status != "D" and sprint.available %}
                     <a href="{% url 'add-task' pk=Project.id spk=sprint.id pbipk=PBI.id%}"
                         style="text-decoration: none; color: black"><i class="fa fa-plus" id="add"></i> ADD TASK</a>
+                    <a href="{% url 'remove-pbi-from-sprint' pk=Project.id spk=sprint.id pbipk=PBI.id%}"
+                        style="text-decoration: none; color: black"><i class="fa fa-minus" id="add"></i> REMOVE PBI FROM SPRINT</a>
                     {% endif %}
                 </div>
             </td>
@@ -119,11 +135,13 @@
                                     <p class="card-body-margin-fix"> Not assigned </p>
                                     {% endif %}
                                     <p class="hidden-display"> {{ tk.id }}</p>
+                                    {% if sprint.available %}
                                     <div class="card-footer text-center">
                                         {% if ProjectParticipant.role == "DT" %}
                                         <button type="button" class="btn btn-primary btn-sm not-done">Start</button>
                                         {% endif %}
                                     </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -161,6 +179,7 @@
                                     <p class="card-body-margin-fix">{{tk.projectParticipant.user.username}}</p>
                                     <p class="hidden-display"> {{ tk.id }}</p>
                                     <div class="card-footer text-center">
+                                        {% if sprint.available %}
                                         <div class="row">
                                             {% if ProjectParticipant.role == "DT" %}
                                             <div class="col-lg-6"><button type="button"
@@ -173,6 +192,7 @@
                                                     Done</button></div>
                                             {% endif %}
                                         </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>

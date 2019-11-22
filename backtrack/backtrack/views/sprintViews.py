@@ -79,7 +79,7 @@ class AddPBIToSprint(LoginRequiredMixin, SuccessMessageMixin, View):
             # If the requqest was sent from the detail page
             addPBI = get_object_or_404(PBI, pk=PBIid)
             if addPBI.sprint:
-                #If PBI has a sprint
+                # If PBI has a sprint
                 messages.error(
                     self.request, "PBI is in a another sprint")
             elif not (sprint or sprint.available):
@@ -141,3 +141,30 @@ class AddPBIToSprint(LoginRequiredMixin, SuccessMessageMixin, View):
                             response = JsonResponse(
                                 {"success": "Successfully added PBIs to sprint"})
                     return response
+
+
+class RemovePBIfromSprint(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
+    # pk_url_kwarg = 'pbipk'
+    model = PBI
+    login_url = '/accounts/login'
+    template_name = "backtrack/remove_PBI_from_Sprint.html"
+    success_message = "PBI was deleted"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add context variables for sidebar
+        context = addContext(self, context)
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
+        pbi = get_object_or_404(PBI, pk=self.kwargs['pbipk'])
+        context['Sprint'] = sprint
+        context['PBI'] = pbi
+        context['Project'] = project
+        return context
+
+    def post(self, request, **kwargs):
+        pbi = get_object_or_404(PBI, pk = self.kwargs['pbipk'])
+        pbi.task.all().delete()
+        pbi.sprint = None
+        pbi.save()
+        return redirect(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
