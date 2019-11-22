@@ -89,10 +89,13 @@
                     {% endif %}
                 </div>
             </td>
-            <td height="100">
-                <div style="height: 110px; overflow: scroll">
+
+            <!-- For tasks Not Done -->
+            <td class="container">
+                <div>
                     {% for pbiTaskList in task %}
                     {% if forloop.counter == forloop.parentloop.counter %}
+                    <!-- If the PBI of the inner loop equals the PBI in the outer loop -->
                     <div class="row">
                         {% for tk in pbiTaskList %}
                         {% if tk.status == 'N' and tk.pbi.id == PBI.id %}
@@ -100,11 +103,14 @@
                             <div class="card card-default align-items-center">
                                 <div class="card-body text-center">
                                     {% if ProjectParticipant.role == "DT" %}
-                                    <p class="card-body-margin-fix"><a style="text-decoration: none; color: cornflowerblue;"
-                                        href={% url 'detail-task-notDone' pk=Project.id spk=sprint.id taskpk=tk.id %}> {{ tk.summary }} </a></p>
+                                    <p class="card-body-margin-fix"><a
+                                            style="text-decoration: none; color: cornflowerblue;"
+                                            href={% url 'detail-task' pk=Project.id spk=sprint.id taskpk=tk.id %}>
+                                            {{ tk.summary }} </a></p>
                                     {% else %}
-                                    <p class="card-body-margin-fix"><a style="text-decoration: none; color: cornflowerblue;"
-                                        href="#"> {{ tk.summary }} </a></p>
+                                    <p class="card-body-margin-fix"><a
+                                            style="text-decoration: none; color: cornflowerblue;" href="#">
+                                            {{ tk.summary }} </a></p>
                                     {% endif %}
                                     <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
                                     {% if tk.projectParticipant.user.username %}
@@ -115,7 +121,7 @@
                                     <p class="hidden-display"> {{ tk.id }}</p>
                                     <div class="card-footer text-center">
                                         {% if ProjectParticipant.role == "DT" %}
-                                            <button type="button" class="btn btn-primary btn-sm not-done">-&gt</button>
+                                        <button type="button" class="btn btn-primary btn-sm not-done">Start</button>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -128,10 +134,13 @@
                     {% endif %}
                     {% endfor %}
             </td>
-            <td height="100">
-                <div style="height: 110px; overflow: scroll">
+
+            <!-- For tasks In Progress -->
+            <td class="container">
+                <div>
                     {% for pbiTaskList in task %}
                     {% if forloop.counter == forloop.parentloop.counter %}
+                    <!-- If the PBI of the inner loop equals the PBI in the outer loop -->
                     <div class="row">
                         {% for tk in pbiTaskList %}
                         {% if tk.status == 'P' and tk.pbi.id == PBI.id %}
@@ -139,11 +148,14 @@
                             <div class="card card-default align-items-center">
                                 <div class="card-body text-center">
                                     {% if ProjectParticipant.role == "DT" %}
-                                    <p class="card-body-margin-fix"><a style="text-decoration: none; color: cornflowerblue;"
-                                        href={% url 'detail-task-inProgress' pk=Project.id spk=sprint.id taskpk=tk.id %}> {{ tk.summary }} </a></p>
+                                    <p class="card-body-margin-fix"><a
+                                            style="text-decoration: none; color: cornflowerblue;"
+                                            href={% url 'detail-task' pk=Project.id spk=sprint.id taskpk=tk.id %}>
+                                            {{ tk.summary }} </a></p>
                                     {% else %}
-                                    <p class="card-body-margin-fix"><a style="text-decoration: none; color: cornflowerblue;"
-                                        href="#"> {{ tk.summary }} </a></p>
+                                    <p class="card-body-margin-fix"><a
+                                            style="text-decoration: none; color: cornflowerblue;" href="#">
+                                            {{ tk.summary }} </a></p>
                                     {% endif %}
                                     <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
                                     <p class="card-body-margin-fix">{{tk.projectParticipant.user.username}}</p>
@@ -152,10 +164,12 @@
                                         <div class="row">
                                             {% if ProjectParticipant.role == "DT" %}
                                             <div class="col-lg-6"><button type="button"
-                                                    class="btn btn-primary btn-sm in-progress-first" style="padding: 4px;"> &lt-
+                                                    class="btn btn-primary btn-sm in-progress-first"
+                                                    style="padding: 4px;"> &lt-
                                                 </button></div>
                                             <div class="col-lg-6"><button type="button"
-                                                    class="btn btn-primary btn-sm in-progress-second" style="padding: 4px;">
+                                                    class="btn btn-primary btn-sm in-progress-second"
+                                                    style="padding: 4px;">
                                                     -&gt</button></div>
                                             {% endif %}
                                         </div>
@@ -170,10 +184,13 @@
                     {% endfor %}
                 </div>
             </td>
-            <td height="100">
-                <div style="height: 110px; overflow: scroll">
+
+            <!-- For tasks Done -->
+            <td class="container">
+                <div>
                     {% for pbiTaskList in task %}
                     {% if forloop.counter == forloop.parentloop.counter %}
+                    <!-- If the PBI of the inner loop equals the PBI in the outer loop -->
                     <div class="row">
                         {% for tk in pbiTaskList %}
                         {% if tk.status == 'D' and tk.pbi.id == PBI.id %}
@@ -181,13 +198,17 @@
                             <div class="card card-default align-items-center">
                                 <div class="card-body text-center">
                                     {% if ProjectParticipant.role == "DT" %}
-                                    <p class="card-body-margin-fix"><a style="text-decoration: none; color: cornflowerblue;"
-                                        href={% url 'detail-task-notDone' pk=Project.id spk=sprint.id taskpk=tk.id %}> {{ tk.summary }} </a></p>
+                                    <p class="card-body-margin-fix"><a
+                                            style="text-decoration: none; color: cornflowerblue;"
+                                            href={% url 'detail-task' pk=Project.id spk=sprint.id taskpk=tk.id %}>
+                                            {{ tk.summary }} </a></p>
                                     {% else %}
-                                    <p class="card-body-margin-fix"><a style="text-decoration: none; color: cornflowerblue;"
-                                        href="#"> {{ tk.summary }} </a></p>
+                                    <p class="card-body-margin-fix"><a
+                                            style="text-decoration: none; color: cornflowerblue;" href="#">
+                                            {{ tk.summary }} </a></p>
                                     {% endif %}
                                     <p class="card-body-margin-fix"> {{ tk.effort_hours }}</p>
+                                    <p class="card-body-margin-fix">{{tk.projectParticipant.user.username}}</p>
                                 </div>
                             </div>
                         </div>
@@ -198,9 +219,13 @@
                     {% endfor %}
                 </div>
             </td>
+
+            <!-- Burndown-->
             <td height="100" style="text-align: right;">
                 4
             </td>
+
+            <!-- Remaining Effort Hours-->
             <td height="100" style="text-align: right;">
                 5
             </td>

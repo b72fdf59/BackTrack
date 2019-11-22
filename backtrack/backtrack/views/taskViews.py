@@ -19,31 +19,31 @@ class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "Task was created"
 
     def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add context variables for sidebar
+        context = addContext(self, context)
+
         sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
         pbi = get_object_or_404(PBI, pk=self.kwargs['pbipk'])
-        context = super().get_context_data(**kwargs)
-        context = addContext(self, context)
-        context['sprint'] = sprint
-        context['pbi'] = pbi
+        context['Sprint'] = sprint
+        context['PBI'] = pbi
         return context
 
     def get_success_url(self):
-        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.object.project.id, 'spk': self.kwargs['spk']}))
+        # Redirect to Sprint Detail
+        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
 
     def form_valid(self, form):
+        # Add PBI and Project to task before saving
         form.instance.pbi = get_object_or_404(
             PBI, pk=self.kwargs['pbipk'])
-        form.instance.project = get_object_or_404(
-            Project, pk=self.kwargs['pk'])
-        # form.instance.sprint = get_object_or_404(
-        #     Sprint, pk=self.kwargs['pk'])
         return super().form_valid(form)
 
 
-class UpdateTaskNotDone(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class DetailTask(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     pk_url_kwarg = 'taskpk'
     model = Task
-    fields = ['status', 'summary', 'effort_hours', 'projectParticipant']
+    fields = ['summary', 'effort_hours', 'projectParticipant']
     login_url = '/accounts/login'
     template_name = 'backtrack/Taskdetail.html'
     success_message = "Task was updated"
@@ -53,38 +53,13 @@ class UpdateTaskNotDone(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['Task'] = self.object
         context['sprint'] = sprint
+        # Add context variables for sidebar
         context = addContext(self, context)
         return context
 
     def get_success_url(self):
+        # Redirect to Sprint Backlog
         return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
-
-    def form_valid(self, form):
-        UpdateTask = self.model.objects.get(pk=self.kwargs['taskpk'])
-        return super().form_valid(form)
-
-class UpdateTaskinProgress(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
-    pk_url_kwarg = 'taskpk'
-    model = Task
-    fields = ['status']
-    login_url = '/accounts/login'
-    template_name = 'backtrack/Taskdetail_inProgress.html'
-    success_message = "Task was updated"
-
-    def get_context_data(self, **kwargs):
-        sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
-        context = super().get_context_data(**kwargs)
-        context['Task'] = self.object
-        context['sprint'] = sprint
-        context = addContext(self, context)
-        return context
-
-    def get_success_url(self):
-        return "{}?all=0".format(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
-
-    def form_valid(self, form):
-        UpdateTask = self.model.objects.get(pk=self.kwargs['taskpk'])
-        return super().form_valid(form)
 
 
 class AddTaskToInProgress(LoginRequiredMixin, SuccessMessageMixin, View):
@@ -95,11 +70,11 @@ class AddTaskToInProgress(LoginRequiredMixin, SuccessMessageMixin, View):
         data = json.loads(request.body)
         taskid = data['Task']
         projectid = data['ProjectID']
-        # print(data)
         task = get_object_or_404(Task, pk=taskid)
-        x = task.putInProgress(
+        confirmed = task.putInProgress(
             self.request.user.projectParticipant.get(project_id=projectid))
-        if not x:
+
+        if confirmed:
             task.save()
             response = JsonResponse(
                 {"success": "Successfully changed Task status to In Progress"})
@@ -160,6 +135,7 @@ class DeleteTask(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['Task'] = self.object
+        # Add context variables for sidebar
         context = addContext(self, context)
         return context
 

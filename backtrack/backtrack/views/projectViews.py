@@ -21,10 +21,13 @@ class CreateProject(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     success_message = "Project was created"
 
     def get_success_url(self):
+        # Redirect to invite members page
         return reverse('invite-project-members', kwargs={'pk': self.object.id})
 
     def form_valid(self, form):
         response = super().form_valid(form)
+
+        # Create a project participant of the user as a Product Owner
         projectParticipant = ProjectParticipant(
             user=self.request.user, role="PO", project=form.instance)
         projectParticipant.save()
@@ -37,10 +40,20 @@ class InviteMember(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['users'] = User.objects.filter(
-            projectParticipant__isnull=True).exclude(username=self.request.user.username)
+        # Get all users other than the current user
+        users = User.objects.all().exclude(username=self.request.user.username)
+
+        for user in users:
+            if user.projectParticipant.all().exists:
+                if user.projectParticipant.filter(project__complete=False).exists():
+                    # If a user has a project which is not complete exclude him.
+                    users = users.exclude(pk=user.pk)
+        context['users'] = users
+        # Add context variables for sidebar
         context = addContext(self, context)
         return context
+
+# Send Email to team member
 
 
 class EmailMember(LoginRequiredMixin, View):
@@ -50,10 +63,13 @@ class EmailMember(LoginRequiredMixin, View):
         userID = self.request.GET['id']
         recipient_email = get_object_or_404(User, id=userID).email
         if recipient_email:
+            # If the recepient mail exists
             username = self.request.user.username
             name = User.objects.get(id=userID).username
+            # Build absolute URL for the invite link
             fullPath = self.request.build_absolute_uri(
                 reverse('add-project-developer', kwargs={'pk': kwargs['pk']}))
+
             link = "{}?id={}".format(
                 fullPath, userID)
             subject = "Invitation to join new project"
@@ -61,7 +77,7 @@ class EmailMember(LoginRequiredMixin, View):
                 name, username, link)
             from_email = settings.EMAIL_HOST_USER
             send_mail(subject, message, from_email, [
-                    recipient_email], fail_silently=False)
+                recipient_email], fail_silently=False)
             return HttpResponse()
         else:
             return HttpResponseForbidden("User does not have an email")
@@ -75,7 +91,9 @@ class AddDeveloper(LoginRequiredMixin, View):
         project = get_object_or_404(Project, pk=kwargs['pk'])
         user = get_object_or_404(User, pk=request.GET['id'])
         if project.projectParticipant.all().filter(role="DT").count() <= 9:
-            if not user.projectParticipant.all().exists():
+            # If there are lesser than 9 project participants
+            if not user.projectParticipant.filter(project__complete=False).exists():
+                # If the user has projects that are not complete
                 projectParticipant = self.model(
                     project=project, user=user, role="DT")
                 projectParticipant.save()

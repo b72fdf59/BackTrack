@@ -11,15 +11,6 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.contrib import messages
 
 
-def getTaskfromProj(pk, all):
-    from ..models import Task
-    data, TaskList = [], Task.objects.all()
-    for task in TaskList:
-        obj = Task.objects.get(pk=task.id)
-        data.append(obj)
-    return data
-
-
 class CreateSprint(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = Sprint
     form_class = CreateSprintForm
@@ -29,16 +20,21 @@ class CreateSprint(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Add context variables for sidebar
         context = addContext(self, context)
         return context
 
     def form_valid(self, form):
         project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        # Get all sprints for a project
         sprintList = project.sprint.all()
+
         for sprint in sprintList:
             if sprint.available:
+                # If a sprint is running redirect back
                 messages.error(self.request, 'Sprint is in Progress')
                 return redirect(self.request.path_info)
+
         form.instance.project = project
         return super().form_valid(form)
 
@@ -50,12 +46,18 @@ class SprintDetail(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
-        data = getPBIfromProj(self.kwargs['pk'], '1')
-        PBIList = data.filter(sprint_id = sprint.id)
+
+        # Get PBI for current sprint
+        PBIList = getPBIfromProj(
+            self.kwargs['pk'], '1').filter(sprint_id=sprint.id)
+
+        # Get tasks for each PBI
         task = []
         for pbi in PBIList:
             task.append(pbi.task.all())
         context = {'data': PBIList, 'sprint': sprint, 'task': task}
+
+        # Add context variables for sidebar
         context = addContext(self, context)
         return context
 
@@ -69,54 +71,73 @@ class AddPBIToSprint(LoginRequiredMixin, SuccessMessageMixin, View):
         import json
         from ..models import PBI
         # Do we get the correct sprint?
+        # We have to do it this way cause we have a property available and not a field
         sprint = self.request.user.projectParticipant.get(
             project__complete=False).project.sprint.all().order_by('-start')[0]
         PBIid = request.POST.get('PBIs')
         if PBIid:
+            # If the requqest was sent from the detail page
             addPBI = get_object_or_404(PBI, pk=PBIid)
-            if not sprint:
+            if addPBI.sprint:
+                #If PBI has a sprint
+                messages.error(
+                    self.request, "PBI is in a another sprint")
+            elif not (sprint or sprint.available):
+                # If there is no current sprint or if the sprint is not available
                 messages.error(
                     self.request, "No such sprint")
             elif sprint.remainingCapacity < addPBI.story_points:
+                # If the remaining capacity is lesser than the story points of the PBI
                 messages.error(
                     self.request, "Sprint remaining capacity is lesser than PBI capactiy")
             else:
+                # Successfully added sprint
                 messages.success(
                     self.request, "Successfully added PBIs to sprint")
                 addPBI.addToSprint(sprint)
                 addPBI.save()
+
+            # Redirect to Product Backlog
             return redirect(reverse('pb', kwargs={'pk': self.kwargs['pk']}))
         else:
-            if not sprint:
+            # If an ajax request is sent from the Product Backlog
+            if not (sprint or sprint.available):
+                # If there is no current sprint or if the sprint is not available
                 response = JsonResponse({"error": "No current Sprint"})
                 response.status_code = 400
                 return response
+
+            # Read json data
             data = json.loads(request.body)
             PBIidList = data['PBIs']
+
             if len(PBIidList) == 0:
+                # If there are no PBIs
                 response = JsonResponse({"error": "Please select PBIs"})
                 response.status_code = 400
                 return response
             else:
-                if not sprint:
-                    response = JsonResponse({"error": "No current Sprint"})
-                    response.status_code = 400
-                    return response
                 PBIList = []
                 totCap = 0
+
+                # Add each PBI sent in the request to a list
                 for PBIid in PBIidList:
                     myPBI = get_object_or_404(PBI, pk=PBIid)
                     totCap += myPBI.story_points
                     PBIList.append(myPBI)
+
                 if sprint.remainingCapacity < totCap:
+                    # If the remaining capacity is lesser than the story points of all the PBI
                     response = JsonResponse(
                         {"error": "Sprint remaining capacity is lesser than all PBI capactiy"})
                     response.status_code = 400
                     return response
                 else:
+                    # Add all the PBI in the list to the sprint
                     for PBI in PBIList:
-                        PBI.addToSprint(sprint)
-                        PBI.save()
-                        response = JsonResponse(
-                            {"success": "Successfully added PBIs to sprint"})
+                        if not PBI.sprint:
+                            PBI.addToSprint(sprint)
+                            PBI.save()
+                            response = JsonResponse(
+                                {"success": "Successfully added PBIs to sprint"})
                     return response

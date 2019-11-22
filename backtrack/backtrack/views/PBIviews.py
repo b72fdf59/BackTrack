@@ -16,9 +16,10 @@ class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'backtrack/home.html'
 
     def get_context_data(self, **kwargs):
-
-        if self.request.user.projectParticipant.all().exists():
+        if self.request.user.projectParticipant.filter(project__complete=False).exists():
+            # If user has a project that is not yet completed
             context = {}
+            # Add context variables for sidebar
             context = addContext(self, context)
         else:
             context = {}
@@ -31,17 +32,25 @@ class ProductBacklogView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         import math
-        # query = request.query_params
+        # Get query parameter 'all' which is 1 or 0
+        # If not present then pass 0
+        # 1:Get all PBIs for a project
+        # 0: Exclude PBI which are Done
         data = getPBIfromProj(
             kwargs['pk'], self.request.GET['all'] if 'all' in self.request.GET else '0')
+
+        # Sort PBI according to priority, put the PBI that are done at the end of the backlog
         data = sorted(data, key=lambda x: (
             x.priority if x.status != "D" else math.inf, x.summary))
+
+        # Calculate the total story points and effort hours
         sum_effort_hours, sum_story_points = 0, 0
         for PBIObj in data:
             sum_effort_hours += PBIObj.effort_hours
             sum_story_points += PBIObj.story_points
             PBIObj.sum_effort_hours = sum_effort_hours
             PBIObj.sum_story_points = sum_story_points
+
         context = {'data': data}
         context = addContext(self, context)
         return context
@@ -56,14 +65,18 @@ class AddPBI(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Add context variables for sidebar
         context = addContext(self, context)
         return context
 
     def get_success_url(self):
+        # Redirect to the product backlog
         return "{}?all=0".format(reverse('pb', kwargs={'pk': self.object.project.id}))
 
     def form_valid(self, form):
+        # Get all PBI that are not done
         PBIData = getPBIfromProj(self.kwargs['pk'], '0')
+
         # Initialise Priority
         priority = 0
         # Sort According to Priority
@@ -74,7 +87,10 @@ class AddPBI(LoginRequiredMixin, SuccessMessageMixin, CreateView):
             priority = PBIData[0].priority + 1
         else:
             priority = 1
+
+        # Assign the priority to the form object before saving
         form.instance.priority = priority
+        # Assign the project to the form object before saving
         form.instance.project = get_object_or_404(
             Project, pk=self.kwargs['pk'])
         return super().form_valid(form)
@@ -91,20 +107,26 @@ class updatePBI(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['PBI'] = self.object
+        # Add context variables for sidebar
         context = addContext(self, context)
         return context
 
     def get_success_url(self):
+        # Redirect to the product backlog
         return "{}?all=0".format(reverse('pb', kwargs={'pk': self.kwargs['pk']}))
 
     def form_valid(self, form):
+        # Get PBI from its primary key
         updatePBI = self.model.objects.get(pk=self.kwargs['pbipk'])
+        # Get all PBI that are not done
         PBIList = getPBIfromProj(self.kwargs['pk'], '0')
+
+        # PBI to be removed
         remove = []
         priorityData = form.cleaned_data['priority']
         if int(priorityData) < updatePBI.priority:
             # Remove all PBI with priority higher than post data priority
-            # and lesser  or equal than current PBI priority
+            # and lesser or equal than current PBI priority
             for PBIObj in PBIList:
                 if PBIObj.priority < int(priorityData) or PBIObj.priority >= updatePBI.priority:
                     remove.append(PBIObj.priority)
@@ -138,11 +160,13 @@ class DeletePBI(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     success_message = "PBI was deleted"
 
     def get_success_url(self):
+        # Redirect to the product backlog
         return "{}?all=0".format(reverse('pb', kwargs={'pk': self.object.project.id}))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['PBI'] = self.object
+        # Add context variables for sidebar
         context = addContext(self, context)
         return context
 

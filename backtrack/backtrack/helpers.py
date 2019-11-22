@@ -3,10 +3,13 @@ from .models import PBI
 
 
 def addContext(self, context):
+    #Get that project by a project participant which has not been completed
     context['Project'] = self.request.user.projectParticipant.get(
         project__complete=False).project
+        #Get the project participant whose project is not completed
     context['ProjectParticipant'] = self.request.user.projectParticipant.get(
         project__complete=False)
+        #Get all the sprints for a particular project and order them by their start date
     context['Sprints'] = self.request.user.projectParticipant.get(
         project__complete=False).project.sprint.all().order_by('start')
     return context

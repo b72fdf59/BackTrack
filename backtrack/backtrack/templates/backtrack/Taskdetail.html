@@ -2,15 +2,9 @@
 {% block content %}
     <h1 class="page-header"><i class="fa fa-edit"></i> Edit Task </h1>
     <div class="row placeholders"></div>
-    <form action={% url 'detail-task-notDone' pk=Project.id spk=sprint.id taskpk=Task.id %} method="POST">
+    <form action={% url 'detail-task' pk=Project.id spk=sprint.id taskpk=Task.id %} method="POST">
         {{ form.non_field_errors }}
         {% csrf_token %}
-       <div class="form-group">
-            {{form.status.errors}}
-            {{form.status.label_tag}}
-            {{form.status}}
-           <small id="priority-small-text" class="form-text text-muted">This is the status for this Task</small>
-       </div>
        <div class="form-group">
             {{form.summary.errors}}
             {{form.summary.label_tag}}
@@ -29,7 +23,7 @@
             {{ form.projectParticipant }}
            <small id="priority-small-text" class="form-text text-muted">This is the Project participant responsible for this Task</small>
        </div>
-       {% if Task.status != 'D' %}
+       {% if Task.status == 'N' %}
        <button type="submit" class="btn btn-primary">Confirm</button>
        {% endif %}
     </form>
