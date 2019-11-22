@@ -32,4 +32,12 @@
     <a id="Delete" href="{% url 'delete-task' pk=Project.id spk=sprint.id taskpk=Task.id %}" type="submit" class="btn btn-danger"
         style="height:2.4em;width:5em;text-align: center; margin-top: 0.5em;">Delete</a>
     {% endif %}
+    
+    <form action={% url 'task-in-progress' %} method="POST">
+    {% csrf_token %}
+    {% if Task.status == 'N' %}
+        <input type="hidden" value=taskpk name="Task" />
+        <input type="hidden" value=Project.id name="ProjectID" />
+       <button type="submit" class="btn btn-primary">Start</button>
+    {% endif %}
 {% endblock content %}

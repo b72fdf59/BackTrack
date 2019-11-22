@@ -38,10 +38,10 @@ urlpatterns = [
          sprintViews.AddPBIToSprint.as_view(), name='add-pbi-to-sprint'),
 
     # Tasks paths in Sprint Backlog
-    path('task/in-progress', taskViews.AddTaskToInProgress.as_view(),
-         name='task-in-progress'),
     path('<int:pk>/<int:spk>/<int:taskpk>/detail-task/',
          taskViews.DetailTask.as_view(), name='detail-task'),
+    path('task/in-progress', taskViews.AddTaskToInProgress.as_view(),
+         name='task-in-progress'),
     path('task/done', taskViews.AddTaskToDone.as_view(), name='task-done'),
     path('task/not-done', taskViews.AddTaskToNotDone.as_view(), name='task-not-done'),
     path('<int:pk>/<int:spk>/<int:taskpk>/detail-task/delete-task/',

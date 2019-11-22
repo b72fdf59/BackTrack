@@ -107,6 +107,7 @@ class updatePBI(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['PBI'] = self.object
+        print(self.object)
         # Add context variables for sidebar
         context = addContext(self, context)
         return context

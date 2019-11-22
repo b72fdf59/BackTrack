@@ -67,9 +67,15 @@ class AddTaskToInProgress(LoginRequiredMixin, SuccessMessageMixin, View):
     success_message = "Successfully changed Task status to In Progress"
 
     def post(self, request, *args, **kwargs):
-        data = json.loads(request.body)
-        taskid = data['Task']
-        projectid = data['ProjectID']
+        if request.POST.get('Task') and request.POST.get('ProjectID'):
+            # If post request is sent from Detail Page
+            taskid = request.POST.get('Task')
+            projectid = request.POST.get('ProjectID')
+        else:
+            # json sent
+            data = json.loads(request.body)
+            taskid = data['Task']
+            projectid = data['ProjectID']
         task = get_object_or_404(Task, pk=taskid)
         confirmed = task.putInProgress(
             self.request.user.projectParticipant.get(project_id=projectid))
@@ -96,8 +102,7 @@ class AddTaskToDone(LoginRequiredMixin, SuccessMessageMixin, View):
         projectid = data['ProjectID']
         # print(data)
         task = get_object_or_404(Task, pk=taskid)
-        task.putInDone(
-            self.request.user.projectParticipant.get(project_id=projectid))
+        task.putInDone()
         task.save()
         response = JsonResponse(
             {"success": "Successfully changed Task status to Done"})
@@ -114,8 +119,7 @@ class AddTaskToNotDone(LoginRequiredMixin, SuccessMessageMixin, View):
         projectid = data['ProjectID']
         # print(data)
         task = get_object_or_404(Task, pk=taskid)
-        task.putInNotDone(
-            self.request.user.projectParticipant.get(project_id=projectid))
+        task.putInNotDone()
         task.save()
         response = JsonResponse(
             {"success": "Successfully changed Task status to Not Done"})

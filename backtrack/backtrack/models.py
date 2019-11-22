@@ -5,13 +5,9 @@ from django.dispatch import receiver
 from django.urls import reverse
 from django_fsm import FSMField, transition
 from django.http import JsonResponse
-
 # Create your models here.
 
-
 class PBI(models.Model):
-    # status = models.CharField(max_length=1,
-    #                           choices=[("N", "Not Done"), ("P", "In Progress"), ("D", "Done")], default="N")
     status = FSMField(default='N')
     story_points = models.FloatField()
     effort_hours = models.FloatField()
@@ -27,7 +23,7 @@ class PBI(models.Model):
         self.sprint = sprint
 
     @transition(field=status, source='P', target='N')
-    def removeToSprint(self, sprint):
+    def removeFromSprint(self, sprint):
         self.sprint = None
 
     @transition(field=status, source='P', target='D')
@@ -77,19 +73,22 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username + "'s Profile"
 
-    @receiver(post_save, sender=User)
-    def create_user_profile(sender, instance, created, **kwargs):
-        if created:
-            Profile.objects.create(user=instance)
 
-    @receiver(post_save, sender=User)
-    def save_user_profile(sender, instance, created, **kwargs):
-        if not created:
-            instance.profile.save()
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
 
-    @receiver(pre_delete, sender=User)
-    def delete_user_profile(instance, **kwargs):
-        instance.profile.delete()
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, created, **kwargs):
+    if not created:
+        instance.profile.save()
+
+
+@receiver(pre_delete, sender=User)
+def delete_user_profile(instance, **kwargs):
+    instance.profile.delete()
 
     class Meta:
         db_table = "User Profile"
@@ -178,14 +177,11 @@ class Task(models.Model):
             return True
 
     @transition(field=status, source='P', target='D')
-    def putInDone(self, pp):
-        # print(pp)
-        # self.projectParticipant = pp
+    def putInDone(self):
         pass
 
     @transition(field=status, source='P', target='N')
-    def putInNotDone(self, pp):
-        print(pp)
+    def putInNotDone(self):
         if self.projectParticipant:
             self.projectParticipant = None
 
@@ -194,3 +190,9 @@ class Task(models.Model):
 
     class Meta:
         db_table = "Task"
+
+@receiver(post_save, sender=Task, dispatch_uid="complete_PBI")
+def completePBI(sender, instance, **kwargs):
+    if not instance.pbi.task.all().exclude(status__exact = "D").exists():
+        instance.pbi.markDone()
+        instance.pbi.save()
