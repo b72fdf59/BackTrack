@@ -36,7 +36,7 @@
     <form action={% url 'task-in-progress' %} method="POST">
     {% csrf_token %}
     {% if Task.status == 'N' %}
-        <input type="hidden" value=taskpk name="Task" />
+        <input type="hidden" value=Task.id name='Task' />
         <input type="hidden" value=Project.id name="ProjectID" />
        <button type="submit" class="btn btn-primary">Start</button>
     {% endif %}

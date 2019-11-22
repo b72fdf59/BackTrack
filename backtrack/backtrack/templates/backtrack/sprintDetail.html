@@ -39,7 +39,7 @@
         <div class="card card-default box-shadow">
             <div class="card-body">
                 <p class="lead medium-text bold-text card-body-margin-fix">Remaining Hours</p>
-                <p class="lead bold-text">--</p>
+                <p class="lead bold-text">{{sprint.remainingHours}}</p>
             </div>
         </div>
     </div>
@@ -222,12 +222,12 @@
 
             <!-- Burndown-->
             <td height="100" style="text-align: right;">
-                4
+                {{PBI.burndown}}
             </td>
 
             <!-- Remaining Effort Hours-->
             <td height="100" style="text-align: right;">
-                5
+                {{PBI.remainingEffortHours}}
             </td>
         </tr>
         {% endfor %}

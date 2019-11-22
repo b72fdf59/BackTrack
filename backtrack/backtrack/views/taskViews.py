@@ -71,6 +71,7 @@ class AddTaskToInProgress(LoginRequiredMixin, SuccessMessageMixin, View):
             # If post request is sent from Detail Page
             taskid = request.POST.get('Task')
             projectid = request.POST.get('ProjectID')
+            print(taskid)
         else:
             # json sent
             data = json.loads(request.body)

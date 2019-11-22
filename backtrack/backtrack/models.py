@@ -19,6 +19,17 @@ class PBI(models.Model):
     sprint = models.ForeignKey(
         'Sprint', on_delete=models.CASCADE, related_name='pbi', null=True, blank=True)
 
+    @property
+    def burndown(self):
+        from django.db.models import Sum
+        myDict = self.task.filter(status__exact = "D").aggregate(Sum('effort_hours'))
+        remainingHours = myDict['effort_hours__sum']
+        return remainingHours
+
+    @property
+    def remainingEffortHours(self):
+        return self.effort_hours - self.burndown
+
     @transition(field=status, source='N', target='P')
     def addToSprint(self, sprint):
         self.sprint = sprint
@@ -155,6 +166,16 @@ class Sprint(models.Model):
     @property
     def count(self):
         return self.project.sprint.filter(start__lte=self.start).count()
+
+    @property
+    def remainingHours(self):
+        from django.db.models import Sum
+        #Get hours of all PBI that are not complete
+        PBIList = self.pbi.all().exclude(status__exact = "D")
+        remainingHours = 0
+        for PBI in PBIList:
+            remainingHours += PBI.remainingEffortHours
+        return remainingHours
 
     def get_absolute_url(self):
         return reverse("detail-sprint", kwargs={"pk": self.project_id, "spk": self.id})
