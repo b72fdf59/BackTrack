@@ -12,12 +12,12 @@
         <li{% if message.tags %} class="{{ message.tags }}" {% endif %} style="list-style:none">{{ message }}</li>
             {% endfor %}
     </div>
+    {% endif %}
     {% if sprint.available is False %}
     <div class="alert alert-danger alert-dismissible">
         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
         <li style="list-style:none"> The Sprint is complete</li>
     </div>
-    {% endif %}
     {% endif %}
 </ul>
 

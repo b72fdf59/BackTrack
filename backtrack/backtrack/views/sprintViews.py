@@ -179,6 +179,13 @@ class CompleteSprint(LoginRequiredMixin, SuccessMessageMixin, View):
         sprintID = kwargs['spk']
         sprint = get_object_or_404(Sprint, pk=sprintID)
         if sprint.complete == False:
+
+            #Get PBI which are in progress and mark them unfinished
+            unfinishedPBI = sprint.pbi.filter(status__exact="P")
+            for PBI in unfinishedPBI:
+                PBI.markUnfinished()
+                PBI.save()
+
             sprint.end = date.today()
             sprint.complete = True
             sprint.save()

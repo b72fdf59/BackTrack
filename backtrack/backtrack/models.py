@@ -44,6 +44,10 @@ class PBI(models.Model):
     def markDone(self):
         pass
 
+    @transition(field=status, source='P', target='U')
+    def markUnfinished(self):
+        pass
+
     # can implement transition unfinished if need be
 
     def delete(self, *args, **kwargs):
