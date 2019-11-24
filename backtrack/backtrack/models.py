@@ -140,13 +140,11 @@ class Sprint(models.Model):
     start = models.DateField(
         auto_now=False, auto_now_add=False, blank=False)
     end = models.DateField(auto_now=False, auto_now_add=False, blank=False)
-    # complete = models.BooleanField(default=False)
+    complete = models.BooleanField(default=False)
     
     @property
     def available(self):
-        from datetime import date
-        now = date.today()
-        return now <= self.end
+        return not self.complete
 
     @property
     def remainingCapacity(self):
@@ -173,23 +171,21 @@ class Sprint(models.Model):
 
     @property
     def remainingDays(self):
-        return 0
+        from datetime import date
+        now = date.today()
+        remDays = self.end - now
+        return remDays.days
 
     def get_absolute_url(self):
         return reverse("detail-sprint", kwargs={"pk": self.project_id, "spk": self.id})
 
 
 class Task(models.Model):
-    # status = models.CharField(max_length=1,
-    #                           choices=[("N", "Not Done"), ("P", "In Progress"), ("D", "Done")], default="N")
     status = FSMField(default='N')
-    # story_points = models.FloatField()
     effort_hours = models.FloatField()
     summary = models.TextField(default=None)
     pbi = models.ForeignKey(
         'PBI', on_delete=models.CASCADE, related_name='task')
-    # sprint = models.ForeignKey(
-    #     'Sprint', on_delete=models.CASCADE, related_name='task_sprint', null=True, blank=True)
     projectParticipant = models.ForeignKey(
         'ProjectParticipant', on_delete=models.CASCADE, related_name='task', null=True, blank=True)
 
