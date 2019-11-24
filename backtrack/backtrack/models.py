@@ -32,7 +32,7 @@ class PBI(models.Model):
     def remainingEffortHours(self):
         return self.effort_hours - self.burndown
 
-    @transition(field=status, source='N', target='P')
+    @transition(field=status, source=['N','U'], target='P')
     def addToSprint(self, sprint):
         self.sprint = sprint
 

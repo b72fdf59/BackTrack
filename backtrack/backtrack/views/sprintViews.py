@@ -78,7 +78,7 @@ class AddPBIToSprint(LoginRequiredMixin, SuccessMessageMixin, View):
         if PBIid:
             # If the requqest was sent from the detail page
             addPBI = get_object_or_404(PBI, pk=PBIid)
-            if addPBI.sprint:
+            if addPBI.sprint and addPBI.status != "U":
                 # If PBI has a sprint
                 messages.error(
                     self.request, "PBI is in a another sprint")

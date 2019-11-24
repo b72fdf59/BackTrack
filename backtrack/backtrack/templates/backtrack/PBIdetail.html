@@ -43,7 +43,7 @@
 {% endif %}
 
 
-{% if PBI.status == "N" and ProjectParticipant.role == "DT"%}
+{% if PBI.status == "N" and ProjectParticipant.role == "DT" or PBI.status == "U" and ProjectParticipant.role == "DT" %}
 <form action="{% url 'add-pbi-to-sprint' pk=Project.id %}" method="post">
     {% csrf_token %}
     <input type="hidden" value="{{PBI.id}}" name="PBIs" />

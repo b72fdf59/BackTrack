@@ -67,7 +67,7 @@
             <tbody>
                 {% for PBI in data %}
                 <tr>
-                    {% if PBI.status != "N" %}
+                    {% if PBI.status == "P" or PBI.status == "D" %}
                     <td><input type="checkbox" disabled checked></td>
                     {% else %}
                     <td><input type="checkbox"></td>
@@ -181,7 +181,7 @@
         $("#put-in-sprint").click(function () {
             $("#sprint-table").find("tr:gt(0)").remove();
             $('input:checkbox:checked', "#product-backlog").each(function () {
-                if ($.trim($(this).closest('tr').children('td').eq(2).text()) == "--") {
+                if ($.trim($(this).closest('tr').children('td').eq(4).text()) == "Not Done" || $.trim($(this).closest('tr').children('td').eq(4).text()) == "Unfinished" ) {
                     row = $(this).closest('tr').clone().find('td:first').remove().end().prop(
                         'outerHTML');
                     $("#sprint-table tbody").append(row);
