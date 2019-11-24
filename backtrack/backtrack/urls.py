@@ -38,6 +38,7 @@ urlpatterns = [
          sprintViews.AddPBIToSprint.as_view(), name='add-pbi-to-sprint'),
     path('<int:pk>/<int:spk>/<int:pbipk>/remove-task/',
          sprintViews.RemovePBIfromSprint.as_view(), name='remove-pbi-from-sprint'),
+     path('<int:pk>/<int:spk>/complete',sprintViews.CompleteSprint.as_view() , name='complete-sprint'),
 
     # Tasks paths in Sprint Backlog
     path('<int:pk>/<int:spk>/<int:taskpk>/detail-task/',

@@ -163,8 +163,29 @@ class RemovePBIfromSprint(LoginRequiredMixin, SuccessMessageMixin, TemplateView)
         return context
 
     def post(self, request, **kwargs):
-        pbi = get_object_or_404(PBI, pk = self.kwargs['pbipk'])
+        pbi = get_object_or_404(PBI, pk=self.kwargs['pbipk'])
         pbi.task.all().delete()
         pbi.sprint = None
         pbi.save()
         return redirect(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
+
+
+class CompleteSprint(LoginRequiredMixin, SuccessMessageMixin, View):
+    login_url = '/accounts/login'
+    success_message = "PBI Completed"
+
+    def post(self, request, **kwargs):
+        from datetime import date
+        sprintID = kwargs['spk']
+        sprint = get_object_or_404(Sprint, pk=sprintID)
+        if sprint.complete == False:
+            sprint.end = date.today()
+            sprint.complete = True
+            sprint.save()
+            response = JsonResponse(
+                {"success": "Successfully Completed Sprint"})
+        else:
+            response = JsonResponse(
+                {"error": "Sprint already complete"})
+            response.status_code = 400
+        return response

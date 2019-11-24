@@ -2,12 +2,6 @@
 {% block content %}
 
 <ul class="messages" style="padding:0;">
-    {% if sprint.available is False %}
-    <div class="alert alert-danger alert-dismissible">
-        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-        <li style="list-style:none"> The Sprint is complete</li>
-    </div>
-    {% endif %}
     {% if messages %}
     {% for message in messages %}
     <div class="alert 
@@ -18,11 +12,25 @@
         <li{% if message.tags %} class="{{ message.tags }}" {% endif %} style="list-style:none">{{ message }}</li>
             {% endfor %}
     </div>
+    {% if sprint.available is False %}
+    <div class="alert alert-danger alert-dismissible">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <li style="list-style:none"> The Sprint is complete</li>
+    </div>
+    {% endif %}
     {% endif %}
 </ul>
 
-<h1 class="page-header"><i class="fa fa-print"></i> Sprint Backlog </h1>
-
+<div>
+    <div class="col-md-10">
+        <h1 class="page-header"><i class="fa fa-print"></i> Sprint Backlog </h1>
+    </div>
+    <div class="col-md-2">
+        <button type="button" id="complete-sprint" class="btn btn-primary btn-sm page-header"
+            style="font-size:1.2em">Complete
+            Sprint</button>
+    </div>
+</div>
 
 <div class="sub-header">
     <div class="col-md-3">
@@ -101,7 +109,8 @@
                     <a href="{% url 'add-task' pk=Project.id spk=sprint.id pbipk=PBI.id%}"
                         style="text-decoration: none; color: black"><i class="fa fa-plus" id="add"></i> ADD TASK</a>
                     <a href="{% url 'remove-pbi-from-sprint' pk=Project.id spk=sprint.id pbipk=PBI.id%}"
-                        style="text-decoration: none; color: black"><i class="fa fa-minus" id="add"></i> REMOVE PBI FROM SPRINT</a>
+                        style="text-decoration: none; color: black"><i class="fa fa-minus" id="add"></i> REMOVE PBI FROM
+                        SPRINT</a>
                     {% endif %}
                 </div>
             </td>
@@ -267,6 +276,35 @@
         }
 
         var token = '{{csrf_token}}';
+
+        $("#complete-sprint").click(function () {
+            var projectID = "{{Project.id}}"
+            var sprintID = "{{sprint.id}}"
+            const url = "{% url 'complete-sprint' pk=123 spk=666 %}".replace('123',
+                projectID).replace('666', sprintID)
+
+            $.ajax({
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": token
+                },
+                url: url,
+                success: function (data) {
+                    var msg = data.success
+                    localStorage.setItem("Message", msg)
+                    window.location.reload();
+                },
+                error: function (data) {
+                    var err = data.responseJSON.error
+                    $("ul.messages").append(
+                        '<div class="alert alert-danger alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" >' +
+                        err + '</li> </div>')
+                }
+
+            });
+        })
+
+
         $(".not-done").click(function () {
             const taskid = $(this).closest(".card-body").find('p.hidden-display').text()
             const url = "{% url 'task-in-progress' %}"
@@ -297,19 +335,6 @@
             });
         })
 
-    });
-
-    $(document).ready(function () {
-
-        if (localStorage.getItem("Message")) {
-            var msg = localStorage.getItem("Message")
-            $("ul.messages").append(
-                '<div class="alert alert-success alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" > ' +
-                msg + '</li> </div>')
-            localStorage.clear();
-        }
-
-        var token = '{{csrf_token}}';
         $(".in-progress-first").click(function () {
             const taskid = $(this).closest(".card-body").find('p.hidden-display').text()
             const url = "{% url 'task-not-done' %}"
@@ -340,19 +365,6 @@
             });
         })
 
-    });
-
-    $(document).ready(function () {
-
-        if (localStorage.getItem("Message")) {
-            var msg = localStorage.getItem("Message")
-            $("ul.messages").append(
-                '<div class="alert alert-success alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" > ' +
-                msg + '</li> </div>')
-            localStorage.clear();
-        }
-
-        var token = '{{csrf_token}}';
         $(".in-progress-second").click(function () {
             const taskid = $(this).closest(".card-body").find('p.hidden-display').text()
             const url = "{% url 'task-done' %}"
@@ -382,7 +394,6 @@
 
             });
         })
-
     });
 </script>
 {% endblock content %}
