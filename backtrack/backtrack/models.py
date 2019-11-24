@@ -22,7 +22,8 @@ class PBI(models.Model):
     @property
     def burndown(self):
         from django.db.models import Sum
-        myDict = self.task.filter(status__exact = "D").aggregate(Sum('effort_hours'))
+        myDict = self.task.filter(
+            status__exact="D").aggregate(Sum('effort_hours'))
         remainingHours = myDict['effort_hours__sum']
         if not remainingHours:
             remainingHours = 0
@@ -32,7 +33,7 @@ class PBI(models.Model):
     def remainingEffortHours(self):
         return self.effort_hours - self.burndown
 
-    @transition(field=status, source=['N','U'], target='P')
+    @transition(field=status, source=['N', 'U'], target='P')
     def addToSprint(self, sprint):
         self.sprint = sprint
 
@@ -84,11 +85,13 @@ class Project(models.Model):
     class Meta:
         db_table = "Project"
 
+
 @receiver(post_save, sender=PBI, dispatch_uid="complete_Project")
 def completePBI(sender, instance, **kwargs):
-    if not instance.project.pbi.all().exclude(status__exact = "D").exists():
+    if not instance.project.pbi.all().exclude(status__exact="D").exists():
         instance.project.complete = True
         instance.project.save()
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -145,7 +148,7 @@ class Sprint(models.Model):
         auto_now=False, auto_now_add=False, blank=False)
     end = models.DateField(auto_now=False, auto_now_add=False, blank=False)
     complete = models.BooleanField(default=False)
-    
+
     @property
     def available(self):
         return not self.complete
@@ -166,8 +169,8 @@ class Sprint(models.Model):
     @property
     def remainingHours(self):
         from django.db.models import Sum
-        #Get hours of all PBI that are not complete
-        PBIList = self.pbi.all().exclude(status__exact = "D")
+        # Get hours of all PBI that are not complete
+        PBIList = self.pbi.all().exclude(status__exact="D")
         remainingHours = 0
         for PBI in PBIList:
             remainingHours += PBI.remainingEffortHours
