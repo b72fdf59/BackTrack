@@ -25,11 +25,13 @@
     <div class="col-md-10">
         <h1 class="page-header"><i class="fa fa-print"></i> Sprint Backlog </h1>
     </div>
+    {% if ProjectParticipant.role == "DT" %}
     <div class="col-md-2">
         <button type="button" id="complete-sprint" class="btn btn-primary btn-sm page-header"
             style="font-size:1.2em">Complete
             Sprint</button>
     </div>
+    {% endif %}
 </div>
 
 <div class="sub-header">

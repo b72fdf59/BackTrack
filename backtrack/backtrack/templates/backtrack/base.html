@@ -2,71 +2,109 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" media="screen" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" media="screen"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
 
-	<title>BackTrack - Home</title>
+    <title>BackTrack - Home</title>
     {% load staticfiles %}
-	<link rel="stylesheet" type="text/css" href="{% static 'backtrack/style.css' %}">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link href="https://fonts.googleapis.com/css?family=Barlow&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'backtrack/style.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Barlow&display=swap" rel="stylesheet">
 
 </head>
 
 <body>
-<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-{% if user.is_authenticated %}
-<!--    Navbar starts here-->
-	<nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">BackTrack</a>
-        </div>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    {% if user.is_authenticated %}
+    <!--    Navbar starts here-->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">BackTrack</a>
+            </div>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav">
-<!--            <li class="active"><a href="#"><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard <span class="sr-only">(current)</span></a></li>-->
-<!--            <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i> Settings</a></li>-->
-            <li><a href="#"><i class="fa fa-user" aria-hidden="true"></i> Profile</a></li>
-<!--            <li><a href="#"><i class="fa fa-question-circle" aria-hidden="true"></i> Help</a></li>-->
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-<!--            <li><a href="#"><i class="fa fa-user-plus" aria-hidden="true"></i> Add Users</a></li>-->
-<!--            <li><a href="#"><i class="fa fa-files-o" aria-hidden="true"></i> Add Categories</a></li>-->
-             <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
-          </ul>
-        </div><!-- /.navbar-collapse -->
-      </div><!-- /.container-fluid -->
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <!--            <li class="active"><a href="#"><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard <span class="sr-only">(current)</span></a></li>-->
+                    <!--            <li><a href="#"><i class="fa fa-cog" aria-hidden="true"></i> Settings</a></li>-->
+                    <li><a href="#"><i class="fa fa-user" aria-hidden="true"></i> Profile</a></li>
+                    <!--            <li><a href="#"><i class="fa fa-question-circle" aria-hidden="true"></i> Help</a></li>-->
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <!--            <li><a href="#"><i class="fa fa-user-plus" aria-hidden="true"></i> Add Users</a></li>-->
+                    <!--            <li><a href="#"><i class="fa fa-files-o" aria-hidden="true"></i> Add Categories</a></li>-->
+                    <li><a href="{% url 'logout' %}"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</a></li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
     </nav>
-<!--    Navbar ends here-->
+    <!--    Navbar ends here-->
 
 
-
+    {% load static %}
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-3 col-md-2 sidebar">
                 <ul class="nav nav-sidebar">
                     <li class="active"><a style="color: cornflowerblue;" href="{% url 'home' %}">Home</a></li>
+                    {% if User.profile.role == "D" %}
                     {% if Project %}
-                         <li><a style="color: cornflowerblue;" href="{% url 'pb' pk=Project.id %}?all=0">Product Backlog</a></li>
-                         {% for sprint in Sprints %}
-                            <li><a style="color: cornflowerblue;" href="{% url 'detail-sprint' pk=Project.id spk=sprint.id %}">Sprint {{forloop.counter}}</a></li>
-                         {% endfor %}
-                         {% if ProjectParticipant.role == "DT"%}
-                            <li><a style="color: cornflowerblue;" href="{% url 'create-sprint' pk=Project.id %}">Create Sprint</a></li>
-                        {% endif %}
-                        {% if ProjectParticipant.role == "PO"%}
-                            <li><a style="color: cornflowerblue;" href="{% url 'invite-project-members' pk=Project.id %}">Invite Members</a></li>
-                        {% endif %}
+                    <li><a style="color: cornflowerblue;" href="{% url 'pb' pk=Project.id %}?all=0">Product Backlog</a>
+                    </li>
+                    {% for sprint in Sprints %}
+                    <li><a style="color: cornflowerblue;"
+                            href="{% url 'detail-sprint' pk=Project.id spk=sprint.id %}">Sprint {{forloop.counter}}</a>
+                    </li>
+                    {% endfor %}
+                    {% if ProjectParticipant.role == "DT"%}
+                    <li><a style="color: cornflowerblue;" href="{% url 'create-sprint' pk=Project.id %}">Create
+                            Sprint</a></li>
+                    {% endif %}
+                    {% if ProjectParticipant.role == "PO"%}
+                    <li><a style="color: cornflowerblue;" href="{% url 'invite-project-members' pk=Project.id %}">Invite
+                            Members</a></li>
+                    {% endif %}
+                    {% endif %}
+
+                    {% elif User.profile.role == "M"%}
+                    {% for projectParticipant in managedPP %}
+                    <li style="color: cornflowerblue;">
+                        <button type="button" class="btn btn-default dropdown-toggle"
+                            style="width: 100%;border: none;position: static;" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            {{projectParticipant.project.name}} <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a style="color: cornflowerblue;"
+                                    href="{% url 'pb' pk=projectParticipant.project.id %}?all=0">Product
+                                    Backlog</a>
+                            </li>
+                            <li role="separator" class="divider"></li>
+                            {% for projectSprint in  managedSprints %}
+                            {% if forloop.counter == forloop.parentloop.counter %}
+                            {% for Sprint in projectSprint %}
+                            <li><a style="color: cornflowerblue;"
+                                    href="{% url 'detail-sprint' pk=projectParticipant.project.id spk=Sprint.id %}">Sprint
+                                    {{forloop.counter}}</a>
+                            </li>
+                            {% endfor %}
+                            {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% endfor %}
+
                     {% endif %}
                 </ul>
             </div>
@@ -80,10 +118,10 @@
         <p>&copy; Pyre-m, 2019</p>
     </footer>
     {% endif %}
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-	<script src="{% static 'backtrack/dropdown.js' %}">
-	</script>
+    <script src="{% static 'backtrack/dropdown.js' %}">
+    </script>
 
 </body>
 

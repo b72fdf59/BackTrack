@@ -1,11 +1,11 @@
 from django.urls import path
 from django.conf.urls import url
-from .views import PBIviews, projectViews, sprintViews, taskViews
+from .views import PBIviews, projectViews, sprintViews, taskViews, homeViews
 from django.shortcuts import redirect
 
 urlpatterns = [
     # Home Path
-    path('', PBIviews.HomeView.as_view(), name='home'),
+    path('', homeViews.HomeView.as_view(), name='home'),
 
     # Paths for Product Backlog
     path('<int:pk>/pb/', PBIviews.ProductBacklogView.as_view(), name='pb'),

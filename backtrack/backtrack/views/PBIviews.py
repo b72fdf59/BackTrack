@@ -10,22 +10,6 @@ from django.urls import reverse, reverse_lazy
 from ..helpers import addContext, getPBIfromProj
 from django.contrib.messages.views import SuccessMessageMixin
 
-
-class HomeView(LoginRequiredMixin, TemplateView):
-    login_url = '/accounts/login'
-    template_name = 'backtrack/home.html'
-
-    def get_context_data(self, **kwargs):
-        if self.request.user.projectParticipant.filter(project__complete=False).exists():
-            # If user has a project that is not yet completed
-            context = {}
-            # Add context variables for sidebar
-            context = addContext(self, context)
-        else:
-            context = {}
-        return context
-
-
 class ProductBacklogView(LoginRequiredMixin, TemplateView):
     login_url = '/accounts/login'
     template_name = 'backtrack/pb.html'

@@ -95,6 +95,8 @@ def completePBI(sender, instance, **kwargs):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=1, choices=[(
+        "D", "Developer"), ("M", "Manager")])
 
     def __str__(self):
         return self.user.username + "'s Profile"
@@ -179,6 +181,8 @@ class Sprint(models.Model):
     @property
     def remainingDays(self):
         from datetime import date
+        if self.complete:
+            return 0
         now = date.today()
         remDays = self.end - now
         return remDays.days

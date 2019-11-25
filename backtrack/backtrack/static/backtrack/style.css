@@ -83,17 +83,22 @@ footer {
 }
 
 .box-shadow {
-  box-shadow: -9px 10px 13px 0px rgba(0,0,0,0.12) !important;
+  box-shadow: -9px 10px 13px 0px rgba(0, 0, 0, 0.12) !important;
 }
 
-.hidden-display{
+.hidden-display {
   display: none;
 }
 
-.small-button{
+.small-button {
   width: 2rem !important;
 }
 
+.dropdown-fix {
+  width: 100%;
+  border: none;
+  position: none;
+}
 
 /* CSS for bootstrap 3 card */
 /* === card component ====== 
