@@ -123,7 +123,7 @@ class AddTaskToDone(LoginRequiredMixin, SuccessMessageMixin, View):
             if confirmed:
                 task.save()
                 messages.success(
-                    self.request, "Successfully changed Task status to In Progress")
+                    self.request, "Successfully changed Task status to Done")
                 return redirect(reverse('detail-sprint', kwargs={'pk': projectid, 'spk': sprintid}))
             else:
                 messages.error(
@@ -141,7 +141,7 @@ class AddTaskToDone(LoginRequiredMixin, SuccessMessageMixin, View):
             if confirmed:
                 task.save()
                 response = JsonResponse(
-                    {"success": "Successfully changed Task status to In Progress"})
+                    {"success": "Successfully changed Task status to Done"})
                 return response
             else:
                 response = JsonResponse(
@@ -166,7 +166,7 @@ class AddTaskToNotDone(LoginRequiredMixin, SuccessMessageMixin, View):
             if confirmed:
                 task.save()
                 messages.success(
-                    self.request, "Successfully changed Task status to In Progress")
+                    self.request, "Successfully changed Task status to Not Done")
                 return redirect(reverse('detail-sprint', kwargs={'pk': projectid, 'spk': sprintid}))
             else:
                 messages.error(
@@ -184,7 +184,7 @@ class AddTaskToNotDone(LoginRequiredMixin, SuccessMessageMixin, View):
             if confirmed:
                 task.save()
                 response = JsonResponse(
-                    {"success": "Successfully changed Task status to In Progress"})
+                    {"success": "Successfully changed Task status to Not Done"})
                 return response
             else:
                 response = JsonResponse(

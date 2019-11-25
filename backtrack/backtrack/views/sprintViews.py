@@ -59,6 +59,10 @@ class SprintDetail(LoginRequiredMixin, TemplateView):
 
         # Add context variables for sidebar
         context = addContext(self, context)
+
+        if sprint.complete == False and sprint.remainingDays == 0 and context['ProjectParticipant'].role == "DT":
+            messages.error(self.request, "Please Complete Sprint")
+
         return context
 
 
@@ -180,7 +184,7 @@ class CompleteSprint(LoginRequiredMixin, SuccessMessageMixin, View):
         sprint = get_object_or_404(Sprint, pk=sprintID)
         if sprint.complete == False:
 
-            #Get PBI which are in progress and mark them unfinished
+            # Get PBI which are in progress and mark them unfinished
             unfinishedPBI = sprint.pbi.filter(status__exact="P")
             for PBI in unfinishedPBI:
                 PBI.markUnfinished()

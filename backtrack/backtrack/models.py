@@ -185,6 +185,8 @@ class Sprint(models.Model):
             return 0
         now = date.today()
         remDays = self.end - now
+        if remDays.days < 0:
+            return 0
         return remDays.days
 
     def get_absolute_url(self):
