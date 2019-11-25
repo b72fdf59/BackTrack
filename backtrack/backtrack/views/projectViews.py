@@ -149,5 +149,5 @@ class AddManager(LoginRequiredMixin, View):
             projectParticipant.save()
             messages.success(request, 'Successfully joined project')
         else:
-            messages.error("Only Developers can be added with This link")
+            messages.error("Only Managers can be added with This link")
         return redirect(reverse('home'))
