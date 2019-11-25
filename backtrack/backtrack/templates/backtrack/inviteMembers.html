@@ -13,27 +13,46 @@
 <div class="float-md-center" style="width: 500px;margin: auto">
     <h3>Developers:</h3>
     <ul class="list-group" style="margin-top: 2em;">
-        {% for user in users %}
+        {% for developer in Developers %}
 
         <li class="list-group-item" style="margin-top: 2em;">
             <div class="row">
                 <div class="col-xs-2">
                     <h4>
-                        {{user}}
+                        {{developer}}
                     </h4>
                 </div>
                 <div class="col-xs-10">
-                    <button type="button" class="btn btn-primary" id="{{user.id}}" style="float: right;">Send
+                    <button type="button" class="btn btn-primary developer" id="{{developer.id}}"
+                        style="float: right;">Send
                         Invite</button>
                 </div>
             </div>
         </li>
         {% endfor %}
     </ul>
+    <h3>Managers:</h3>
+    <ul class="list-group" style="margin-top: 2em;">
+        {% for Manager in Managers %}
+
+        <li class="list-group-item" style="margin-top: 2em;">
+            <div class="row">
+                <div class="col-xs-2">
+                    <h4>
+                        {{Manager}}
+                    </h4>
+                </div>
+                <div class="col-xs-10">
+                    <button type="button" class="btn btn-primary manager" id="{{Manager.id}}" style="float: right;">Send
+                        Invite</button>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
 </div>
 <script>
     $(document).ready(function () {
-        $('.btn').click(function () {
+        $('.btn, .developer').click(function () {
             if (this.id) {
                 const url = "{% url 'email-member' pk=Project.id %}"
                 var $button = $(this)
@@ -53,7 +72,36 @@
                     },
                     error: function (data) {
                         $("ul.messages").append(
-                            '<div class="alert alert-danger alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" > User does not have an email </li> </div>')
+                            '<div class="alert alert-danger alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" > developer does not have an email </li> </div>'
+                        )
+                    }
+
+                });
+            }
+        })
+
+        $('.btn, .manager').click(function () {
+            if (this.id) {
+                const url = "{% url 'email-member' pk=Project.id %}"
+                var $button = $(this)
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    data: {
+                        "id": this.id
+                    },
+                    success: function (data) {
+                        $button.toggleClass("btn-primary btn-default").text('Sent');
+                        $button.delay(10000).queue(function (next) {
+                            $button.toggleClass("btn-default btn-primary").text(
+                                'Send Invite')
+                            next();
+                        })
+                    },
+                    error: function (data) {
+                        $("ul.messages").append(
+                            '<div class="alert alert-danger alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" > developer does not have an email </li> </div>'
+                        )
                     }
 
                 });

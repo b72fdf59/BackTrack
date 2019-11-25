@@ -24,6 +24,8 @@ urlpatterns = [
          name='email-member'),
     path('project/create/<int:pk>/add/developer', projectViews.AddDeveloper.as_view(),
          name='add-project-developer'),
+    path('project/create/<int:pk>/add/manager', projectViews.AddManager.as_view(),
+         name='add-project-manager'),
     path('<int:pk>/create/sprint',
          sprintViews.CreateSprint.as_view(), name='create-sprint'),
 
@@ -38,7 +40,8 @@ urlpatterns = [
          sprintViews.AddPBIToSprint.as_view(), name='add-pbi-to-sprint'),
     path('<int:pk>/<int:spk>/<int:pbipk>/remove-task/',
          sprintViews.RemovePBIfromSprint.as_view(), name='remove-pbi-from-sprint'),
-     path('<int:pk>/<int:spk>/complete',sprintViews.CompleteSprint.as_view() , name='complete-sprint'),
+    path('<int:pk>/<int:spk>/complete',
+         sprintViews.CompleteSprint.as_view(), name='complete-sprint'),
 
     # Tasks paths in Sprint Backlog
     path('<int:pk>/<int:spk>/<int:taskpk>/detail-task/',

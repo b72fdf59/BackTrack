@@ -40,15 +40,26 @@ class InviteMember(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {}
-        # Get all users other than the current user
-        users = User.objects.all().exclude(username=self.request.user.username)
+        # Get all developers other than the current user
+        developers = User.objects.all().exclude(
+            username=self.request.user.username).filter(profile__role__exact="D")
+        managers = User.objects.all().exclude(
+            username=self.request.user.username).filter(profile__role__exact="M")
 
-        for user in users:
+        for user in developers:
             if user.projectParticipant.all().exists:
                 if user.projectParticipant.filter(project__complete=False).exists():
                     # If a user has a project which is not complete exclude him.
-                    users = users.exclude(pk=user.pk)
-        context['users'] = users
+                    developers = developers.exclude(pk=user.pk)
+        context['Developers'] = developers
+
+        for user in managers:
+            if user.projectParticipant.all().exists:
+                if user.projectParticipant.filter(project__complete=False).exists():
+                    # If a user has a project which is not complete exclude him.
+                    managers = managers.exclude(pk=user.pk)
+
+        context['Managers'] = managers
         # Add context variables for sidebar
         context = addContext(self, context)
         return context
@@ -60,21 +71,37 @@ class EmailMember(LoginRequiredMixin, View):
     login_url = '/accounts/login'
 
     def get(self, request, *args, **kwargs):
+        # Get user to whom we have to send an email
         userID = self.request.GET['id']
-        recipient_email = get_object_or_404(User, id=userID).email
+        receivingUser = get_object_or_404(User, id=userID)
+        recipient_email = receivingUser.email
         if recipient_email:
             # If the recepient mail exists
             username = self.request.user.username
-            name = User.objects.get(id=userID).username
-            # Build absolute URL for the invite link
-            fullPath = self.request.build_absolute_uri(
-                reverse('add-project-developer', kwargs={'pk': kwargs['pk']}))
+            name = receivingUser.username
 
-            link = "{}?id={}".format(
-                fullPath, userID)
-            subject = "Invitation to join new project"
-            message = "Dear {}, {} invites you to join a new project as a developer.\nClick on the link below to join the team.\n {}".format(
-                name, username, link)
+            if receivingUser.profile.role == "D":
+                # If user is a developer
+                # Build absolute URL for the invite link
+                fullPath = self.request.build_absolute_uri(
+                    reverse('add-project-developer', kwargs={'pk': kwargs['pk']}))
+
+                link = "{}?id={}".format(
+                    fullPath, userID)
+                subject = "Invitation to join new project"
+                message = "Dear {}, {} invites you to join a new project as a developer.\nClick on the link below to join the team.\n {}".format(
+                    name, username, link)
+
+            elif receivingUser.profile.role == "M":
+                fullPath = self.request.build_absolute_uri(
+                    reverse('add-project-manager', kwargs={'pk': kwargs['pk']}))
+
+                link = "{}?id={}".format(
+                    fullPath, userID)
+                subject = "Invitation to join new project"
+                message = "Dear {}, {} invites you to join a new project as a manager.\nClick on the link below to join the team.\n {}".format(
+                    name, username, link)
+
             from_email = settings.EMAIL_HOST_USER
             send_mail(subject, message, from_email, [
                 recipient_email], fail_silently=False)
@@ -89,17 +116,38 @@ class AddDeveloper(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         project = get_object_or_404(Project, pk=kwargs['pk'])
-        user = get_object_or_404(User, pk=request.GET['id'])
-        if project.projectParticipant.all().filter(role="DT").count() <= 9:
-            # If there are lesser than 9 project participants
-            if not user.projectParticipant.filter(project__complete=False).exists():
-                # If the user has projects that are not complete
-                projectParticipant = self.model(
-                    project=project, user=user, role="DT")
-                projectParticipant.save()
+        dev = get_object_or_404(User, pk=request.GET['id'])
+        if request.user.profile.role == "D":
+            if project.projectParticipant.all().filter(role="DT").count() <= 9:
+                # If there are lesser than 9 project participants
+                if not dev.projectParticipant.filter(project__complete=False).exists():
+                    # If the developer has projects that are not complete
+                    projectParticipant = self.model(
+                        project=project, user=dev, role="DT")
+                    projectParticipant.save()
+                    messages.success(request, 'Successfully joined project')
+                else:
+                    messages.error("You are already a part of a projects")
             else:
-                raise Exception("You are already a part of a projects")
+                messages.error("This Project already has 9 developers")
         else:
-            raise Exception("This Project already has 9 developers")
-        messages.success(request, 'Successfully joined project')
+            messages.error("Only Developers can be added with This link")
+        return redirect(reverse('home'))
+
+
+class AddManager(LoginRequiredMixin, View):
+    model = ProjectParticipant
+    login_url = '/accounts/login'
+
+    def get(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, pk=kwargs['pk'])
+        manager = get_object_or_404(User, pk=request.GET['id'])
+
+        if request.user.profile.role == "M":
+            projectParticipant = self.model(
+                project=project, user=manager, role="SM")
+            projectParticipant.save()
+            messages.success(request, 'Successfully joined project')
+        else:
+            messages.error("Only Developers can be added with This link")
         return redirect(reverse('home'))
