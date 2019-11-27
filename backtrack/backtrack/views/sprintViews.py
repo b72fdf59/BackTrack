@@ -2,7 +2,7 @@ from django.views.generic import CreateView, View, TemplateView
 from django.shortcuts import get_object_or_404, redirect, render
 from ..models import Sprint, Project, PBI, Task
 from ..forms import CreateSprintForm
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
 from django.contrib.auth.models import User
 from ..helpers import addContext, getPBIfromProj
@@ -11,7 +11,7 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.contrib import messages
 
 
-class CreateSprint(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class CreateSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
     model = Sprint
     form_class = CreateSprintForm
     template_name = "backtrack/createSprint.html"
@@ -37,9 +37,20 @@ class CreateSprint(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 
         form.instance.project = project
         return super().form_valid(form)
+    
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False
 
 
-class SprintDetail(LoginRequiredMixin, TemplateView):
+class SprintDetail(LoginRequiredMixin,UserPassesTestMixin, TemplateView):
     pk_url_kwarg = 'pbipk'
     login_url = '/accounts/login'
     template_name = 'backtrack/sprintDetail.html'
@@ -64,9 +75,21 @@ class SprintDetail(LoginRequiredMixin, TemplateView):
             messages.error(self.request, "Please Complete Sprint")
 
         return context
+    
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False
 
 
-class AddPBIToSprint(LoginRequiredMixin, SuccessMessageMixin, View):
+
+class AddPBIToSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, View):
     login_url = '/accounts/login'
     success_message = "PBI was added"
 
@@ -146,8 +169,20 @@ class AddPBIToSprint(LoginRequiredMixin, SuccessMessageMixin, View):
                                 {"success": "Successfully added PBIs to sprint"})
                     return response
 
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False
 
-class RemovePBIfromSprint(LoginRequiredMixin, SuccessMessageMixin, TemplateView):
+
+
+class RemovePBIfromSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, TemplateView):
     # pk_url_kwarg = 'pbipk'
     model = PBI
     login_url = '/accounts/login'
@@ -172,9 +207,21 @@ class RemovePBIfromSprint(LoginRequiredMixin, SuccessMessageMixin, TemplateView)
         pbi.sprint = None
         pbi.save()
         return redirect(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
+    
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False
 
 
-class CompleteSprint(LoginRequiredMixin, SuccessMessageMixin, View):
+
+class CompleteSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, View):
     login_url = '/accounts/login'
     success_message = "PBI Completed"
 
@@ -200,3 +247,14 @@ class CompleteSprint(LoginRequiredMixin, SuccessMessageMixin, View):
                 {"error": "Sprint already complete"})
             response.status_code = 400
         return response
+    
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False

@@ -1,7 +1,7 @@
 from ..models import PBI, Project
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views import View
 from django.views.generic import TemplateView, FormView, CreateView, UpdateView, DeleteView
 from collections import OrderedDict
@@ -10,7 +10,8 @@ from django.urls import reverse, reverse_lazy
 from ..helpers import addContext, getPBIfromProj
 from django.contrib.messages.views import SuccessMessageMixin
 
-class ProductBacklogView(LoginRequiredMixin, TemplateView):
+
+class ProductBacklogView(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     login_url = '/accounts/login'
     template_name = 'backtrack/pb.html'
 
@@ -39,8 +40,19 @@ class ProductBacklogView(LoginRequiredMixin, TemplateView):
         context = addContext(self, context)
         return context
 
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False
 
-class AddPBI(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+
+class AddPBI(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, CreateView):
     model = PBI
     fields = ['summary', 'story_points', 'effort_hours']
     login_url = '/accounts/login'
@@ -79,8 +91,18 @@ class AddPBI(LoginRequiredMixin, SuccessMessageMixin, CreateView):
             Project, pk=self.kwargs['pk'])
         return super().form_valid(form)
 
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False
 
-class updatePBI(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class updatePBI(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     pk_url_kwarg = 'pbipk'
     model = PBI
     fields = ['priority', 'summary', 'story_points', 'effort_hours']
@@ -135,9 +157,20 @@ class updatePBI(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
                 PBIObj.save()
 
         return super().form_valid(form)
+    
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False
 
 
-class DeletePBI(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+class DeletePBI(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView):
     template_name = 'backtrack/pbi_confirm_delete.html'
     model = PBI
     login_url = '/accounts/login'
@@ -158,3 +191,14 @@ class DeletePBI(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super().delete(request, *args, **kwargs)
+
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False

@@ -16,4 +16,5 @@ class HomeView(LoginRequiredMixin, TemplateView):
             context = addContext(self, context)
         else:
             context = {}
+            context['User'] = self.request.user
         return context
