@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.http import HttpResponse, HttpResponseForbidden
 from django.core.mail import send_mail
 from django.conf import settings
@@ -34,7 +34,7 @@ class CreateProject(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return response
 
 
-class InviteMember(LoginRequiredMixin, TemplateView):
+class InviteMember(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     template_name = "backtrack/inviteMembers.html"
     login_url = '/accounts/login'
 
@@ -63,11 +63,22 @@ class InviteMember(LoginRequiredMixin, TemplateView):
         # Add context variables for sidebar
         context = addContext(self, context)
         return context
+    
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False
 
 # Send Email to team member
 
 
-class EmailMember(LoginRequiredMixin, View):
+class EmailMember(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = '/accounts/login'
 
     def get(self, request, *args, **kwargs):
@@ -108,9 +119,20 @@ class EmailMember(LoginRequiredMixin, View):
             return HttpResponse()
         else:
             return HttpResponseForbidden("User does not have an email")
+    
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False
 
 
-class AddDeveloper(LoginRequiredMixin, View):
+class AddDeveloper(LoginRequiredMixin, UserPassesTestMixin, View):
     model = ProjectParticipant
     login_url = '/accounts/login'
 
@@ -133,9 +155,20 @@ class AddDeveloper(LoginRequiredMixin, View):
         else:
             messages.error("Only Developers can be added with This link")
         return redirect(reverse('home'))
+    
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False
 
 
-class AddManager(LoginRequiredMixin, View):
+class AddManager(LoginRequiredMixin, UserPassesTestMixin, View):
     model = ProjectParticipant
     login_url = '/accounts/login'
 
@@ -151,3 +184,14 @@ class AddManager(LoginRequiredMixin, View):
         else:
             messages.error("Only Managers can be added with This link")
         return redirect(reverse('home'))
+
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False

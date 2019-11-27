@@ -2,7 +2,7 @@ from ..models import Sprint, Project, PBI, Task
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.messages.views import SuccessMessageMixin
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse
 from ..helpers import addContext
 from django.views.generic import CreateView, View, TemplateView, UpdateView, DeleteView
@@ -40,7 +40,7 @@ class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return super().form_valid(form)
 
 
-class DetailTask(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+class DetailTask(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     pk_url_kwarg = 'taskpk'
     model = Task
     fields = ['summary', 'effort_hours', 'projectParticipant']
@@ -60,6 +60,18 @@ class DetailTask(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     def get_success_url(self):
         # Redirect to Sprint Backlog
         return reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']})
+
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False
+
 
 
 class AddTaskToInProgress(LoginRequiredMixin, SuccessMessageMixin, View):
@@ -193,7 +205,7 @@ class AddTaskToNotDone(LoginRequiredMixin, SuccessMessageMixin, View):
                 return response
 
 
-class DeleteTask(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
+class DeleteTask(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, DeleteView):
     template_name = 'backtrack/task_confirm_delete.html'
     model = Task
     login_url = '/accounts/login'
@@ -213,3 +225,14 @@ class DeleteTask(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, self.success_message)
         return super().delete(request, *args, **kwargs)
+
+    def test_func(self):
+        # Get User
+        user = self.request.user
+        # Get project from the URL
+        project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        if user.projectParticipant.filter(project__complete=False).exists():
+            userProject = user.projectParticipant.get(
+                project__complete=False).project
+            return userProject.pk == project.pk
+        return False
