@@ -73,7 +73,6 @@ class DetailTask(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, U
         return False
 
 
-
 class AddTaskToInProgress(LoginRequiredMixin, SuccessMessageMixin, View):
     login_url = '/accounts/login'
     success_message = "Successfully changed Task status to In Progress"
@@ -134,6 +133,13 @@ class AddTaskToDone(LoginRequiredMixin, SuccessMessageMixin, View):
 
             if confirmed:
                 task.save()
+
+                if not self.request.user.projectParticipant.filter(
+                        project__complete=False).exists():
+                    # If project is complete then redirect to home
+                    messages.success(request, "Project Completed Successfully!")
+                    return redirect(reverse('home'))
+
                 messages.success(
                     self.request, "Successfully changed Task status to Done")
                 return redirect(reverse('detail-sprint', kwargs={'pk': projectid, 'spk': sprintid}))
@@ -152,8 +158,16 @@ class AddTaskToDone(LoginRequiredMixin, SuccessMessageMixin, View):
 
             if confirmed:
                 task.save()
+
+                if not self.request.user.projectParticipant.filter(
+                        project__complete=False).exists():
+                    # If project is complete then redirect to home
+                    response = JsonResponse(
+                        {"success": "Project Completed Successfully!", "status_code": 302})
+                    return response
+
                 response = JsonResponse(
-                    {"success": "Successfully changed Task status to Done"})
+                    {"success": "Successfully changed Task status to Done", "status_code": 200})
                 return response
             else:
                 response = JsonResponse(

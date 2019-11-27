@@ -37,7 +37,7 @@ class CreateSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin,
 
         form.instance.project = project
         return super().form_valid(form)
-    
+
     def test_func(self):
         # Get User
         user = self.request.user
@@ -50,7 +50,7 @@ class CreateSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin,
         return False
 
 
-class SprintDetail(LoginRequiredMixin,UserPassesTestMixin, TemplateView):
+class SprintDetail(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
     pk_url_kwarg = 'pbipk'
     login_url = '/accounts/login'
     template_name = 'backtrack/sprintDetail.html'
@@ -75,7 +75,7 @@ class SprintDetail(LoginRequiredMixin,UserPassesTestMixin, TemplateView):
             messages.error(self.request, "Please Complete Sprint")
 
         return context
-    
+
     def test_func(self):
         # Get User
         user = self.request.user
@@ -86,7 +86,6 @@ class SprintDetail(LoginRequiredMixin,UserPassesTestMixin, TemplateView):
                 project__complete=False).project
             return userProject.pk == project.pk
         return False
-
 
 
 class AddPBIToSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, View):
@@ -162,7 +161,7 @@ class AddPBIToSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
                 else:
                     # Add all the PBI in the list to the sprint
                     for PBI in PBIList:
-                        if not PBI.sprint:
+                        if not PBI.sprint or PBI.status == "U":
                             PBI.addToSprint(sprint)
                             PBI.save()
                             response = JsonResponse(
@@ -179,7 +178,6 @@ class AddPBIToSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
                 project__complete=False).project
             return userProject.pk == project.pk
         return False
-
 
 
 class RemovePBIfromSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, TemplateView):
@@ -207,7 +205,7 @@ class RemovePBIfromSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessag
         pbi.sprint = None
         pbi.save()
         return redirect(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
-    
+
     def test_func(self):
         # Get User
         user = self.request.user
@@ -218,7 +216,6 @@ class RemovePBIfromSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessag
                 project__complete=False).project
             return userProject.pk == project.pk
         return False
-
 
 
 class CompleteSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, View):
@@ -247,7 +244,7 @@ class CompleteSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
                 {"error": "Sprint already complete"})
             response.status_code = 400
         return response
-    
+
     def test_func(self):
         # Get User
         user = self.request.user

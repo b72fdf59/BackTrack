@@ -86,12 +86,6 @@ class Project(models.Model):
         db_table = "Project"
 
 
-@receiver(post_save, sender=PBI, dispatch_uid="complete_Project")
-def completePBI(sender, instance, **kwargs):
-    if not instance.project.pbi.all().exclude(status__exact="D").exists():
-        instance.project.complete = True
-        instance.project.save()
-
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -230,5 +224,9 @@ class Task(models.Model):
 @receiver(post_save, sender=Task, dispatch_uid="complete_PBI")
 def completePBI(sender, instance, **kwargs):
     if not instance.pbi.task.all().exclude(status__exact="D").exists():
-        instance.pbi.markDone()
-        instance.pbi.save()
+        pbi = instance.pbi
+        pbi.markDone()
+        pbi.save()
+        if not pbi.project.pbi.all().exclude(status__exact="D").exists():
+            pbi.project.complete = True
+            pbi.project.save()

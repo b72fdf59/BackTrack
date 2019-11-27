@@ -1,8 +1,8 @@
 {% extends "backtrack/base.html" %}
 {% block content %}
 <h1 class="page-header"><i class="fa fa-home"></i> Home </h1>
-{% if messages %}
 <ul class="messages" style="padding:0;">
+{% if messages %}
     {% for message in messages %}
     <div class="alert alert-success alert-dismissible">
         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
@@ -10,8 +10,8 @@
             {% endfor %}
     </div>
 
-</ul>
 {% endif %}
+</ul>
 <div class="row placeholders"></div>
 <h1 id="X">Hello {{user.first_name}} !</h1>
 <h2>Welcome to your collaboration home.</h2>
@@ -21,4 +21,20 @@
     <a type="button" id="myButton" href={% url 'create-project' %} class="btn btn-primary">Start Project</a>
 </div>
 {% endif %}
+
+<script>
+
+$(document).ready(function () {
+    if (localStorage.getItem("Message")) {
+        console.log("Here")
+            var msg = localStorage.getItem("Message")
+            $("ul.messages").append(
+                '<div class="alert alert-success alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" > ' +
+                msg + '</li> </div>')
+            localStorage.clear();
+        }
+})
+
+</script>
+
 {% endblock content %}

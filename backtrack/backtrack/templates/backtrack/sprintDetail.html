@@ -110,7 +110,7 @@
                     {% if ProjectParticipant.role == "DT" and PBI.status != "D" and sprint.available %}
                     <a href="{% url 'add-task' pk=Project.id spk=sprint.id pbipk=PBI.id%}"
                         style="text-decoration: none; color: black"><i class="fa fa-plus" id="add"></i> ADD TASK</a>
-                        <hr>
+                    <hr>
                     <a href="{% url 'remove-pbi-from-sprint' pk=Project.id spk=sprint.id pbipk=PBI.id%}"
                         style="text-decoration: none; color: black"><i class="fa fa-minus" id="add"></i> REMOVE PBI FROM
                         SPRINT</a>
@@ -372,6 +372,7 @@
             const taskid = $(this).closest(".card-body").find('p.hidden-display').text()
             const url = "{% url 'task-done' %}"
             const projectID = "{{Project.id}}"
+            const homeUrl = "{% url 'home' %}"
 
             $.ajax({
                 type: "POST",
@@ -385,8 +386,13 @@
                 }),
                 success: function (data) {
                     var msg = data.success
-                    localStorage.setItem("Message", msg)
-                    window.location.reload();
+                    if (data.status_code == 302) {
+                        localStorage.setItem("Message", msg)
+                        window.location.href = homeUrl
+                    } else {
+                        localStorage.setItem("Message", msg)
+                        window.location.reload();
+                    }
                 },
                 error: function (data) {
                     var err = data.responseJSON.error
