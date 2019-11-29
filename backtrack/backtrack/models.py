@@ -62,7 +62,7 @@ class PBI(models.Model):
             if pbi.priority > self.priority:
                 pbi.priority -= 1
                 pbi.save()
-        super().delete(*args, **kwargs)
+        # super().delete(*args, **kwargs)
 
     def __str__(self):
         return self.summary
