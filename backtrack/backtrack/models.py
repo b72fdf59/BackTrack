@@ -30,6 +30,16 @@ class PBI(models.Model):
         return remainingHours
 
     @property
+    def TotalTaskHours(self):
+        TaskHours = 0
+        TaskList = self.task.all()
+        for task in TaskList:
+            if task.pbi.id == self.id:
+                TaskHours += task.effort_hours
+        return TaskHours
+
+
+    @property
     def remainingEffortHours(self):
         return self.effort_hours - self.burndown
 
