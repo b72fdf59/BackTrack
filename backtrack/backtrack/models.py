@@ -47,11 +47,12 @@ class PBI(models.Model):
 
     @transition(field=status, source='P', target='D')
     def markDone(self):
-        pass
+        self.delete()
+        self.priority = 0
 
     @transition(field=status, source='P', target='U')
     def markUnfinished(self):
-        pass
+        self.sprint = None
 
     # can implement transition unfinished if need be
 
