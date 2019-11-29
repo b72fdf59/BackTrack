@@ -33,6 +33,11 @@
             Sprint</button>
     </div>
     {% endif %}
+    {% else %}
+        <div class="col-md-2">
+              <button type="button" class="btn btn-block btn-sm page-header"
+            style="font-size:1.2em" disabled>Sprint is completed</button>
+        </div>
     {% endif %}
 </div>
 
@@ -256,12 +261,12 @@
 
             <!-- Burndown-->
             <td height="100" style="text-align: right;">
-                {{PBI.burndown}}
+                <h3>{{PBI.burndown}}</h3>
             </td>
 
             <!-- Remaining Effort Hours-->
             <td height="100" style="text-align: right;">
-                {{PBI.remainingEffortHours}}
+                <h3>{{PBI.remainingEffortHours}}</h3>
             </td>
         </tr>
         {% endfor %}
