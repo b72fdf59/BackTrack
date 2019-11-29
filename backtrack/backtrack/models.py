@@ -41,6 +41,10 @@ class PBI(models.Model):
     def removeFromSprint(self, sprint):
         self.sprint = None
 
+    @transition(field=status, source='P', target='N')
+    def markNotDone(self):
+        pass
+
     @transition(field=status, source='P', target='D')
     def markDone(self):
         pass

@@ -202,6 +202,7 @@ class RemovePBIfromSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessag
     def post(self, request, **kwargs):
         pbi = get_object_or_404(PBI, pk=self.kwargs['pbipk'])
         pbi.task.all().delete()
+        pbi.markNotDone()
         pbi.sprint = None
         pbi.save()
         return redirect(reverse('detail-sprint', kwargs={'pk': self.kwargs['pk'], 'spk': self.kwargs['spk']}))
