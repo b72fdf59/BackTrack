@@ -2,7 +2,20 @@
 {% block content %}
 <h1 class="page-header"><i class="fa fa-plus" id="A"></i> Add Task</h1>
 <div class="row placeholders"></div>
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert
+        {% if message.tags == "success" %} alert-success {% endif %}
+         {% if message.tags == "error" %} alert-danger {% endif %}
+         alert-dismissible">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <li{% if message.tags %} class="{{ message.tags }}" {% endif %} style="list-style:none">{{ message }}</li>
+    {% endfor %}
+    </div>
+    {% endif %}
+{% if PBI.TotalTaskHours < PBI.effort_hours %}
 <form action={% url 'add-task' pk=Project.id spk=Sprint.id pbipk=PBI.id %} method="POST">
+    {{ PBI.remainingHours }}
     {{ form.non_field_errors }}
     {% csrf_token %}
     <div class="form-group">
@@ -19,4 +32,25 @@
     </div>
     <button type="submit" class="btn btn-primary">Confirm</button>
 </form>
+{% else %}
+    <h3 style="color: indianred">Task capacity is full for this PBI</h3>
+    <form action={% url 'add-task' pk=Project.id spk=Sprint.id pbipk=PBI.id %} method="POST">
+    {{ PBI.remainingHours }}
+    {{ form.non_field_errors }}
+    {% csrf_token %}
+    <div class="form-group hidden-display">
+        {{form.summary.errors}}
+        {{form.summary.label_tag}}
+        {{form.summary}}
+        <small id="priority-small-text" class="form-text text-muted">This is the summary for this Task</small>
+    </div>
+    <div class="form-group hidden-display">
+        {{form.effort_hours.errors}}
+        {{form.effort_hours.label_tag}}
+        {{form.effort_hours}}
+        <small id="priority-small-text" class="form-text text-muted">This is the Effort hours for this Task</small>
+    </div>
+    <button type="submit" class="btn btn-primary hidden-display">Confirm</button>
+    </form>
+{% endif %}
 {% endblock content %}

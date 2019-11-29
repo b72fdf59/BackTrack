@@ -37,7 +37,13 @@ class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         # Add PBI and Project to task before saving
         form.instance.pbi = get_object_or_404(
             PBI, pk=self.kwargs['pbipk'])
-        return super().form_valid(form)
+        if (form.instance.effort_hours + form.instance.pbi.TotalTaskHours) <= form.instance.pbi.effort_hours:
+            return super().form_valid(form)
+        else:
+            # return super().form_invalid(form)
+            response = super().form_invalid(form)
+            messages.error(self.request, "Please add effort hour fot the Task within PBI capacity")
+            return response
 
 
 class DetailTask(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
