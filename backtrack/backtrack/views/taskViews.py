@@ -8,6 +8,7 @@ from ..helpers import addContext
 from django.views.generic import CreateView, View, TemplateView, UpdateView, DeleteView
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 import json
+from ..forms import TaskDetailForm
 
 
 class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
@@ -50,10 +51,15 @@ class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
 class DetailTask(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     pk_url_kwarg = 'taskpk'
     model = Task
-    fields = ['summary', 'effort_hours', 'projectParticipant']
+    form_class = TaskDetailForm
     login_url = '/accounts/login'
     template_name = 'backtrack/Taskdetail.html'
     success_message = "Task was updated"
+
+    def get_form_kwargs(self, *args, **kwargs):
+        kwargs = super(DetailTask, self).get_form_kwargs(**kwargs)
+        kwargs['Project'] = self.kwargs['pk']
+        return kwargs
 
     def get_context_data(self, **kwargs):
         sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
