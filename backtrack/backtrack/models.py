@@ -57,7 +57,7 @@ class PBI(models.Model):
 
     @transition(field=status, source='P', target='D')
     def markDone(self):
-        self.delete()
+        self.delete(transition=1)
         self.priority = 0
 
     @transition(field=status, source='P', target='U')
@@ -72,7 +72,8 @@ class PBI(models.Model):
             if pbi.priority > self.priority:
                 pbi.priority -= 1
                 pbi.save()
-        # super().delete(*args, **kwargs)
+        if not hasattr(kwargs, "transition"):
+                super().delete(*args, **kwargs)
 
     def __str__(self):
         return self.summary
