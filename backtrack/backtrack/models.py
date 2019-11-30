@@ -31,13 +31,12 @@ class PBI(models.Model):
 
     @property
     def TotalTaskHours(self):
-        TaskHours = 0
-        TaskList = self.task.all()
-        for task in TaskList:
-            if task.pbi.id == self.id:
-                TaskHours += task.effort_hours
-        return TaskHours
-
+        from django.db.models import Sum
+        myDict = self.task.all().aggregate(Sum('effort_hours'))
+        taskHours = myDict['effort_hours__sum']
+        if not taskHours:
+            taskHours = 0
+        return taskHours
 
     @property
     def remainingEffortHours(self):
@@ -73,7 +72,7 @@ class PBI(models.Model):
                 pbi.priority -= 1
                 pbi.save()
         if not hasattr(kwargs, "transition"):
-                super().delete(*args, **kwargs)
+            super().delete(*args, **kwargs)
 
     def __str__(self):
         return self.summary
@@ -100,7 +99,6 @@ class Project(models.Model):
 
     class Meta:
         db_table = "Project"
-
 
 
 class Profile(models.Model):

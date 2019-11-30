@@ -63,7 +63,7 @@ class InviteMember(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
         # Add context variables for sidebar
         context = addContext(self, context)
         return context
-    
+
     def test_func(self):
         # Get User
         user = self.request.user
@@ -119,7 +119,7 @@ class EmailMember(LoginRequiredMixin, UserPassesTestMixin, View):
             return HttpResponse()
         else:
             return HttpResponseForbidden("User does not have an email")
-    
+
     def test_func(self):
         # Get User
         user = self.request.user
@@ -132,7 +132,7 @@ class EmailMember(LoginRequiredMixin, UserPassesTestMixin, View):
         return False
 
 
-class AddDeveloper(LoginRequiredMixin, UserPassesTestMixin, View):
+class AddDeveloper(LoginRequiredMixin, View):
     model = ProjectParticipant
     login_url = '/accounts/login'
 
@@ -155,20 +155,9 @@ class AddDeveloper(LoginRequiredMixin, UserPassesTestMixin, View):
         else:
             messages.error("Only Developers can be added with This link")
         return redirect(reverse('home'))
-    
-    def test_func(self):
-        # Get User
-        user = self.request.user
-        # Get project from the URL
-        project = get_object_or_404(Project, pk=self.kwargs['pk'])
-        if user.projectParticipant.filter(project__complete=False).exists():
-            userProject = user.projectParticipant.get(
-                project__complete=False).project
-            return userProject.pk == project.pk
-        return False
 
 
-class AddManager(LoginRequiredMixin, UserPassesTestMixin, View):
+class AddManager(LoginRequiredMixin, View):
     model = ProjectParticipant
     login_url = '/accounts/login'
 
@@ -184,14 +173,3 @@ class AddManager(LoginRequiredMixin, UserPassesTestMixin, View):
         else:
             messages.error("Only Managers can be added with This link")
         return redirect(reverse('home'))
-
-    def test_func(self):
-        # Get User
-        user = self.request.user
-        # Get project from the URL
-        project = get_object_or_404(Project, pk=self.kwargs['pk'])
-        if user.projectParticipant.filter(project__complete=False).exists():
-            userProject = user.projectParticipant.get(
-                project__complete=False).project
-            return userProject.pk == project.pk
-        return False

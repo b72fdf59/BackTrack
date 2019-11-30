@@ -42,10 +42,8 @@ class AddTask(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         else:
             # return super().form_invalid(form)
             response = super().form_invalid(form)
-            messages.error(self.request, "Please add effort hour fot the Task within PBI capacity")
+            messages.error(self.request, "Please add effort hour for the Task within PBI capacity")
             return response
-
-
 class DetailTask(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):
     pk_url_kwarg = 'taskpk'
     model = Task
