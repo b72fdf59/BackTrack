@@ -52,13 +52,6 @@ class InviteMember(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
                     # If a user has a project which is not complete exclude him.
                     developers = developers.exclude(pk=user.pk)
         context['Developers'] = developers
-
-        for user in managers:
-            if user.projectParticipant.all().exists:
-                if user.projectParticipant.filter(project__complete=False).exists():
-                    # If a user has a project which is not complete exclude him.
-                    managers = managers.exclude(pk=user.pk)
-
         context['Managers'] = managers
         # Add context variables for sidebar
         context = addContext(self, context)
