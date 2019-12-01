@@ -57,6 +57,7 @@ class SprintDetail(LoginRequiredMixin, UserPassesTestMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         sprint = get_object_or_404(Sprint, pk=self.kwargs['spk'])
+        # projPart = self.request.user.projectParticipant
 
         # Get PBI for current sprint
         PBIList = getPBIfromProj(

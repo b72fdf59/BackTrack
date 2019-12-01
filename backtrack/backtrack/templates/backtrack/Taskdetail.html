@@ -50,27 +50,30 @@
     <input type="hidden" value={{Task.id}} name='Task' />
     <input type="hidden" value={{Project.id}} name="ProjectID" />
     <input type="hidden" value={{sprint.id}} name="SprintID" />
+    {% if ProjectParticipant.role == "DT" and ProjectParticipant.user.username == Task.projectParticipant.user.username %}
     <button type="submit" class="btn btn-primary" style="margin-top: 0.5em;">Start Task</button>
+    {% endif %}
     {% endif %}
 </form>
 
 {% if Task.status == 'P' and sprint.available %}
 <form action={% url 'task-done' %} method="POST">
     {% csrf_token %}
-
     <input type="hidden" value={{Task.id}} name='Task' />
     <input type="hidden" value={{Project.id}} name="ProjectID" />
     <input type="hidden" value={{sprint.id}} name="SprintID" />
+    {% if ProjectParticipant.role == "DT" and ProjectParticipant.user.username == Task.projectParticipant.user.username %}
     <button type="submit" class="btn btn-primary" style="margin-top: 0.5em;">Finish Task</button>
+    {% endif %}
 </form>
 <form action={% url 'task-not-done' %} method="POST">
     {% csrf_token %}
-
     <input type="hidden" value={{Task.id}} name='Task' />
     <input type="hidden" value={{Project.id}} name="ProjectID" />
     <input type="hidden" value={{sprint.id}} name="SprintID" />
+    {% if ProjectParticipant.role == "DT" and ProjectParticipant.user.username == Task.projectParticipant.user.username %}
     <button type="submit" class="btn btn-primary" style="margin-top: 0.5em;">Task Not Done</button>
-
+    {% endif %}
 </form>
 {% endif %}
 {% endblock content %}

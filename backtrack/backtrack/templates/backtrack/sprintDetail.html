@@ -156,7 +156,9 @@
                                     <p class="hidden-display"> {{ tk.id }}</p>
                                     {% if sprint.available %}
                                     <div class="card-footer text-center">
-                                        {% if ProjectParticipant.role == "DT" %}
+                                        {% if ProjectParticipant.role == "DT" and not tk.projectParticipant %}
+                                        <button type="button" class="btn btn-primary btn-sm not-done">Start</button>
+                                        {% elif ProjectParticipant.role == "DT" and ProjectParticipant.user.username == tk.projectParticipant.user.username %}
                                         <button type="button" class="btn btn-primary btn-sm not-done">Start</button>
                                         {% endif %}
                                     </div>
@@ -200,7 +202,7 @@
                                     <div class="card-footer" style="padding: 1px 5px 5px 4px">
                                         {% if sprint.available %}
                                         <div class="row">
-                                            {% if ProjectParticipant.role == "DT" %}
+                                            {% if ProjectParticipant.role == "DT" and ProjectParticipant.user.username == tk.projectParticipant.user.username %}
                                             <div class="col-lg-6"><button type="button"
                                                     class="btn btn-primary btn-sm in-progress-first"
                                                     style="padding: 1px;font-size:0.8em"> Not Done
