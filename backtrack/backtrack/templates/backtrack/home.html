@@ -2,7 +2,7 @@
 {% block content %}
 <h1 class="page-header"><i class="fa fa-home"></i> Home </h1>
 <ul class="messages" style="padding:0;">
-{% if messages %}
+    {% if messages %}
     {% for message in messages %}
     <div class="alert alert-success alert-dismissible">
         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
@@ -10,11 +10,23 @@
             {% endfor %}
     </div>
 
-{% endif %}
+    {% endif %}
 </ul>
 <div class="row placeholders"></div>
 <h1 id="X">Hello {{user.first_name}} !</h1>
 <h2>Welcome to your collaboration home.</h2>
+{% if ProjectParticipant %}
+<h3 style="text-align: center;">You are currently wokring as a
+    {% if ProjectParticipant.role == "PO" %} 
+    Product Owner
+    {% elif ProjectParticipant.role == "DT" %}
+    Development Team Member
+    {% else %}
+    Manager
+    {% endif %}
+    on Project : {{Project.name}}
+</h3>
+{% endif %}
 {% if not Project and User.profile.role == "D"%}
 <h3 style="text-align:center;margin-top:3rem;">Start a Project Now!</h3>
 <div style="text-align:center;margin-top:2rem;">
@@ -23,18 +35,16 @@
 {% endif %}
 
 <script>
-
-$(document).ready(function () {
-    if (localStorage.getItem("Message")) {
-        console.log("Here")
+    $(document).ready(function () {
+        if (localStorage.getItem("Message")) {
+            console.log("Here")
             var msg = localStorage.getItem("Message")
             $("ul.messages").append(
                 '<div class="alert alert-success alert-dismissible"> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> <li class = "error" style = "list-style:none" > ' +
                 msg + '</li> </div>')
             localStorage.clear();
         }
-})
-
+    })
 </script>
 
 {% endblock content %}
