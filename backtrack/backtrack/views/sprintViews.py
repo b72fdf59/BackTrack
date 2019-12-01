@@ -97,10 +97,9 @@ class AddPBIToSprint(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixi
 
         import json
         from ..models import PBI
-        # Do we get the correct sprint?
         # We have to do it this way cause we have a property available and not a field
         sprint = self.request.user.projectParticipant.get(
-            project__complete=False).project.sprint.all().order_by('-start')[0]
+            project__complete=False).project.sprint.get(complete=False)
         PBIid = request.POST.get('PBIs')
         if PBIid:
             # If the requqest was sent from the detail page
