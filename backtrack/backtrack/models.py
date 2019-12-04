@@ -71,7 +71,7 @@ class PBI(models.Model):
             if pbi.priority > self.priority:
                 pbi.priority -= 1
                 pbi.save()
-        if not hasattr(kwargs, "transition"):
+        if not "transition" in kwargs:
             super().delete(*args, **kwargs)
 
     def __str__(self):

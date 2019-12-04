@@ -32,14 +32,17 @@
         {{form.effort_hours}}
         <small id="priority-small-text" class="form-text text-muted">This is the Effort hours for this PBI</small>
     </div>
-    {% if PBI.status == "N" and ProjectParticipant.role == "PO" %}
+    {% if PBI.status == "N" or PBI.status == "U" %}
+    {% if ProjectParticipant.role == "PO" %}
     <button type="submit" class="btn btn-primary" style="height:2.4em;width:5em;text-align:center;">Confirm</button>
     {% endif %}
+    {% endif %}
 </form>
-{% csrf_token %}
-{% if PBI.status == "N" and ProjectParticipant.role == "PO" %}
+{% if PBI.status == "N" or PBI.status == "U" %}
+{% if ProjectParticipant.role == "PO" %}
 <a id="Delete" href="{% url 'delete-pbi' pk=Project.id pbipk=PBI.id %}" type="submit" class="btn btn-danger"
     style="height:2.4em;width:5em;text-align: center; margin-top: 0.5em;">Delete</a>
+{% endif %}
 {% endif %}
 
 
