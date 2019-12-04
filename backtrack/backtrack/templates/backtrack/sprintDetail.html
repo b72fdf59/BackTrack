@@ -19,13 +19,23 @@
         <li style="list-style:none"> The Sprint has already been completed</li>
     </div>
     {% endif %}
+    {% if sprint.notStarted %}
+    <div class="alert alert-danger alert-dismissible">
+        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+        <li style="list-style:none"> The Sprint has not started yet</li>
+    </div>
+    {% endif %}
 </ul>
 
 <div>
     <div class="col-md-10">
         <h1 class="page-header"><i class="fa fa-print"></i> Sprint Backlog </h1>
     </div>
-    {% if sprint.available is True %}
+    {% if sprint.notStarted%}
+    <div class="col-md-2">
+        <button type="button" class="btn btn-block btn-sm page-header" style="font-size:1.2em" disabled>Sprint has not started</button>
+    </div>
+    {% elif sprint.available is True %}
     {% if ProjectParticipant.role == "DT" %}
     <div class="col-md-2">
         <button type="button" id="complete-sprint" class="btn btn-primary btn-sm page-header"
@@ -34,10 +44,10 @@
     </div>
     {% endif %}
     {% else %}
-        <div class="col-md-2">
-              <button type="button" class="btn btn-block btn-sm page-header"
-            style="font-size:1.2em" disabled>Sprint is completed</button>
-        </div>
+    <div class="col-md-2">
+        <button type="button" class="btn btn-block btn-sm page-header" style="font-size:1.2em" disabled>Sprint is
+            completed</button>
+    </div>
     {% endif %}
 </div>
 

@@ -160,6 +160,13 @@ class Sprint(models.Model):
     complete = models.BooleanField(default=False)
 
     @property
+    def notStarted(self):
+        from datetime import date
+        if date.today() > self.start:
+            return False
+        return True
+
+    @property
     def available(self):
         return not self.complete
 
@@ -195,7 +202,7 @@ class Sprint(models.Model):
         remDays = self.end - now
         if remDays.days < 0:
             return 0
-        if remDays > self.end - self.end:
+        if remDays > self.end - self.start:
             return (self.end - self.start).days
         return remDays.days
 
