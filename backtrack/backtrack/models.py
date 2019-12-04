@@ -196,7 +196,7 @@ class Sprint(models.Model):
         if remDays.days < 0:
             return 0
         if remDays > self.end - self.end:
-            return self.end - self.start
+            return (self.end - self.start).days
         return remDays.days
 
     def get_absolute_url(self):
