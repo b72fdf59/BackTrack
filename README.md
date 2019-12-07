@@ -1,12 +1,12 @@
 # BackTrack
 
-###**Introduction to BackTrack**
+### Introduction to BackTrack
 
 BackTrack is a web-based application which helps project teams to plan, organize and track the whole project. It has all the essential features needed to perfectly manage an agile-based, scrum process framework project. 
 
-Idle developers can create a project, invite manager(s) and developers to join the development team. Using the various roles, users login into a platform designed just for them- a product owner can manage the product backlog, development teams can make appropriate changes to the sprint backlog and the managerâ€™s access rights limit him to just overlooking multiple projects while not making any changes.
+Idle developers can create a project, invite manager(s) and developers to join the development team. Using the various roles, users login into a platform designed just for them- a product owner can manage the product backlog, development teams can make appropriate changes to the sprint backlog and the manager’s access rights limit him to just overlooking multiple projects while not making any changes.
 
-###**An Outline of the Limitations of BackTrack**
+### An Outline of the Limitations of BackTrack
 
 Our project is almost the perfect tool for managing an agile-based project. Being just the first release, there is always scope for improvement and a few glitches which can be improved on. 
 
@@ -16,7 +16,7 @@ We would like to highlight some of the limitations of BackTrack:
 
 We were unable to fix these issues due to the paucity of time. We focused on the features which were of most value to the customer and hence, have not implemented a few features which did not have a high priority.
 
-###**Setup**
+### Setup
 
 Please do this setup in the following order:
 
