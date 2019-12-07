@@ -21,8 +21,8 @@ We were unable to fix these issues due to the paucity of time. We focused on the
 Please do this setup in the following order:
 
 1.	Open the file in your preferred code editor.
-2.	Create a virtual env for this project using the command ***pip env shell***
-3.	In the terminal, your current directory will be ***/backtrack***. You must change the directory to backtrack inside the current directory using the command ***cd backtrack/***
-4.	Now, to install all necessary libraries to support the smooth functioning of this application, install all packages using the command ***pip install -r requirements.txt***
-5.	On installing all packages successfully, apply all migrations for the app using the command ***python manage.py migrate***
-6.	On applying all migrations, you are ready to launch the app on your local server using the command ***python manage.py runserver***
+2.	Create a virtual env for this project using the command *** pip env shell ***
+3.	In the terminal, your current directory will be *** /backtrack ***. You must change the directory to backtrack inside the current directory using the command *** cd backtrack/ ***
+4.	Now, to install all necessary libraries to support the smooth functioning of this application, install all packages using the command *** pip install -r requirements.txt ***
+5.	On installing all packages successfully, apply all migrations for the app using the command *** python manage.py migrate ***
+6.	On applying all migrations, you are ready to launch the app on your local server using the command *** python manage.py runserver ***
