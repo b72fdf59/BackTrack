@@ -162,7 +162,7 @@ class Sprint(models.Model):
     @property
     def notStarted(self):
         from datetime import date
-        if date.today() > self.start:
+        if date.today() >= self.start:
             return False
         return True
 
